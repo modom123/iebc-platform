@@ -28,12 +28,15 @@ create or replace trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
 
--- Subscriptions & Payments
+-- Subscriptions
+-- silver  = $9/mo  — 0 consultants, 1 user
+-- gold    = $22/mo — 3 consultants, 5 users
+-- platinum= $42/mo — 5 consultants, 10 users
 create table if not exists public.subscriptions (
   id uuid default gen_random_uuid() primary key,
   user_id uuid references public.profiles(id) on delete cascade,
-  plan text check (plan in ('solo', 'business', 'pro', 'starter', 'growth')),
-  status text default 'active',
+  plan text check (plan in ('silver', 'gold', 'platinum')),
+  status text default 'active' check (status in ('active', 'canceled', 'past_due', 'trialing')),
   stripe_subscription_id text unique,
   current_period_end timestamptz,
   created_at timestamptz default now()
@@ -55,6 +58,7 @@ alter table public.iebc_fees enable row level security;
 create policy "Admin view fees" on public.iebc_fees for select using (
   exists (select 1 from public.profiles where id = auth.uid() and role = 'admin')
 );
+create policy "Service role manages fees" on public.iebc_fees for all using (auth.role() = 'service_role');
 
 -- Leads & Pipeline
 create table if not exists public.leads (
@@ -73,6 +77,7 @@ create policy "Staff manage leads" on public.leads for all using (
 );
 
 -- Consultant Assignments
+-- Gold: up to 3 consultants | Platinum: up to 5 consultants
 create table if not exists public.consultant_assignments (
   id uuid default gen_random_uuid() primary key,
   user_id uuid references public.profiles(id) on delete cascade,

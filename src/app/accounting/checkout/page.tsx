@@ -1,31 +1,74 @@
 'use client'
-import { useRouter, useSearchParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import { Suspense } from 'react'
 import Link from 'next/link'
 
 const plans = [
-  { id: 'solo', label: 'Solo', price: '$19/mo', desc: 'Perfect for freelancers and solo operators.' },
-  { id: 'business', label: 'Business', price: '$49/mo', desc: 'For growing teams up to 10 people.' },
-  { id: 'pro', label: 'Pro', price: '$99/mo', desc: 'Full platform access with priority support.' },
-  { id: 'starter', label: 'Starter Bundle', price: '$1,500 + $299/mo', desc: 'Formation + monthly consulting retainer.' },
-  { id: 'growth', label: 'Growth Bundle', price: '$3,500 + $499/mo', desc: 'Full formation, accounting & 60-consultant system.' },
+  {
+    id: 'silver',
+    label: 'Silver',
+    price: '$9',
+    period: '/mo',
+    consultants: 0,
+    users: 1,
+    features: [
+      'Core accounting dashboard',
+      'Income & expense tracking',
+      'Transaction history',
+      'Monthly financial summary',
+      'Email support',
+    ],
+    link: process.env.NEXT_PUBLIC_STRIPE_LINK_SILVER || '',
+    highlight: false,
+  },
+  {
+    id: 'gold',
+    label: 'Gold',
+    price: '$22',
+    period: '/mo',
+    consultants: 3,
+    users: 5,
+    features: [
+      'Everything in Silver',
+      '3 IEBC consultants assigned',
+      'Up to 5 team users',
+      'Invoice generation',
+      'Lead pipeline access',
+      'Priority support',
+    ],
+    link: process.env.NEXT_PUBLIC_STRIPE_LINK_GOLD || '',
+    highlight: true,
+  },
+  {
+    id: 'platinum',
+    label: 'Platinum',
+    price: '$42',
+    period: '/mo',
+    consultants: 5,
+    users: 10,
+    features: [
+      'Everything in Gold',
+      '5 IEBC consultants assigned',
+      'Up to 10 team users',
+      'Full accounting suite',
+      'Business formation support',
+      'AI workforce dispatch',
+      'Dedicated account manager',
+    ],
+    link: 'https://buy.stripe.com/bJe14h1aVeRj58CfrVgEg01',
+    highlight: false,
+  },
 ]
 
 function CheckoutInner() {
   const searchParams = useSearchParams()
   const canceled = searchParams.get('canceled')
 
-  const handleCheckout = async (plan: string) => {
-    const res = await fetch('/api/stripe/checkout', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ plan }),
-    })
-    const data = await res.json()
-    if (data.url) {
-      window.location.href = data.url
-    } else if (data.error === 'Unauthorized') {
-      window.location.href = '/auth/login'
+  const handleCheckout = (plan: typeof plans[0]) => {
+    if (plan.link) {
+      window.location.href = plan.link
+    } else {
+      alert(`${plan.label} plan coming soon. Please select Platinum or contact support.`)
     }
   }
 
@@ -34,28 +77,71 @@ function CheckoutInner() {
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-10">
           <h1 className="text-3xl font-bold text-[#0F4C81]">Choose Your Plan</h1>
-          <p className="text-gray-500 mt-2">Formation · Accounting · 60 Consultants. Cancel anytime.</p>
+          <p className="text-gray-500 mt-2">
+            Efficient by IEBC — Accounting · Consultants · Business Growth
+          </p>
           {canceled && (
-            <p className="mt-3 text-red-600 text-sm font-medium">Payment was canceled. Please try again.</p>
+            <p className="mt-3 text-red-600 text-sm font-medium">
+              Payment was canceled. Please try again.
+            </p>
           )}
         </div>
+
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {plans.map(p => (
-            <div key={p.id} className="bg-white p-6 rounded-xl border border-gray-200 hover:border-[#0F4C81] hover:shadow-md transition flex flex-col">
-              <h3 className="text-xl font-bold">{p.label}</h3>
-              <p className="text-2xl font-extrabold text-[#0F4C81] mt-2">{p.price}</p>
-              <p className="text-sm text-gray-500 mt-2 flex-1">{p.desc}</p>
-              <button
-                onClick={() => handleCheckout(p.id)}
-                className="btn-primary mt-4 text-center w-full"
-              >
-                Select {p.label}
-              </button>
+            <div
+              key={p.id}
+              className={`bg-white rounded-xl border flex flex-col transition ${
+                p.highlight
+                  ? 'border-[#0F4C81] shadow-lg scale-105'
+                  : 'border-gray-200 hover:border-[#0F4C81] hover:shadow-md'
+              }`}
+            >
+              {p.highlight && (
+                <div className="bg-[#0F4C81] text-white text-xs font-bold text-center py-1.5 rounded-t-xl tracking-widest uppercase">
+                  Most Popular
+                </div>
+              )}
+              <div className="p-6 flex flex-col flex-1">
+                <h3 className="text-xl font-bold text-slate-800">{p.label}</h3>
+                <div className="mt-3 mb-1">
+                  <span className="text-4xl font-extrabold text-[#0F4C81]">{p.price}</span>
+                  <span className="text-gray-500 text-sm">{p.period}</span>
+                </div>
+                <p className="text-xs text-gray-400 mb-4">
+                  {p.consultants > 0 ? `${p.consultants} IEBC consultants · ` : ''}
+                  Up to {p.users} user{p.users > 1 ? 's' : ''}
+                </p>
+                <ul className="space-y-2 flex-1 mb-6">
+                  {p.features.map((f, i) => (
+                    <li key={i} className="flex items-start gap-2 text-sm text-gray-600">
+                      <span className="text-green-500 mt-0.5">✓</span>
+                      {f}
+                    </li>
+                  ))}
+                </ul>
+                <button
+                  onClick={() => handleCheckout(p)}
+                  className={`w-full py-3 rounded-lg font-semibold transition text-sm ${
+                    p.highlight
+                      ? 'bg-[#0F4C81] text-white hover:bg-[#082D4F]'
+                      : 'border-2 border-[#0F4C81] text-[#0F4C81] hover:bg-blue-50'
+                  }`}
+                >
+                  {p.link ? `Get ${p.label}` : 'Coming Soon'}
+                </button>
+              </div>
             </div>
           ))}
         </div>
-        <div className="text-center mt-8">
-          <Link href="/" className="text-sm text-gray-500 hover:text-gray-700">← Back to Home</Link>
+
+        <p className="text-center text-xs text-gray-400 mt-8">
+          All plans billed monthly. Cancel anytime. Secure payments via Stripe.
+        </p>
+        <div className="text-center mt-4">
+          <Link href="/" className="text-sm text-gray-500 hover:text-gray-700">
+            ← Back to Home
+          </Link>
         </div>
       </div>
     </main>

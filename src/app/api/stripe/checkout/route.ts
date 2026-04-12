@@ -2,12 +2,12 @@ import { NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 
+// Map plan IDs to Stripe price IDs — set these in your Stripe dashboard
+// then add the price IDs to your environment variables
 const PRICE_IDS: Record<string, string> = {
-  solo: 'price_solo_tier',
-  business: 'price_business_tier',
-  pro: 'price_pro_tier',
-  starter: 'price_starter_bundle',
-  growth: 'price_growth_bundle',
+  silver:   process.env.STRIPE_PRICE_SILVER   || 'price_silver_placeholder',
+  gold:     process.env.STRIPE_PRICE_GOLD     || 'price_gold_placeholder',
+  platinum: process.env.STRIPE_PRICE_PLATINUM || 'price_platinum_placeholder',
 }
 
 export async function POST(req: Request) {
@@ -21,8 +21,8 @@ export async function POST(req: Request) {
     }
 
     const priceId = PRICE_IDS[plan]
-    if (!priceId) {
-      return NextResponse.json({ error: 'Invalid plan' }, { status: 400 })
+    if (!priceId || priceId.includes('placeholder')) {
+      return NextResponse.json({ error: 'Invalid plan or price not configured' }, { status: 400 })
     }
 
     const checkoutSession = await stripe.checkout.sessions.create({

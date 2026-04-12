@@ -31,7 +31,7 @@ export async function POST(req: Request) {
       customer_email: session.user.email,
       line_items: [{ price: priceId, quantity: 1 }],
       metadata: { user_id: session.user.id, plan },
-      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/accounting?session_id={CHECKOUT_SESSION_ID}`,
+      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/hub?subscribed=1`,
       cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/accounting/checkout?canceled=true`,
     })
 

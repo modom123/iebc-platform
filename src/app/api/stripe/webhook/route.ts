@@ -25,19 +25,58 @@ export async function POST(req: Request) {
     const plan = session.metadata?.plan
 
     if (userId && plan) {
-      await supabase.from('subscriptions').insert({
-        user_id: userId,
-        plan,
-        stripe_subscription_id: session.subscription,
-        status: 'active',
-        current_period_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-      })
+      // Upsert so re-subscriptions don't error
+      await supabase.from('subscriptions').upsert(
+        {
+          user_id: userId,
+          plan,
+          stripe_subscription_id: session.subscription as string,
+          stripe_customer_id: session.customer as string,
+          status: 'active',
+          current_period_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+        },
+        { onConflict: 'user_id' }
+      )
     }
+  }
+
+  if (event.type === 'customer.subscription.updated') {
+    const sub = event.data.object as Stripe.Subscription
+    const periodEnd = new Date((sub.current_period_end ?? 0) * 1000).toISOString()
+
+    await supabase
+      .from('subscriptions')
+      .update({
+        status: sub.status,
+        current_period_end: periodEnd,
+      })
+      .eq('stripe_subscription_id', sub.id)
+  }
+
+  if (event.type === 'customer.subscription.deleted') {
+    const sub = event.data.object as Stripe.Subscription
+
+    await supabase
+      .from('subscriptions')
+      .update({ status: 'canceled' })
+      .eq('stripe_subscription_id', sub.id)
   }
 
   if (event.type === 'invoice.payment_succeeded') {
     const invoice = event.data.object as Stripe.Invoice
     const feeCents = Math.round((invoice.amount_paid ?? 0) * 0.0076)
+
+    // Renew subscription period on successful payment
+    if (invoice.subscription) {
+      await supabase
+        .from('subscriptions')
+        .update({
+          status: 'active',
+          current_period_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+        })
+        .eq('stripe_subscription_id', invoice.subscription as string)
+    }
+
     await supabase.from('iebc_fees').insert({
       payment_intent_id: invoice.payment_intent,
       gross_amount_cents: invoice.amount_paid,

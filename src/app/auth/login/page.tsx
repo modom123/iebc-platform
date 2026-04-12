@@ -2,14 +2,17 @@
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
+import { Suspense } from 'react'
 
-export default function Login() {
+function LoginInner() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
   const router = useRouter()
+  const searchParams = useSearchParams()
+  const redirect = searchParams.get('redirect') || '/hub'
   const supabase = createClient()
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -21,7 +24,7 @@ export default function Login() {
       setError(error.message)
       setLoading(false)
     } else {
-      router.push('/accounting')
+      router.push(redirect)
       router.refresh()
     }
   }
@@ -79,5 +82,13 @@ export default function Login() {
         </div>
       </div>
     </main>
+  )
+}
+
+export default function Login() {
+  return (
+    <Suspense>
+      <LoginInner />
+    </Suspense>
   )
 }

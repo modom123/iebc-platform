@@ -8,7 +8,7 @@ const TIER_INFO: Record<string, { label: string; color: string; consultants: num
   platinum: { label: 'Platinum', color: 'bg-blue-100 text-[#0F4C81]',   consultants: 5, users: 10, price: '$42/mo' },
 }
 
-export default async function Hub() {
+export default async function Hub({ searchParams }: { searchParams?: Record<string, string> }) {
   const supabase = createServerSupabaseClient()
   const { data: { session } } = await supabase.auth.getSession()
   if (!session) redirect('/auth/login')
@@ -55,6 +55,17 @@ export default async function Hub() {
       </div>
 
       <div className="max-w-7xl mx-auto p-6 space-y-6">
+
+        {/* Subscription success banner */}
+        {searchParams?.subscribed === '1' && (
+          <div className="bg-green-50 border border-green-200 rounded-xl px-6 py-4 flex items-center gap-3">
+            <span className="text-2xl">🎉</span>
+            <div>
+              <p className="font-semibold text-green-800">Welcome to IEBC!</p>
+              <p className="text-sm text-green-700">Your subscription is active. Start exploring your dashboard below.</p>
+            </div>
+          </div>
+        )}
 
         {/* Welcome */}
         <div className="flex items-center justify-between">

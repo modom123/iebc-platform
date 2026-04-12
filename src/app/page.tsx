@@ -8,28 +8,28 @@ const services = [
   },
   {
     icon: '📊',
-    title: 'Efficient Accounting',
-    desc: 'Real-time income & expense tracking, invoicing, financial summaries, and cash flow visibility in one dashboard.',
+    title: 'Enterprise Accounting',
+    desc: 'Full accounting suite: transactions, invoices, bills, budgets, reconciliation, reports, tax center, and cash flow forecasting.',
   },
   {
     icon: '🤖',
-    title: '60-Consultant AI Workforce',
-    desc: 'A team of 60 specialized consultants across departments — routed to your business automatically based on your needs.',
+    title: 'AI Receipt Scanner',
+    desc: 'Snap a photo of any receipt or invoice. Claude AI instantly extracts vendor, amount, date, and category — no manual entry.',
   },
   {
     icon: '🔥',
     title: 'Lead Pipeline & CRM',
-    desc: 'Track hot leads, manage your pipeline, and convert prospects into clients with built-in pipeline management.',
+    desc: 'Track hot leads, manage your pipeline, convert prospects into clients, and measure estimated deal value in real time.',
   },
   {
     icon: '📋',
     title: 'Task & Project Hub',
-    desc: 'Centralized Master Hub for tracking active builds, tasks due, and team assignments across your entire operation.',
+    desc: 'Master Hub for tracking tasks, active projects, team assignments, mileage, and billable hours across your operation.',
   },
   {
-    icon: '💳',
-    title: 'Subscription Billing',
-    desc: 'Transparent monthly plans with Stripe-powered secure billing. Upgrade or cancel anytime with no hidden fees.',
+    icon: '👥',
+    title: 'AI Consultant Workforce',
+    desc: '60 specialized consultants across every department — automatically routed to your business based on your needs.',
   },
 ]
 
@@ -42,8 +42,17 @@ const plans = [
     consultants: 0,
     users: 1,
     highlight: false,
-    features: ['Core accounting dashboard', 'Income & expense tracking', 'Transaction history', 'Email support'],
-    link: '/accounting/checkout',
+    features: [
+      'Full accounting dashboard',
+      'Income & expense tracking',
+      'Invoices & estimates',
+      'AI receipt scanner',
+      'Mileage & time tracker',
+      'Reports (P&L, cash flow)',
+      'CSV export',
+      'Email support',
+    ],
+    link: '/auth/signup?plan=silver',
   },
   {
     id: 'gold',
@@ -53,8 +62,17 @@ const plans = [
     consultants: 3,
     users: 5,
     highlight: true,
-    features: ['Everything in Silver', '3 IEBC consultants', 'Up to 5 users', 'Invoice generation', 'Lead pipeline', 'Priority support'],
-    link: '/accounting/checkout',
+    features: [
+      'Everything in Silver',
+      '3 IEBC consultants assigned',
+      'Up to 5 team users',
+      'Lead pipeline & CRM',
+      'Task management',
+      'Budgets & reconciliation',
+      'Auto-categorization rules',
+      'Priority support',
+    ],
+    link: '/auth/signup?plan=gold',
   },
   {
     id: 'platinum',
@@ -64,8 +82,17 @@ const plans = [
     consultants: 5,
     users: 10,
     highlight: false,
-    features: ['Everything in Gold', '5 IEBC consultants', 'Up to 10 users', 'Full accounting suite', 'Business formation', 'AI workforce dispatch', 'Dedicated account manager'],
-    link: 'https://buy.stripe.com/bJe14h1aVeRj58CfrVgEg01',
+    features: [
+      'Everything in Gold',
+      '5 IEBC consultants assigned',
+      'Up to 10 team users',
+      'Business formation wizard',
+      'Tax center & obligations',
+      'Projects & job costing',
+      'AI workforce dispatch',
+      'Dedicated account manager',
+    ],
+    link: '/auth/signup?plan=platinum',
   },
 ]
 
@@ -77,10 +104,11 @@ export default function Home() {
       <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-gray-200 px-6 py-4 flex justify-between items-center">
         <span className="text-2xl font-bold text-[#0F4C81]">IEBC</span>
         <div className="flex gap-4 text-sm items-center">
-          <Link href="/hub" className="hover:text-[#0F4C81] hidden md:block">Master Hub</Link>
-          <Link href="/accounting" className="hover:text-[#0F4C81] hidden md:block">Accounting</Link>
-          <Link href="#pricing" className="hover:text-[#0F4C81] hidden md:block">Pricing</Link>
-          <Link href="/accounting/checkout" className="bg-[#0F4C81] text-white px-4 py-2 rounded-lg font-semibold hover:bg-[#082D4F]">Get Started</Link>
+          <Link href="/hub" className="hover:text-[#0F4C81] hidden md:block text-gray-600">Master Hub</Link>
+          <Link href="/accounting" className="hover:text-[#0F4C81] hidden md:block text-gray-600">Accounting</Link>
+          <Link href="#pricing" className="hover:text-[#0F4C81] hidden md:block text-gray-600">Pricing</Link>
+          <Link href="/auth/login" className="hidden md:block text-gray-600 hover:text-[#0F4C81] font-medium">Sign In</Link>
+          <Link href="/auth/signup" className="bg-[#0F4C81] text-white px-4 py-2 rounded-lg font-semibold hover:bg-[#082D4F]">Get Started</Link>
         </div>
       </nav>
 
@@ -94,18 +122,18 @@ export default function Home() {
           Start Working <span className="text-[#0F4C81]">On</span> It.
         </h1>
         <p className="text-xl text-slate-600 max-w-2xl mx-auto mb-10">
-          Formation · Accounting · 60 Consultants · AI Workforce.<br />
-          <span className="font-semibold text-slate-800">Avg. 22 hrs saved per week.</span>
+          Formation · Accounting · AI Scanner · 60 Consultants.<br />
+          <span className="font-semibold text-slate-800">The accounting platform built to beat QuickBooks.</span>
         </p>
         <div className="flex gap-4 justify-center flex-wrap">
-          <Link href="/accounting/checkout" className="btn-primary text-base">
-            🚀 Get Started
+          <Link href="/auth/signup" className="btn-primary text-base">
+            🚀 Start Free — From $9/mo
           </Link>
-          <Link href="/accounting" className="btn-secondary text-base">
-            View Dashboard
+          <Link href="/auth/login" className="btn-secondary text-base">
+            Sign In
           </Link>
         </div>
-        <p className="mt-6 text-sm text-gray-400">No contracts · Cancel anytime · Starts at $9/mo</p>
+        <p className="mt-6 text-sm text-gray-400">No contracts · Cancel anytime · Setup in 2 minutes</p>
       </header>
 
       {/* Services */}
@@ -127,10 +155,52 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Why IEBC vs competitors */}
+      <section className="py-16 px-6 bg-gray-50">
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-10">
+            <h2 className="text-3xl font-bold text-[#0F4C81]">Why Choose IEBC?</h2>
+            <p className="text-gray-500 mt-2">Everything QuickBooks, Xero, and NetSuite offer — plus what they don&apos;t.</p>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {[
+              {
+                title: 'vs. QuickBooks',
+                points: ['AI receipt scanner built in', 'Lead CRM included', 'Business formation wizard', 'Starts at $9 vs $30/mo'],
+              },
+              {
+                title: 'vs. Xero',
+                points: ['60-consultant AI workforce', 'Mileage & time tracking', 'Estimates → Invoice conversion', 'Task & project management'],
+              },
+              {
+                title: 'vs. NetSuite',
+                points: ['No 12-month contracts', 'Setup in minutes, not months', '10% the price', 'Built for small business owners'],
+              },
+            ].map((col, i) => (
+              <div key={i} className="bg-white rounded-xl border border-gray-200 p-6">
+                <h3 className="font-bold text-[#0F4C81] mb-3">{col.title}</h3>
+                <ul className="space-y-2">
+                  {col.points.map((p, j) => (
+                    <li key={j} className="flex items-start gap-2 text-sm text-gray-600">
+                      <span className="text-green-500 mt-0.5 shrink-0">✓</span>{p}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Stats */}
       <section className="py-16 px-6 bg-[#0F4C81] text-white">
         <div className="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-          {[['22 hrs', 'Saved per week'], ['60', 'Consultants on demand'], ['$10M', 'MRR target'], ['3 tiers', 'Starting at $9/mo']].map(([val, label], i) => (
+          {[
+            ['22 hrs', 'Saved per week'],
+            ['60', 'Consultants on demand'],
+            ['15+', 'Accounting modules'],
+            ['$9/mo', 'Starting price'],
+          ].map(([val, label], i) => (
             <div key={i}>
               <p className="text-3xl font-extrabold">{val}</p>
               <p className="text-sm text-blue-200 mt-1">{label}</p>
@@ -140,7 +210,7 @@ export default function Home() {
       </section>
 
       {/* Pricing */}
-      <section id="pricing" className="py-20 px-6 bg-gray-50">
+      <section id="pricing" className="py-20 px-6 bg-white">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-12">
             <h2 className="text-3xl font-bold text-[#0F4C81]">Simple, Transparent Pricing</h2>
@@ -171,7 +241,7 @@ export default function Home() {
                   <ul className="space-y-2 flex-1 mb-6">
                     {p.features.map((f, i) => (
                       <li key={i} className="flex items-start gap-2 text-sm text-gray-600">
-                        <span className="text-green-500 mt-0.5">✓</span>{f}
+                        <span className="text-green-500 mt-0.5 shrink-0">✓</span>{f}
                       </li>
                     ))}
                   </ul>
@@ -183,7 +253,7 @@ export default function Home() {
                         : 'border-2 border-[#0F4C81] text-[#0F4C81] hover:bg-blue-50'
                     }`}
                   >
-                    Get {p.label}
+                    Get Started — {p.label}
                   </Link>
                 </div>
               </div>
@@ -196,12 +266,17 @@ export default function Home() {
       </section>
 
       {/* Footer CTA */}
-      <section className="py-16 px-6 bg-white text-center">
+      <section className="py-16 px-6 bg-gray-50 text-center">
         <h2 className="text-2xl font-bold text-[#0F4C81] mb-3">Ready to build a better business?</h2>
-        <p className="text-gray-500 mb-6">Join IEBC and get your formation, accounting, and consultant team in one place.</p>
-        <Link href="/accounting/checkout" className="btn-primary">
-          Start Today — From $9/mo
-        </Link>
+        <p className="text-gray-500 mb-6">Join IEBC and get formation, accounting, consultants, and AI tools in one place.</p>
+        <div className="flex gap-4 justify-center">
+          <Link href="/auth/signup" className="btn-primary">
+            Start Today — From $9/mo
+          </Link>
+          <Link href="/auth/login" className="btn-secondary px-6 py-3 border-2 border-[#0F4C81] text-[#0F4C81] rounded-lg font-semibold hover:bg-blue-50">
+            Sign In
+          </Link>
+        </div>
       </section>
 
     </main>

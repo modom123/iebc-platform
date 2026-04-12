@@ -1,0 +1,20 @@
+iebc-platform/
+├── src/
+│   ├── app/
+│   │   ├── layout.tsx
+│   │   ├── globals.css
+│   │   ├── page.tsx
+│   │   ├── accounting/page.tsx
+│   │   ├── accounting/checkout/page.tsx
+│   │   ├── hub/page.tsx
+│   │   └── api/
+│   │       ├── stripe/checkout/route.ts
+│   │       └── stripe/webhook/route.ts
+│   ├── lib/
+│   │   ├── supabase/client.ts
+│   │   ├── supabase/server.ts
+│   │   └── stripe.ts
+│   └── middleware.ts
+├── supabase-schema.sql
+├── .env.local
+└── package.json

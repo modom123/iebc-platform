@@ -24,7 +24,7 @@ export async function middleware(request: NextRequest) {
 
   const { data: { session } } = await supabase.auth.getSession()
 
-  const protectedPaths = ['/accounting', '/hub']
+  const protectedPaths = ['/accounting', '/hub', '/settings', '/admin']
   if (protectedPaths.some(p => request.nextUrl.pathname.startsWith(p)) && !session) {
     return NextResponse.redirect(new URL('/auth/login', request.url))
   }
@@ -32,4 +32,4 @@ export async function middleware(request: NextRequest) {
   return response
 }
 
-export const config = { matcher: ['/accounting/:path*', '/hub/:path*'] }
+export const config = { matcher: ['/accounting/:path*', '/hub/:path*', '/settings/:path*', '/admin/:path*'] }

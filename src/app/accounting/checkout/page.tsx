@@ -18,7 +18,7 @@ const plans = [
       'Monthly financial summary',
       'Email support',
     ],
-    link: process.env.NEXT_PUBLIC_STRIPE_LINK_SILVER || '',
+    link: process.env.NEXT_PUBLIC_STRIPE_LINK_SILVER || 'https://buy.stripe.com/dRm7sF9Hr6kNbx0frVgEg03',
     highlight: false,
   },
   {

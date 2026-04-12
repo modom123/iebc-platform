@@ -47,6 +47,8 @@ export default async function Hub() {
           <Link href="/accounting" className="hover:text-[#0F4C81] text-gray-600">Accounting</Link>
           <Link href="/hub/leads" className="hover:text-[#0F4C81] text-gray-600">Leads</Link>
           <Link href="/hub/tasks" className="hover:text-[#0F4C81] text-gray-600">Tasks</Link>
+          <Link href="/hub/team" className="hover:text-[#0F4C81] text-gray-600">Team</Link>
+          <Link href="/hub/formation" className="hover:text-[#0F4C81] text-gray-600">Formation</Link>
           <Link href="/settings" className="hover:text-[#0F4C81] text-gray-600">Settings</Link>
           {!sub && <Link href="/accounting/checkout" className="bg-[#0F4C81] text-white px-3 py-1 rounded-lg">Upgrade</Link>}
         </div>
@@ -91,6 +93,8 @@ export default async function Hub() {
             { href: '/hub/leads', icon: '🔥', label: 'Add Lead', sub: 'Manage pipeline' },
             { href: '/accounting/invoices/new', icon: '📄', label: 'New Invoice', sub: 'Bill a customer' },
             { href: '/accounting/transactions', icon: '💰', label: 'Log Transaction', sub: 'Record income/expense' },
+            { href: '/hub/team', icon: '👥', label: 'Team', sub: 'Manage members' },
+            { href: '/hub/formation', icon: '🏛️', label: 'Formation', sub: 'Set up your entity' },
           ].map(({ href, icon, label, sub }) => (
             <Link key={href} href={href} className="bg-white border border-gray-200 rounded-xl p-4 flex items-center gap-3 hover:border-[#0F4C81] hover:shadow-sm transition">
               <span className="text-2xl">{icon}</span>

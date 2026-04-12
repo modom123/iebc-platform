@@ -94,6 +94,8 @@ export default async function SettingsPage() {
               { href: '/hub', label: 'Master Hub', icon: '🏢' },
               { href: '/hub/leads', label: 'Lead Pipeline', icon: '🔥' },
               { href: '/hub/tasks', label: 'Tasks', icon: '✅' },
+              { href: '/hub/team', label: 'Team Management', icon: '👥' },
+              { href: '/hub/formation', label: 'Business Formation', icon: '🏛️' },
             ].map(({ href, label, icon }) => (
               <Link key={href} href={href} className="flex items-center gap-2 p-3 border border-gray-200 rounded-lg hover:border-[#0F4C81] hover:bg-blue-50 transition text-sm font-medium text-gray-700">
                 <span>{icon}</span> {label}

@@ -36,7 +36,7 @@ const plans = [
       'Lead pipeline access',
       'Priority support',
     ],
-    link: process.env.NEXT_PUBLIC_STRIPE_LINK_GOLD || '',
+    link: process.env.NEXT_PUBLIC_STRIPE_LINK_GOLD || 'https://buy.stripe.com/4gM8wJ8Dn10teJc6VpgEg02',
     highlight: true,
   },
   {

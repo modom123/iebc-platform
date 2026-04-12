@@ -1,185 +1,168 @@
-import Link from 'next/link'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
-
-const TIER_LABELS: Record<string, { label: string; color: string; consultants: number; users: number }> = {
-  silver:   { label: 'Silver',   color: 'bg-gray-100 text-gray-700',   consultants: 0, users: 1 },
-  gold:     { label: 'Gold',     color: 'bg-yellow-100 text-yellow-700', consultants: 3, users: 5 },
-  platinum: { label: 'Platinum', color: 'bg-blue-100 text-[#0F4C81]',   consultants: 5, users: 10 },
-}
+import { redirect } from 'next/navigation'
+import Link from 'next/link'
 
 export default async function Accounting() {
   const supabase = createServerSupabaseClient()
   const { data: { session } } = await supabase.auth.getSession()
+  if (!session) redirect('/auth/login')
 
-  let sub = null
-  let transactions: { date: string; vendor: string; amount: number; type: 'credit' | 'debit' }[] = []
+  const userId = session.user.id
+  const now = new Date()
+  const firstOfMonth = new Date(now.getFullYear(), now.getMonth(), 1).toISOString().split('T')[0]
+  const today = now.toISOString().split('T')[0]
 
-  if (session) {
-    const { data } = await supabase
-      .from('subscriptions')
-      .select('plan, status, current_period_end')
-      .eq('user_id', session.user.id)
-      .single()
-    sub = data
+  const [
+    { data: txAll },
+    { data: txMonth },
+    { data: invoices },
+    { data: sub },
+    { data: recentTx },
+  ] = await Promise.all([
+    supabase.from('transactions').select('type,amount').eq('user_id', userId),
+    supabase.from('transactions').select('type,amount').eq('user_id', userId).gte('date', firstOfMonth),
+    supabase.from('invoices').select('status,total,amount_paid').eq('user_id', userId),
+    supabase.from('subscriptions').select('plan,status').eq('user_id', userId).single(),
+    supabase.from('transactions').select('*').eq('user_id', userId).order('date', { ascending: false }).limit(8),
+  ])
 
-    // Fetch recent IEBC fee records as a proxy for transaction history
-    const { data: fees } = await supabase
-      .from('iebc_fees')
-      .select('created_at, gross_amount_cents, iebc_fee_cents')
-      .order('created_at', { ascending: false })
-      .limit(10)
+  const totalIncome = (txAll || []).filter(t => t.type === 'income').reduce((s, t) => s + Number(t.amount), 0)
+  const totalExpenses = (txAll || []).filter(t => t.type === 'expense').reduce((s, t) => s + Number(t.amount), 0)
+  const netProfit = totalIncome - totalExpenses
+  const monthIncome = (txMonth || []).filter(t => t.type === 'income').reduce((s, t) => s + Number(t.amount), 0)
+  const monthExpenses = (txMonth || []).filter(t => t.type === 'expense').reduce((s, t) => s + Number(t.amount), 0)
 
-    transactions = (fees || []).map(f => ({
-      date: new Date(f.created_at).toLocaleDateString(),
-      vendor: 'Stripe Payment',
-      amount: f.gross_amount_cents / 100,
-      type: 'credit' as const,
-    }))
-  }
+  const outstanding = (invoices || [])
+    .filter(i => i.status !== 'paid' && i.status !== 'void')
+    .reduce((s, i) => s + (Number(i.total) - Number(i.amount_paid)), 0)
+  const overdueCount = (invoices || []).filter(i => i.status === 'overdue').length
 
-  const tier = sub?.plan ? TIER_LABELS[sub.plan] : null
+  const fmt = (n: number) => '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 
   return (
-    <main className="min-h-screen bg-gray-50 text-slate-900 p-6">
-      <div className="max-w-6xl mx-auto space-y-6">
-
-        {/* Header */}
-        <div className="bg-white p-6 rounded-xl border border-gray-200 flex justify-between items-center">
-          <div>
-            <h1 className="text-2xl font-bold text-[#0F4C81]">📊 Efficient by IEBC</h1>
-            {tier && (
-              <span className={`inline-block mt-1 px-3 py-0.5 rounded-full text-xs font-bold uppercase tracking-wide ${tier.color}`}>
-                {tier.label} Plan · {tier.consultants > 0 ? `${tier.consultants} consultants · ` : ''}Up to {tier.users} user{tier.users > 1 ? 's' : ''}
-              </span>
-            )}
-          </div>
-          <div className="flex gap-3 items-center">
-            {!session && (
-              <Link href="/accounting/checkout" className="btn-primary text-sm">Upgrade</Link>
-            )}
-            <Link href="/" className="text-sm text-gray-500 hover:text-gray-700">← Public Site</Link>
-          </div>
+    <main className="min-h-screen bg-gray-50 text-slate-900">
+      {/* Top Nav */}
+      <div className="bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+        <div className="flex items-center gap-4">
+          <Link href="/" className="text-xl font-bold text-[#0F4C81]">IEBC</Link>
+          <span className="text-gray-300">|</span>
+          <span className="text-sm font-semibold text-gray-700">Efficient Accounting</span>
         </div>
+        <div className="flex gap-3 text-sm">
+          <Link href="/accounting/transactions" className="hover:text-[#0F4C81] text-gray-600">Transactions</Link>
+          <Link href="/accounting/invoices" className="hover:text-[#0F4C81] text-gray-600">Invoices</Link>
+          <Link href="/accounting/reports" className="hover:text-[#0F4C81] text-gray-600">Reports</Link>
+          <Link href="/hub" className="hover:text-[#0F4C81] text-gray-600">Hub</Link>
+          {!sub && <Link href="/accounting/checkout" className="bg-[#0F4C81] text-white px-3 py-1 rounded-lg">Upgrade</Link>}
+        </div>
+      </div>
 
-        {/* Financial Summary */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+      <div className="max-w-7xl mx-auto p-6 space-y-6">
+
+        {/* KPI Cards */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
-            ['Revenue', '$24,850', 'text-green-700'],
-            ['Expenses', '$9,320', 'text-red-600'],
-            ['Net Profit', '$15,530', 'text-green-700'],
-            ['Cash on Hand', '$47,200', 'text-[#0F4C81]'],
-          ].map(([l, v, color], i) => (
-            <div key={i} className="bg-white p-5 rounded-xl border border-gray-200">
-              <p className="text-sm text-gray-500">{l}</p>
-              <p className={`text-2xl font-bold ${color}`}>{v}</p>
+            { label: 'Total Revenue', value: fmt(totalIncome), sub: `${fmt(monthIncome)} this month`, color: 'text-green-700' },
+            { label: 'Total Expenses', value: fmt(totalExpenses), sub: `${fmt(monthExpenses)} this month`, color: 'text-red-600' },
+            { label: 'Net Profit', value: fmt(netProfit), sub: netProfit >= 0 ? 'Profitable' : 'Net loss', color: netProfit >= 0 ? 'text-green-700' : 'text-red-600' },
+            { label: 'Outstanding AR', value: fmt(outstanding), sub: overdueCount > 0 ? `${overdueCount} overdue` : 'No overdue', color: outstanding > 0 ? 'text-orange-600' : 'text-gray-700' },
+          ].map((card, i) => (
+            <div key={i} className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+              <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">{card.label}</p>
+              <p className={`text-2xl font-bold mt-1 ${card.color}`}>{card.value}</p>
+              <p className="text-xs text-gray-400 mt-1">{card.sub}</p>
             </div>
           ))}
         </div>
 
-        {/* Tier Features */}
-        {sub?.plan && (
-          <div className="bg-white p-6 rounded-xl border border-gray-200">
-            <h3 className="font-semibold mb-3">Your {tier?.label} Plan Features</h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-              {sub.plan === 'silver' && (
-                <>
-                  <Feature text="Core accounting dashboard" />
-                  <Feature text="Income & expense tracking" />
-                  <Feature text="Transaction history" />
-                  <Feature text="Email support" />
-                  <div className="md:col-span-2">
-                    <Link href="/accounting/checkout" className="text-sm text-[#0F4C81] font-semibold hover:underline">
-                      Upgrade to Gold for consultants & more features →
-                    </Link>
-                  </div>
-                </>
-              )}
-              {sub.plan === 'gold' && (
-                <>
-                  <Feature text="3 IEBC consultants assigned" />
-                  <Feature text="Up to 5 team users" />
-                  <Feature text="Invoice generation" />
-                  <Feature text="Lead pipeline access" />
-                  <Feature text="Priority support" />
-                  <div>
-                    <Link href="/accounting/checkout" className="text-sm text-[#0F4C81] font-semibold hover:underline">
-                      Upgrade to Platinum →
-                    </Link>
-                  </div>
-                </>
-              )}
-              {sub.plan === 'platinum' && (
-                <>
-                  <Feature text="Full accounting suite" />
-                  <Feature text="5 IEBC consultants assigned" />
-                  <Feature text="Up to 10 team users" />
-                  <Feature text="Business formation support" />
-                  <Feature text="AI workforce dispatch" />
-                  <Feature text="Dedicated account manager" />
-                </>
-              )}
-            </div>
-          </div>
-        )}
-
-        {/* Transactions */}
-        <div className="bg-white p-6 rounded-xl border border-gray-200">
-          <h3 className="font-semibold mb-4">Recent Transactions</h3>
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50">
-              <tr>
-                <th className="p-3 text-left">Date</th>
-                <th className="p-3 text-left">Vendor</th>
-                <th className="p-3 text-right">Amount</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-100">
-              {transactions.length > 0 ? transactions.map((t, i) => (
-                <tr key={i}>
-                  <td className="p-3">{t.date}</td>
-                  <td className="p-3">{t.vendor}</td>
-                  <td className={`p-3 text-right font-mono ${t.type === 'credit' ? 'text-green-600' : 'text-red-600'}`}>
-                    {t.type === 'credit' ? '+' : '-'}${t.amount.toFixed(2)}
-                  </td>
-                </tr>
-              )) : (
-                <>
-                  <tr>
-                    <td className="p-3">2026-04-03</td>
-                    <td className="p-3">AWS Cloud</td>
-                    <td className="p-3 text-right font-mono text-red-600">-$284.00</td>
-                  </tr>
-                  <tr>
-                    <td className="p-3">2026-04-02</td>
-                    <td className="p-3">Apex Co. Payment</td>
-                    <td className="p-3 text-right font-mono text-green-600">+$4,200.00</td>
-                  </tr>
-                </>
-              )}
-            </tbody>
-          </table>
+        {/* Quick Actions */}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <Link href="/accounting/transactions" className="bg-white border border-gray-200 rounded-xl p-4 flex items-center gap-3 hover:border-[#0F4C81] hover:shadow-sm transition">
+            <span className="text-2xl">💰</span>
+            <div><p className="font-semibold text-sm">Add Transaction</p><p className="text-xs text-gray-400">Log income or expense</p></div>
+          </Link>
+          <Link href="/accounting/invoices/new" className="bg-white border border-gray-200 rounded-xl p-4 flex items-center gap-3 hover:border-[#0F4C81] hover:shadow-sm transition">
+            <span className="text-2xl">📄</span>
+            <div><p className="font-semibold text-sm">New Invoice</p><p className="text-xs text-gray-400">Bill a customer</p></div>
+          </Link>
+          <Link href="/accounting/reports?type=pnl" className="bg-white border border-gray-200 rounded-xl p-4 flex items-center gap-3 hover:border-[#0F4C81] hover:shadow-sm transition">
+            <span className="text-2xl">📊</span>
+            <div><p className="font-semibold text-sm">P&L Report</p><p className="text-xs text-gray-400">Profit & loss</p></div>
+          </Link>
+          <Link href="/accounting/reports?type=cashflow" className="bg-white border border-gray-200 rounded-xl p-4 flex items-center gap-3 hover:border-[#0F4C81] hover:shadow-sm transition">
+            <span className="text-2xl">🔄</span>
+            <div><p className="font-semibold text-sm">Cash Flow</p><p className="text-xs text-gray-400">Money in & out</p></div>
+          </Link>
         </div>
 
-        {/* Upsell if no subscription */}
-        {!sub && (
-          <div className="bg-[#0F4C81] text-white p-6 rounded-xl text-center">
-            <h3 className="font-bold text-lg mb-2">Unlock Your Full Dashboard</h3>
-            <p className="text-blue-200 text-sm mb-4">Subscribe to sync real data, access consultants, and manage your team.</p>
-            <Link href="/accounting/checkout" className="bg-white text-[#0F4C81] px-6 py-2 rounded-lg font-semibold hover:bg-blue-50 transition">
-              View Plans — From $9/mo
-            </Link>
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          {/* Recent Transactions */}
+          <div className="lg:col-span-2 bg-white rounded-xl border border-gray-200 shadow-sm">
+            <div className="p-5 border-b border-gray-100 flex justify-between items-center">
+              <h2 className="font-bold text-gray-800">Recent Transactions</h2>
+              <Link href="/accounting/transactions" className="text-sm text-[#0F4C81] hover:underline">View all</Link>
+            </div>
+            {recentTx && recentTx.length > 0 ? (
+              <table className="w-full text-sm">
+                <thead><tr className="bg-gray-50 text-gray-500 text-xs uppercase">
+                  <th className="p-3 text-left">Date</th>
+                  <th className="p-3 text-left">Description</th>
+                  <th className="p-3 text-left">Category</th>
+                  <th className="p-3 text-right">Amount</th>
+                </tr></thead>
+                <tbody className="divide-y divide-gray-50">
+                  {recentTx.map(t => (
+                    <tr key={t.id} className="hover:bg-gray-50">
+                      <td className="p-3 text-gray-500">{t.date}</td>
+                      <td className="p-3 font-medium">{t.description}</td>
+                      <td className="p-3"><span className="px-2 py-0.5 bg-gray-100 rounded text-xs">{t.category || 'Uncategorized'}</span></td>
+                      <td className={`p-3 text-right font-mono font-semibold ${t.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
+                        {t.type === 'income' ? '+' : '-'}{fmt(Number(t.amount))}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <div className="p-8 text-center">
+                <p className="text-gray-400 text-sm mb-3">No transactions yet</p>
+                <Link href="/accounting/transactions" className="btn-primary text-sm">Add First Transaction</Link>
+              </div>
+            )}
           </div>
-        )}
 
+          {/* Invoice Summary */}
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
+            <div className="p-5 border-b border-gray-100 flex justify-between items-center">
+              <h2 className="font-bold text-gray-800">Invoices</h2>
+              <Link href="/accounting/invoices" className="text-sm text-[#0F4C81] hover:underline">View all</Link>
+            </div>
+            <div className="p-5 space-y-3">
+              {[
+                { label: 'Draft', status: 'draft', color: 'bg-gray-100 text-gray-600' },
+                { label: 'Sent', status: 'sent', color: 'bg-blue-100 text-blue-700' },
+                { label: 'Paid', status: 'paid', color: 'bg-green-100 text-green-700' },
+                { label: 'Overdue', status: 'overdue', color: 'bg-red-100 text-red-700' },
+              ].map(({ label, status, color }) => {
+                const count = (invoices || []).filter(i => i.status === status).length
+                const total = (invoices || []).filter(i => i.status === status).reduce((s, i) => s + Number(i.total), 0)
+                return (
+                  <div key={status} className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${color}`}>{label}</span>
+                      <span className="text-xs text-gray-400">{count} invoice{count !== 1 ? 's' : ''}</span>
+                    </div>
+                    <span className="text-sm font-semibold">{fmt(total)}</span>
+                  </div>
+                )
+              })}
+              <Link href="/accounting/invoices/new" className="block text-center btn-primary text-sm mt-4">
+                + New Invoice
+              </Link>
+            </div>
+          </div>
+        </div>
       </div>
     </main>
-  )
-}
-
-function Feature({ text }: { text: string }) {
-  return (
-    <div className="flex items-center gap-2 text-sm text-gray-600">
-      <span className="text-green-500">✓</span> {text}
-    </div>
   )
 }

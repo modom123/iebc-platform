@@ -77,7 +77,10 @@ export default function TransactionsPage() {
           <span className="text-gray-300">|</span>
           <h1 className="font-bold text-gray-800">Transactions</h1>
         </div>
-        <button onClick={() => setShowForm(true)} className="btn-primary text-sm">+ Add Transaction</button>
+        <div className="flex gap-2">
+          <a href="/api/export?type=transactions" className="btn-secondary text-sm py-2">Export CSV</a>
+          <button onClick={() => setShowForm(true)} className="btn-primary text-sm">+ Add Transaction</button>
+        </div>
       </div>
 
       <div className="max-w-6xl mx-auto p-6 space-y-4">

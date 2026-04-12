@@ -59,7 +59,10 @@ export default function InvoicesPage() {
           <span className="text-gray-300">|</span>
           <h1 className="font-bold text-gray-800">Invoices</h1>
         </div>
-        <Link href="/accounting/invoices/new" className="btn-primary text-sm">+ New Invoice</Link>
+        <div className="flex gap-2">
+          <a href="/api/export?type=invoices" className="btn-secondary text-sm py-2">Export CSV</a>
+          <Link href="/accounting/invoices/new" className="btn-primary text-sm">+ New Invoice</Link>
+        </div>
       </div>
 
       <div className="max-w-6xl mx-auto p-6 space-y-4">
@@ -110,7 +113,9 @@ export default function InvoicesPage() {
               <tbody className="divide-y divide-gray-50">
                 {invoices.map(inv => (
                   <tr key={inv.id} className="hover:bg-gray-50">
-                    <td className="p-3 font-mono font-semibold text-[#0F4C81]">{inv.invoice_number}</td>
+                    <td className="p-3 font-mono font-semibold text-[#0F4C81]">
+                      <Link href={`/accounting/invoices/${inv.id}`} className="hover:underline">{inv.invoice_number}</Link>
+                    </td>
                     <td className="p-3">
                       <p className="font-medium">{inv.customers?.name || '—'}</p>
                       <p className="text-xs text-gray-400">{inv.customers?.email || ''}</p>

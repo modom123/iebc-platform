@@ -1,16 +1,16 @@
 import { NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 
-export async function GET(req: Request) {
+export async function GET() {
   const supabase = createServerSupabaseClient()
   const { data: { session } } = await supabase.auth.getSession()
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { data, error } = await supabase
-    .from('customers')
+    .from('budgets')
     .select('*')
     .eq('user_id', session.user.id)
-    .order('name')
+    .order('category')
 
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json(data)
@@ -22,13 +22,19 @@ export async function POST(req: Request) {
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const body = await req.json()
-  const { name, email, phone, address } = body
+  const { category, amount, period } = body
 
-  if (!name) return NextResponse.json({ error: 'name is required' }, { status: 400 })
+  if (!category || !amount) {
+    return NextResponse.json({ error: 'category and amount are required' }, { status: 400 })
+  }
 
+  // Upsert: if budget for category already exists, update it
   const { data, error } = await supabase
-    .from('customers')
-    .insert({ user_id: session.user.id, name, email, phone, address })
+    .from('budgets')
+    .upsert(
+      { user_id: session.user.id, category, amount, period: period || 'monthly' },
+      { onConflict: 'user_id,category' }
+    )
     .select()
     .single()
 
@@ -45,7 +51,7 @@ export async function PATCH(req: Request) {
   const { id, ...updates } = body
 
   const { data, error } = await supabase
-    .from('customers')
+    .from('budgets')
     .update(updates)
     .eq('id', id)
     .eq('user_id', session.user.id)
@@ -65,7 +71,7 @@ export async function DELETE(req: Request) {
   const id = searchParams.get('id')
 
   const { error } = await supabase
-    .from('customers')
+    .from('budgets')
     .delete()
     .eq('id', id!)
     .eq('user_id', session.user.id)

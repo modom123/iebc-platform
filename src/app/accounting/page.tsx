@@ -48,11 +48,14 @@ export default async function Accounting() {
           <span className="text-gray-300">|</span>
           <span className="text-sm font-semibold text-gray-700">Efficient Accounting</span>
         </div>
-        <div className="flex gap-3 text-sm">
+        <div className="flex gap-3 text-sm items-center flex-wrap">
           <Link href="/accounting/transactions" className="hover:text-[#0F4C81] text-gray-600">Transactions</Link>
           <Link href="/accounting/invoices" className="hover:text-[#0F4C81] text-gray-600">Invoices</Link>
+          <Link href="/accounting/customers" className="hover:text-[#0F4C81] text-gray-600">Customers</Link>
+          <Link href="/accounting/budgets" className="hover:text-[#0F4C81] text-gray-600">Budgets</Link>
           <Link href="/accounting/reports" className="hover:text-[#0F4C81] text-gray-600">Reports</Link>
           <Link href="/hub" className="hover:text-[#0F4C81] text-gray-600">Hub</Link>
+          <Link href="/settings" className="hover:text-[#0F4C81] text-gray-600">Settings</Link>
           {!sub && <Link href="/accounting/checkout" className="bg-[#0F4C81] text-white px-3 py-1 rounded-lg">Upgrade</Link>}
         </div>
       </div>

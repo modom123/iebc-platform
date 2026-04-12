@@ -1,0 +1,43 @@
+import { NextResponse } from 'next/server'
+import { stripe } from '@/lib/stripe'
+import { createServerSupabaseClient } from '@/lib/supabase/server'
+
+const PRICE_IDS: Record<string, string> = {
+  solo: 'price_solo_tier',
+  business: 'price_business_tier',
+  pro: 'price_pro_tier',
+  starter: 'price_starter_bundle',
+  growth: 'price_growth_bundle',
+}
+
+export async function POST(req: Request) {
+  try {
+    const { plan } = await req.json()
+    const supabase = createServerSupabaseClient()
+    const { data: { session } } = await supabase.auth.getSession()
+
+    if (!session) {
+      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    const priceId = PRICE_IDS[plan]
+    if (!priceId) {
+      return NextResponse.json({ error: 'Invalid plan' }, { status: 400 })
+    }
+
+    const checkoutSession = await stripe.checkout.sessions.create({
+      mode: 'subscription',
+      payment_method_types: ['card'],
+      customer_email: session.user.email,
+      line_items: [{ price: priceId, quantity: 1 }],
+      metadata: { user_id: session.user.id, plan },
+      success_url: `${process.env.NEXT_PUBLIC_APP_URL}/accounting?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${process.env.NEXT_PUBLIC_APP_URL}/accounting/checkout?canceled=true`,
+    })
+
+    return NextResponse.json({ url: checkoutSession.url })
+  } catch (error) {
+    console.error('Stripe Checkout Error:', error)
+    return NextResponse.json({ error: 'Checkout failed' }, { status: 500 })
+  }
+}

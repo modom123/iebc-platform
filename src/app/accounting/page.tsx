@@ -96,6 +96,8 @@ export default async function Accounting() {
           <Link href="/accounting/scanner" className="hover:text-[#0F4C81] text-gray-600 font-medium">🤖 AI Scan</Link>
           <Link href="/accounting/customers" className="hover:text-[#0F4C81] text-gray-600">Customers</Link>
           <Link href="/accounting/bills" className="hover:text-[#0F4C81] text-gray-600">Bills</Link>
+          <Link href="/accounting/vendors" className="hover:text-[#0F4C81] text-gray-600">Vendors</Link>
+          <Link href="/accounting/payroll" className="hover:text-[#0F4C81] text-gray-600">Payroll</Link>
           <Link href="/accounting/budgets" className="hover:text-[#0F4C81] text-gray-600">Budgets</Link>
           <Link href="/accounting/tracker" className="hover:text-[#0F4C81] text-gray-600">Tracker</Link>
           <Link href="/accounting/reports" className="hover:text-[#0F4C81] text-gray-600">Reports</Link>
@@ -191,6 +193,8 @@ export default async function Accounting() {
             { href: '/accounting/scanner', icon: '🤖', label: 'AI Scanner' },
             { href: '/accounting/bills', icon: '🧾', label: 'Pay a Bill' },
             { href: '/accounting/tracker', icon: '🚗', label: 'Mileage & Time' },
+            { href: '/accounting/payroll', icon: '👔', label: 'Payroll' },
+            { href: '/accounting/vendors', icon: '🏢', label: 'Vendors' },
             { href: '/accounting/recurring', icon: '🔁', label: 'Recurring' },
             { href: '/accounting/projects', icon: '🏗️', label: 'Projects' },
             { href: '/accounting/reconcile', icon: '🏦', label: 'Reconcile' },

@@ -81,32 +81,7 @@ export default async function Accounting() {
   const fmt = (n: number) => '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 
   return (
-    <main className="min-h-screen bg-gray-50 text-slate-900">
-      {/* Top Nav */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
-        <div className="flex items-center gap-4">
-          <Link href="/" className="text-xl font-bold text-[#0F4C81]">IEBC</Link>
-          <span className="text-gray-300">|</span>
-          <span className="text-sm font-semibold text-gray-700">Efficient Accounting</span>
-        </div>
-        <div className="flex gap-3 text-sm items-center flex-wrap">
-          <Link href="/accounting/transactions" className="hover:text-[#0F4C81] text-gray-600">Transactions</Link>
-          <Link href="/accounting/invoices" className="hover:text-[#0F4C81] text-gray-600">Invoices</Link>
-          <Link href="/accounting/estimates" className="hover:text-[#0F4C81] text-gray-600">Estimates</Link>
-          <Link href="/accounting/scanner" className="hover:text-[#0F4C81] text-gray-600 font-medium">🤖 AI Scan</Link>
-          <Link href="/accounting/customers" className="hover:text-[#0F4C81] text-gray-600">Customers</Link>
-          <Link href="/accounting/bills" className="hover:text-[#0F4C81] text-gray-600">Bills</Link>
-          <Link href="/accounting/vendors" className="hover:text-[#0F4C81] text-gray-600">Vendors</Link>
-          <Link href="/accounting/payroll" className="hover:text-[#0F4C81] text-gray-600">Payroll</Link>
-          <Link href="/accounting/budgets" className="hover:text-[#0F4C81] text-gray-600">Budgets</Link>
-          <Link href="/accounting/tracker" className="hover:text-[#0F4C81] text-gray-600">Tracker</Link>
-          <Link href="/accounting/reports" className="hover:text-[#0F4C81] text-gray-600">Reports</Link>
-          <Link href="/hub" className="hover:text-[#0F4C81] text-gray-600">Hub</Link>
-          <Link href="/settings" className="hover:text-[#0F4C81] text-gray-600">Settings</Link>
-          {!sub && <Link href="/accounting/checkout" className="bg-[#0F4C81] text-white px-3 py-1 rounded-lg">Upgrade</Link>}
-        </div>
-      </div>
-
+    <div className="text-slate-900">
       <div className="max-w-7xl mx-auto p-6 space-y-6">
 
         {/* Alerts */}
@@ -304,6 +279,6 @@ export default async function Accounting() {
           </div>
         </div>
       </div>
-    </main>
+    </div>
   )
 }

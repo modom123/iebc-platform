@@ -35,26 +35,7 @@ export default async function Hub() {
   const overdueTasks = (tasks || []).filter(t => t.due_date && t.due_date < todayStr).length
 
   return (
-    <main className="min-h-screen bg-gray-50 text-slate-900">
-      {/* Top Nav */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
-        <div className="flex items-center gap-4">
-          <Link href="/" className="text-xl font-bold text-[#0F4C81]">IEBC</Link>
-          <span className="text-gray-300">|</span>
-          <span className="text-sm font-semibold text-gray-700">Master Hub</span>
-        </div>
-        <div className="flex gap-3 text-sm items-center">
-          <Link href="/accounting" className="hover:text-[#0F4C81] text-gray-600">Accounting</Link>
-          <Link href="/hub/leads" className="hover:text-[#0F4C81] text-gray-600">Leads</Link>
-          <Link href="/hub/tasks" className="hover:text-[#0F4C81] text-gray-600">Tasks</Link>
-          <Link href="/hub/team" className="hover:text-[#0F4C81] text-gray-600">Team</Link>
-          <Link href="/hub/formation" className="hover:text-[#0F4C81] text-gray-600">Formation</Link>
-          <Link href="/hub/documents" className="hover:text-[#0F4C81] text-gray-600">Docs</Link>
-          <Link href="/settings" className="hover:text-[#0F4C81] text-gray-600">Settings</Link>
-          {!sub && <Link href="/accounting/checkout" className="bg-[#0F4C81] text-white px-3 py-1 rounded-lg">Upgrade</Link>}
-        </div>
-      </div>
-
+    <div className="text-slate-900">
       <div className="max-w-7xl mx-auto p-6 space-y-6">
 
         {/* Welcome */}
@@ -230,6 +211,6 @@ export default async function Hub() {
         </div>
 
       </div>
-    </main>
+    </div>
   )
 }

@@ -92,9 +92,12 @@ export default async function Accounting() {
         <div className="flex gap-3 text-sm items-center flex-wrap">
           <Link href="/accounting/transactions" className="hover:text-[#0F4C81] text-gray-600">Transactions</Link>
           <Link href="/accounting/invoices" className="hover:text-[#0F4C81] text-gray-600">Invoices</Link>
+          <Link href="/accounting/estimates" className="hover:text-[#0F4C81] text-gray-600">Estimates</Link>
+          <Link href="/accounting/scanner" className="hover:text-[#0F4C81] text-gray-600 font-medium">🤖 AI Scan</Link>
           <Link href="/accounting/customers" className="hover:text-[#0F4C81] text-gray-600">Customers</Link>
           <Link href="/accounting/bills" className="hover:text-[#0F4C81] text-gray-600">Bills</Link>
           <Link href="/accounting/budgets" className="hover:text-[#0F4C81] text-gray-600">Budgets</Link>
+          <Link href="/accounting/tracker" className="hover:text-[#0F4C81] text-gray-600">Tracker</Link>
           <Link href="/accounting/reports" className="hover:text-[#0F4C81] text-gray-600">Reports</Link>
           <Link href="/hub" className="hover:text-[#0F4C81] text-gray-600">Hub</Link>
           <Link href="/settings" className="hover:text-[#0F4C81] text-gray-600">Settings</Link>
@@ -184,13 +187,16 @@ export default async function Accounting() {
           {[
             { href: '/accounting/transactions', icon: '💰', label: 'Add Transaction' },
             { href: '/accounting/invoices/new', icon: '📄', label: 'New Invoice' },
-            { href: '/accounting/bills', icon: '📋', label: 'Pay a Bill' },
+            { href: '/accounting/estimates', icon: '📋', label: 'Estimates' },
+            { href: '/accounting/scanner', icon: '🤖', label: 'AI Scanner' },
+            { href: '/accounting/bills', icon: '🧾', label: 'Pay a Bill' },
+            { href: '/accounting/tracker', icon: '🚗', label: 'Mileage & Time' },
             { href: '/accounting/recurring', icon: '🔁', label: 'Recurring' },
             { href: '/accounting/projects', icon: '🏗️', label: 'Projects' },
             { href: '/accounting/reconcile', icon: '🏦', label: 'Reconcile' },
             { href: '/accounting/budgets', icon: '🎯', label: 'Budgets' },
             { href: '/accounting/reports', icon: '📊', label: 'Reports' },
-            { href: '/accounting/tax', icon: '🧾', label: 'Tax Center' },
+            { href: '/accounting/tax', icon: '💸', label: 'Tax Center' },
             { href: '/accounting/rules', icon: '⚡', label: 'Auto Rules' },
             { href: '/accounting/customers', icon: '👥', label: 'Customers' },
             { href: '/api/export?type=transactions', icon: '⬇️', label: 'Export CSV' },

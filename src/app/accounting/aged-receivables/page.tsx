@@ -65,7 +65,7 @@ export default function AgedReceivablesPage() {
   const criticalTotal = buckets.slice(3).reduce((s, b) => s + b.total, 0) // 61+ days
 
   // Unique customers for filter
-  const customers = [...new Set(invoices.map(inv => inv.customers?.name).filter(Boolean))]
+  const customers = Array.from(new Set(invoices.map(inv => inv.customers?.name).filter(Boolean))) as string[]
 
   return (
     <main className="min-h-screen bg-gray-50">

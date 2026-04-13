@@ -49,8 +49,8 @@ export default function AuditPage() {
 
   useEffect(() => { load() }, [filterAction, filterResource])
 
-  const uniqueActions = [...new Set(logs.map(l => l.action))]
-  const uniqueResources = [...new Set(logs.map(l => l.resource_type))]
+  const uniqueActions = Array.from(new Set(logs.map(l => l.action)))
+  const uniqueResources = Array.from(new Set(logs.map(l => l.resource_type)))
 
   return (
     <main className="min-h-screen bg-gray-50">

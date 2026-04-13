@@ -31,10 +31,13 @@ const NAV_SECTIONS = [
     items: [
       { href: '/accounting/coa', icon: '≡', label: 'Chart of Accounts' },
       { href: '/accounting/journal', icon: '⊟', label: 'Journal Entries' },
-      { href: '/accounting/reconcile', icon: '⇌', label: 'Reconciliation' },
       { href: '/accounting/reports', icon: '▦', label: 'Reports' },
+      { href: '/accounting/aged-receivables', icon: '⏱', label: 'Aged Receivables' },
+      { href: '/accounting/forecast', icon: '▲', label: 'Cash Forecast' },
+      { href: '/accounting/reconcile', icon: '⇌', label: 'Reconciliation' },
       { href: '/accounting/tax', icon: '◈', label: 'Tax Center' },
       { href: '/accounting/budgets', icon: '◎', label: 'Budgets' },
+      { href: '/accounting/rules', icon: '⚡', label: 'Auto Rules' },
       { href: '/accounting/scanner', icon: '✦', label: 'AI Receipt Scanner' },
     ],
   },
@@ -46,6 +49,14 @@ const NAV_SECTIONS = [
       { href: '/accounting/projects', icon: '◧', label: 'Projects' },
       { href: '/accounting/tracker', icon: '▷', label: 'Mileage & Time' },
       { href: '/accounting/recurring', icon: '↺', label: 'Recurring' },
+    ],
+  },
+  {
+    title: 'Connect & Portals',
+    items: [
+      { href: '/accounting/connect', icon: '⬡', label: 'Bank Connect' },
+      { href: '/accounting/clients', icon: '◈', label: 'Client Portals' },
+      { href: '/accounting/audit', icon: '◉', label: 'Audit Trail' },
     ],
   },
   {

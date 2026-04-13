@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS chart_of_accounts (
 );
 ALTER TABLE chart_of_accounts ENABLE ROW LEVEL SECURITY;
 CREATE POLICY coa_owner ON chart_of_accounts FOR ALL USING (user_id = auth.uid());
+CREATE POLICY IF NOT EXISTS coa_owner ON chart_of_accounts FOR ALL USING (user_id = auth.uid());
 
 -- JOURNAL ENTRIES
 CREATE TABLE IF NOT EXISTS journal_entries (
@@ -35,6 +36,7 @@ CREATE TABLE IF NOT EXISTS journal_entries (
 );
 ALTER TABLE journal_entries ENABLE ROW LEVEL SECURITY;
 CREATE POLICY je_owner ON journal_entries FOR ALL USING (user_id = auth.uid());
+CREATE POLICY IF NOT EXISTS je_owner ON journal_entries FOR ALL USING (user_id = auth.uid());
 
 CREATE TABLE IF NOT EXISTS journal_entry_lines (
   id                UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -48,6 +50,7 @@ CREATE TABLE IF NOT EXISTS journal_entry_lines (
 );
 ALTER TABLE journal_entry_lines ENABLE ROW LEVEL SECURITY;
 CREATE POLICY jel_owner ON journal_entry_lines FOR ALL USING (user_id = auth.uid());
+CREATE POLICY IF NOT EXISTS jel_owner ON journal_entry_lines FOR ALL USING (user_id = auth.uid());
 
 -- PURCHASE ORDERS
 CREATE TABLE IF NOT EXISTS purchase_orders (
@@ -68,6 +71,7 @@ CREATE TABLE IF NOT EXISTS purchase_orders (
 );
 ALTER TABLE purchase_orders ENABLE ROW LEVEL SECURITY;
 CREATE POLICY po_owner ON purchase_orders FOR ALL USING (user_id = auth.uid());
+CREATE POLICY IF NOT EXISTS po_owner ON purchase_orders FOR ALL USING (user_id = auth.uid());
 
 CREATE TABLE IF NOT EXISTS purchase_order_lines (
   id                  UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -81,6 +85,7 @@ CREATE TABLE IF NOT EXISTS purchase_order_lines (
 );
 ALTER TABLE purchase_order_lines ENABLE ROW LEVEL SECURITY;
 CREATE POLICY pol_owner ON purchase_order_lines FOR ALL USING (user_id = auth.uid());
+CREATE POLICY IF NOT EXISTS pol_owner ON purchase_order_lines FOR ALL USING (user_id = auth.uid());
 
 -- INVENTORY
 CREATE TABLE IF NOT EXISTS inventory_items (
@@ -102,6 +107,7 @@ CREATE TABLE IF NOT EXISTS inventory_items (
 );
 ALTER TABLE inventory_items ENABLE ROW LEVEL SECURITY;
 CREATE POLICY inv_owner ON inventory_items FOR ALL USING (user_id = auth.uid());
+CREATE POLICY IF NOT EXISTS inv_owner ON inventory_items FOR ALL USING (user_id = auth.uid());
 
 CREATE TABLE IF NOT EXISTS inventory_adjustments (
   id                  UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -113,6 +119,7 @@ CREATE TABLE IF NOT EXISTS inventory_adjustments (
 );
 ALTER TABLE inventory_adjustments ENABLE ROW LEVEL SECURITY;
 CREATE POLICY inv_adj_owner ON inventory_adjustments FOR ALL USING (user_id = auth.uid());
+CREATE POLICY IF NOT EXISTS inv_adj_owner ON inventory_adjustments FOR ALL USING (user_id = auth.uid());
 
 -- CLIENT PORTAL TOKENS
 CREATE TABLE IF NOT EXISTS client_portal_tokens (
@@ -127,6 +134,8 @@ CREATE TABLE IF NOT EXISTS client_portal_tokens (
 ALTER TABLE client_portal_tokens ENABLE ROW LEVEL SECURITY;
 CREATE POLICY portal_token_owner ON client_portal_tokens FOR ALL USING (user_id = auth.uid());
 CREATE POLICY portal_token_public_read ON client_portal_tokens FOR SELECT USING (true);
+CREATE POLICY IF NOT EXISTS portal_token_owner ON client_portal_tokens FOR ALL USING (user_id = auth.uid());
+CREATE POLICY IF NOT EXISTS portal_token_public_read ON client_portal_tokens FOR SELECT USING (true);
 
 -- INVOICE PAYMENTS
 CREATE TABLE IF NOT EXISTS invoice_payments (
@@ -141,6 +150,7 @@ CREATE TABLE IF NOT EXISTS invoice_payments (
 );
 ALTER TABLE invoice_payments ENABLE ROW LEVEL SECURITY;
 CREATE POLICY payments_owner ON invoice_payments FOR ALL USING (user_id = auth.uid());
+CREATE POLICY IF NOT EXISTS payments_owner ON invoice_payments FOR ALL USING (user_id = auth.uid());
 
 -- ALTER INVOICES: add paid_at + payment_method
 ALTER TABLE invoices ADD COLUMN IF NOT EXISTS paid_at TIMESTAMPTZ;
@@ -165,6 +175,7 @@ CREATE TABLE IF NOT EXISTS employees (
 );
 ALTER TABLE employees ENABLE ROW LEVEL SECURITY;
 CREATE POLICY emp_owner ON employees FOR ALL USING (user_id = auth.uid());
+CREATE POLICY IF NOT EXISTS emp_owner ON employees FOR ALL USING (user_id = auth.uid());
 
 CREATE TABLE IF NOT EXISTS pay_runs (
   id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -180,6 +191,7 @@ CREATE TABLE IF NOT EXISTS pay_runs (
 );
 ALTER TABLE pay_runs ENABLE ROW LEVEL SECURITY;
 CREATE POLICY payrun_owner ON pay_runs FOR ALL USING (user_id = auth.uid());
+CREATE POLICY IF NOT EXISTS payrun_owner ON pay_runs FOR ALL USING (user_id = auth.uid());
 
 CREATE TABLE IF NOT EXISTS pay_stubs (
   id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
@@ -197,6 +209,7 @@ CREATE TABLE IF NOT EXISTS pay_stubs (
 );
 ALTER TABLE pay_stubs ENABLE ROW LEVEL SECURITY;
 CREATE POLICY stub_owner ON pay_stubs FOR ALL USING (user_id = auth.uid());
+CREATE POLICY IF NOT EXISTS stub_owner ON pay_stubs FOR ALL USING (user_id = auth.uid());
 
 -- VENDORS
 CREATE TABLE IF NOT EXISTS vendors (
@@ -217,6 +230,7 @@ CREATE TABLE IF NOT EXISTS vendors (
 );
 ALTER TABLE vendors ENABLE ROW LEVEL SECURITY;
 CREATE POLICY vendor_owner ON vendors FOR ALL USING (user_id = auth.uid());
+CREATE POLICY IF NOT EXISTS vendor_owner ON vendors FOR ALL USING (user_id = auth.uid());
 
 -- DOCUMENT VAULT (corrected columns to match API)
 CREATE TABLE IF NOT EXISTS vault_documents (
@@ -232,6 +246,7 @@ CREATE TABLE IF NOT EXISTS vault_documents (
 );
 ALTER TABLE vault_documents ENABLE ROW LEVEL SECURITY;
 CREATE POLICY vault_owner ON vault_documents FOR ALL USING (user_id = auth.uid());
+CREATE POLICY IF NOT EXISTS vault_owner ON vault_documents FOR ALL USING (user_id = auth.uid());
 
 -- STORAGE BUCKET (run separately in Supabase Dashboard > Storage)
 -- CREATE BUCKET "documents" (private)

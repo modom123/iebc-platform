@@ -76,20 +76,74 @@ export async function GET(req: Request) {
       .filter(i => i.status !== 'paid' && i.status !== 'void')
       .reduce((s, i) => s + (Number(i.total) - Number(i.amount_paid)), 0)
 
+    const { data: bills } = await supabase
+      .from('bills')
+      .select('amount, status')
+      .eq('user_id', session.user.id)
+
+    const ap = (bills || [])
+      .filter(b => b.status !== 'paid' && b.status !== 'void')
+      .reduce((s, b) => s + Number(b.amount), 0)
+
+    const cashBalance = totalIncome - totalExpenses
+    const totalAssets = ar + cashBalance
+    const totalEquity = totalAssets - ap
+
     return NextResponse.json({
       type: 'balance_sheet',
       as_of: to,
       assets: {
         accounts_receivable: ar,
-        cash: totalIncome - totalExpenses,
-        total: ar + (totalIncome - totalExpenses),
+        cash: cashBalance,
+        total: totalAssets,
       },
-      liabilities: { total: 0 },
-      equity: { retained_earnings: netProfit, total: netProfit },
+      liabilities: { accounts_payable: ap, total: ap },
+      equity: { retained_earnings: totalEquity, total: totalEquity },
     })
   }
 
-  return NextResponse.json({ error: 'Invalid report type. Use: pnl, cashflow, balance_sheet' }, { status: 400 })
+  if (report === 'trial_balance') {
+    const { data: accounts } = await supabase
+      .from('chart_of_accounts')
+      .select('id, code, name, type')
+      .eq('user_id', session.user.id)
+      .order('code')
+
+    const { data: lines } = await supabase
+      .from('journal_entry_lines')
+      .select('account_id, debit, credit, journal_entries!inner(user_id, date)')
+      .eq('journal_entries.user_id', session.user.id)
+      .gte('journal_entries.date', from)
+      .lte('journal_entries.date', to)
+
+    const balanceMap: Record<string, { debit: number; credit: number }> = {}
+    for (const line of lines || []) {
+      if (!balanceMap[line.account_id]) balanceMap[line.account_id] = { debit: 0, credit: 0 }
+      balanceMap[line.account_id].debit += Number(line.debit || 0)
+      balanceMap[line.account_id].credit += Number(line.credit || 0)
+    }
+
+    const rows = (accounts || []).map(acct => ({
+      code: acct.code,
+      name: acct.name,
+      type: acct.type,
+      debit: balanceMap[acct.id]?.debit || 0,
+      credit: balanceMap[acct.id]?.credit || 0,
+    })).filter(r => r.debit > 0 || r.credit > 0)
+
+    const totalDebits = rows.reduce((s, r) => s + r.debit, 0)
+    const totalCredits = rows.reduce((s, r) => s + r.credit, 0)
+
+    return NextResponse.json({
+      type: 'trial_balance',
+      period: { from, to },
+      rows,
+      totals: { debit: totalDebits, credit: totalCredits },
+      balanced: Math.abs(totalDebits - totalCredits) < 0.01,
+    })
+  }
+
+  return NextResponse.json({ error: 'Invalid report type. Use: pnl, cashflow, balance_sheet, trial_balance' }, { status: 400 })
 }
 
 function groupByCategory(transactions: { category: string | null; amount: number }[]) {

@@ -252,6 +252,14 @@ export default async function Hub() {
               { href: '/accounting/clients',       icon: '🔗', label: 'Client Portals' },
               { href: '/accounting/purchaseorders',icon: '📦', label: 'Purchase Orders' },
               { href: '/accounting/tracker',       icon: '🚗', label: 'Mileage & Time' },
+              { href: '/accounting/recurring',     icon: '🔁', label: 'Recurring' },
+              { href: '/accounting/journal',       icon: '📝', label: 'Journal Entries' },
+              { href: '/accounting/aged-receivables', icon: '⏱️', label: 'Aged Receivables' },
+              { href: '/accounting/rules',         icon: '⚡', label: 'Auto Rules' },
+              { href: '/accounting/coa',           icon: '📒', label: 'Chart of Accounts' },
+              { href: '/accounting/audit',         icon: '🔒', label: 'Audit Trail' },
+              { href: '/api/export?type=transactions', icon: '⬇️', label: 'Export CSV' },
+              { href: '/hub/consultants',          icon: '🤖', label: 'AI Consultants' },
             ].map(({ href, icon, label }) => (
               <Link key={href} href={href}
                 className="bg-white border border-gray-200 rounded-xl p-3 flex items-center gap-2.5 hover:border-[#0F4C81] hover:shadow-sm transition text-sm">

@@ -91,8 +91,20 @@ export async function GET(req: Request) {
     filename = `customers-${new Date().toISOString().split('T')[0]}.csv`
   }
 
+  else if (type === 'bills') {
+    const { data, error } = await supabase
+      .from('bills')
+      .select('vendor_name,description,amount,due_date,status,category,reference,created_at')
+      .eq('user_id', session.user.id)
+      .order('due_date', { ascending: false })
+
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+    csv = toCSV(data as Record<string, unknown>[], ['vendor_name', 'description', 'amount', 'due_date', 'status', 'category', 'reference', 'created_at'])
+    filename = `bills-${new Date().toISOString().split('T')[0]}.csv`
+  }
+
   else {
-    return NextResponse.json({ error: 'Invalid type. Use: transactions, invoices, leads, customers' }, { status: 400 })
+    return NextResponse.json({ error: 'Invalid type. Use: transactions, invoices, leads, customers, bills' }, { status: 400 })
   }
 
   return new Response(csv, {

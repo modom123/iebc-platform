@@ -1,208 +1,462 @@
 import Link from 'next/link'
 
-const services = [
+const NAV_LINKS = [
+  { label: 'Efficient Accounting', href: '/efficient' },
+  { label: 'Master Hub', href: '/hub' },
+  { label: 'Client Portal', href: '/portal' },
+  { label: 'Pricing', href: '#pricing' },
+]
+
+const PRODUCTS = [
   {
-    icon: '🏛️',
-    title: 'Business Formation',
-    desc: 'LLC, S-Corp, C-Corp setup, EIN registration, operating agreements, and registered agent services — done for you.',
+    eyebrow: 'Efficient Accounting',
+    headline: 'Books that run themselves.',
+    body: 'Full-stack accounting suite — invoicing, payroll, reconciliation, AI receipt scanning, tax center, and real-time cash flow. Everything a growing business needs, none of the complexity.',
+    cta: { label: 'Explore Efficient →', href: '/efficient' },
+    accent: '#0F4C81',
+    features: ['Invoicing & estimates', 'Bank reconciliation', 'AI receipt scanner', 'Tax center & 1099s', 'Cash flow forecasting', 'Client payment portal'],
   },
   {
-    icon: '📊',
-    title: 'Efficient Accounting',
-    desc: 'Real-time income & expense tracking, invoicing, financial summaries, and cash flow visibility in one dashboard.',
-  },
-  {
-    icon: '🤖',
-    title: '60-Consultant AI Workforce',
-    desc: 'A team of 60 specialized consultants across departments — routed to your business automatically based on your needs.',
-  },
-  {
-    icon: '🔥',
-    title: 'Lead Pipeline & CRM',
-    desc: 'Track hot leads, manage your pipeline, and convert prospects into clients with built-in pipeline management.',
-  },
-  {
-    icon: '📋',
-    title: 'Task & Project Hub',
-    desc: 'Centralized Master Hub for tracking active builds, tasks due, and team assignments across your entire operation.',
-  },
-  {
-    icon: '💳',
-    title: 'Subscription Billing',
-    desc: 'Transparent monthly plans with Stripe-powered secure billing. Upgrade or cancel anytime with no hidden fees.',
+    eyebrow: 'Master Hub',
+    headline: 'Your command center.',
+    body: 'One dashboard for leads, tasks, team, formations, and your AI consultant workforce. Stop juggling five tools — run your entire operation from a single hub.',
+    cta: { label: 'Open Hub →', href: '/hub' },
+    accent: '#C9A02E',
+    features: ['Lead pipeline & CRM', 'Task & project tracking', 'Team management', 'Business formation', 'Document vault', '60-consultant AI workforce'],
   },
 ]
 
-const plans = [
+const STATS = [
+  { value: '22 hrs', label: 'saved per week, on average' },
+  { value: '60', label: 'AI consultants on demand' },
+  { value: '25+', label: 'accounting modules' },
+  { value: '$9/mo', label: 'to get started' },
+]
+
+const WHY = [
+  {
+    icon: '⚡',
+    title: 'Built for operators',
+    body: 'Not accountants, not developers. IEBC is designed for founders and operators who need to move fast without breaking their books.',
+  },
+  {
+    icon: '🔒',
+    title: 'Secure by default',
+    body: 'Row-level security, encrypted client portals, and Stripe-powered billing. Your data and your clients\' data are protected at every layer.',
+  },
+  {
+    icon: '🤖',
+    title: 'AI embedded throughout',
+    body: 'From auto-categorizing transactions to routing consultant requests, AI handles the repetitive work so you stay focused on growth.',
+  },
+  {
+    icon: '📈',
+    title: 'Scales with you',
+    body: 'Start solo at $9/mo. Add users, unlock consultants, and access the full suite as your business grows — no migration, no new tools.',
+  },
+]
+
+const PLANS = [
   {
     id: 'silver',
     label: 'Silver',
     price: '$9',
     period: '/mo',
+    desc: 'For solo founders getting started.',
     consultants: 0,
     users: 1,
     highlight: false,
-    features: ['Core accounting dashboard', 'Income & expense tracking', 'Transaction history', 'Email support'],
+    features: [
+      'Core accounting dashboard',
+      'Income & expense tracking',
+      'Invoicing & estimates',
+      'Transaction history',
+      'Client payment portal',
+      'Email support',
+    ],
     link: '/accounting/checkout',
+    cta: 'Start with Silver',
   },
   {
     id: 'gold',
     label: 'Gold',
     price: '$22',
     period: '/mo',
+    desc: 'For growing teams with more to manage.',
     consultants: 3,
     users: 5,
     highlight: true,
-    features: ['Everything in Silver', '3 IEBC consultants', 'Up to 5 users', 'Invoice generation', 'Lead pipeline', 'Priority support'],
+    features: [
+      'Everything in Silver',
+      '3 IEBC AI consultants',
+      'Up to 5 users',
+      'Lead pipeline & CRM',
+      'Task & project hub',
+      'Bank reconciliation',
+      'Priority support',
+    ],
     link: '/accounting/checkout',
+    cta: 'Start with Gold',
   },
   {
     id: 'platinum',
     label: 'Platinum',
     price: '$42',
     period: '/mo',
+    desc: 'Full power for serious operators.',
     consultants: 5,
     users: 10,
     highlight: false,
-    features: ['Everything in Gold', '5 IEBC consultants', 'Up to 10 users', 'Full accounting suite', 'Business formation', 'AI workforce dispatch', 'Dedicated account manager'],
+    features: [
+      'Everything in Gold',
+      '5 IEBC AI consultants',
+      'Up to 10 users',
+      'Full accounting suite',
+      'Business formation',
+      'AI workforce dispatch',
+      'Dedicated account manager',
+    ],
     link: 'https://buy.stripe.com/bJe14h1aVeRj58CfrVgEg01',
+    cta: 'Start with Platinum',
   },
 ]
+
+const FOOTER_LINKS = {
+  Products: [
+    { label: 'Efficient Accounting', href: '/efficient' },
+    { label: 'Master Hub', href: '/hub' },
+    { label: 'Client Portal', href: '/portal' },
+    { label: 'Pricing', href: '#pricing' },
+  ],
+  Company: [
+    { label: 'About IEBC', href: '#' },
+    { label: 'Contact', href: '#' },
+    { label: 'Privacy Policy', href: '#' },
+    { label: 'Terms of Service', href: '#' },
+  ],
+  Account: [
+    { label: 'Sign In', href: '/auth/login' },
+    { label: 'Create Account', href: '/auth/signup' },
+    { label: 'Forgot Password', href: '/auth/forgot-password' },
+  ],
+}
 
 export default function Home() {
   return (
     <main className="min-h-screen bg-white text-slate-900 font-sans">
 
-      {/* Nav */}
-      <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-gray-200 px-6 py-4 flex justify-between items-center">
-        <span className="text-2xl font-bold text-[#0F4C81]">IEBC</span>
-        <div className="flex gap-4 text-sm items-center">
-          <Link href="/hub" className="hover:text-[#0F4C81] hidden md:block">Master Hub</Link>
-          <Link href="/accounting" className="hover:text-[#0F4C81] hidden md:block">Accounting</Link>
-          <Link href="#pricing" className="hover:text-[#0F4C81] hidden md:block">Pricing</Link>
-          <Link href="/accounting/checkout" className="bg-[#0F4C81] text-white px-4 py-2 rounded-lg font-semibold hover:bg-[#082D4F]">Get Started</Link>
+      {/* ── Navigation ── */}
+      <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-gray-100 px-6 py-0">
+        <div className="max-w-7xl mx-auto flex items-center justify-between h-16">
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="w-9 h-9 bg-[#0F4C81] rounded-lg flex items-center justify-center">
+              <span className="text-white text-base font-extrabold">I</span>
+            </div>
+            <div className="leading-tight">
+              <span className="text-[#0F4C81] font-extrabold text-lg tracking-tight">IEBC</span>
+              <span className="hidden md:block text-[10px] text-gray-400 font-medium tracking-wide -mt-1">Integrated Efficiency Business Consultants</span>
+            </div>
+          </Link>
+
+          {/* Center links */}
+          <div className="hidden md:flex items-center gap-1">
+            {NAV_LINKS.map(l => (
+              <Link
+                key={l.href}
+                href={l.href}
+                className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-[#0F4C81] hover:bg-blue-50 rounded-lg transition"
+              >
+                {l.label}
+              </Link>
+            ))}
+          </div>
+
+          {/* Right CTAs */}
+          <div className="flex items-center gap-2">
+            <Link href="/auth/login" className="hidden md:block px-4 py-2 text-sm font-medium text-gray-600 hover:text-[#0F4C81] transition">
+              Sign In
+            </Link>
+            <Link href="/accounting/checkout" className="bg-[#0F4C81] text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-[#082D4F] transition">
+              Get Started
+            </Link>
+          </div>
         </div>
       </nav>
 
-      {/* Hero */}
-      <header className="py-24 px-6 text-center bg-gradient-to-b from-white to-gray-50">
-        <div className="inline-block bg-blue-50 text-[#0F4C81] text-xs font-bold px-4 py-1.5 rounded-full mb-6 uppercase tracking-widest">
-          Integrated Efficiency Business Consultants
+      {/* ── Hero ── */}
+      <header className="relative bg-[#050F1C] text-white overflow-hidden">
+        {/* Background grid */}
+        <div className="absolute inset-0 opacity-[0.04]" style={{
+          backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)',
+          backgroundSize: '60px 60px',
+        }} />
+        {/* Glow */}
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-[#0F4C81] opacity-20 blur-[120px] rounded-full pointer-events-none" />
+
+        <div className="relative max-w-5xl mx-auto px-6 py-28 text-center">
+          <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 text-white text-xs font-semibold px-4 py-1.5 rounded-full mb-8 tracking-widest uppercase">
+            <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
+            Integrated Efficiency Business Consultants
+          </div>
+
+          <h1 className="text-5xl md:text-7xl font-extrabold leading-tight mb-6 tracking-tight">
+            Stop Working{' '}
+            <span className="text-[#4A9EE8]">In</span>{' '}
+            Your Business.
+            <br />
+            Start Working{' '}
+            <span className="text-[#C9A02E]">On</span>{' '}
+            It.
+          </h1>
+
+          <p className="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto mb-10 leading-relaxed">
+            Formation · Accounting · 60 AI Consultants · Operations Hub.<br />
+            <span className="text-white font-semibold">One platform that runs your business while you build it.</span>
+          </p>
+
+          <div className="flex flex-wrap gap-3 justify-center mb-10">
+            <Link href="/accounting/checkout" className="bg-[#0F4C81] hover:bg-[#1560A0] text-white px-7 py-3.5 rounded-xl font-semibold text-base transition shadow-lg shadow-blue-900/30">
+              Get Started Free
+            </Link>
+            <Link href="/efficient" className="bg-white/10 hover:bg-white/20 border border-white/20 text-white px-7 py-3.5 rounded-xl font-semibold text-base transition">
+              Explore Efficient Accounting
+            </Link>
+          </div>
+
+          <p className="text-sm text-slate-500">No contracts · Cancel anytime · Starts at $9/mo</p>
         </div>
-        <h1 className="text-4xl md:text-6xl font-extrabold mb-6 leading-tight">
-          Stop Working <span className="text-[#0F4C81]">In</span> Your Business.<br />
-          Start Working <span className="text-[#0F4C81]">On</span> It.
-        </h1>
-        <p className="text-xl text-slate-600 max-w-2xl mx-auto mb-10">
-          Formation · Accounting · 60 Consultants · AI Workforce.<br />
-          <span className="font-semibold text-slate-800">Avg. 22 hrs saved per week.</span>
-        </p>
-        <div className="flex gap-4 justify-center flex-wrap">
-          <Link href="/accounting/checkout" className="btn-primary text-base">
-            🚀 Get Started
-          </Link>
-          <Link href="/accounting" className="btn-secondary text-base">
-            View Dashboard
-          </Link>
+
+        {/* Stats bar */}
+        <div className="relative border-t border-white/10 bg-white/5 backdrop-blur-sm">
+          <div className="max-w-5xl mx-auto px-6 py-6 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+            {STATS.map((s, i) => (
+              <div key={i}>
+                <p className="text-2xl font-extrabold text-white">{s.value}</p>
+                <p className="text-xs text-slate-400 mt-0.5">{s.label}</p>
+              </div>
+            ))}
+          </div>
         </div>
-        <p className="mt-6 text-sm text-gray-400">No contracts · Cancel anytime · Starts at $9/mo</p>
       </header>
 
-      {/* Services */}
-      <section className="py-20 px-6 bg-white">
+      {/* ── Products ── */}
+      <section className="py-24 px-6 bg-white">
         <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-[#0F4C81]">Everything Your Business Needs</h2>
-            <p className="text-gray-500 mt-3 max-w-xl mx-auto">One platform. Formation to growth — built for operators who move fast.</p>
+          <div className="text-center mb-16">
+            <p className="text-xs font-bold text-[#0F4C81] uppercase tracking-widest mb-3">The Platform</p>
+            <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900">Two products. One complete business.</h2>
+            <p className="text-gray-500 mt-4 max-w-xl mx-auto">IEBC combines an accounting suite and an operations hub into a single platform — no integrations required.</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {services.map((s, i) => (
-              <div key={i} className="p-6 border border-gray-200 rounded-xl hover:border-[#0F4C81] hover:shadow-md transition">
-                <div className="text-3xl mb-3">{s.icon}</div>
-                <h3 className="text-lg font-bold mb-2">{s.title}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed">{s.desc}</p>
+
+          <div className="space-y-8">
+            {PRODUCTS.map((product, idx) => (
+              <div
+                key={idx}
+                className={`rounded-2xl border border-gray-200 overflow-hidden hover:border-gray-300 hover:shadow-lg transition grid md:grid-cols-2 ${idx % 2 === 1 ? 'md:[&>*:first-child]:order-2' : ''}`}
+              >
+                {/* Content */}
+                <div className="p-10 flex flex-col justify-center">
+                  <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: product.accent }}>{product.eyebrow}</p>
+                  <h3 className="text-2xl md:text-3xl font-extrabold text-gray-900 mb-4">{product.headline}</h3>
+                  <p className="text-gray-500 leading-relaxed mb-6">{product.body}</p>
+                  <ul className="grid grid-cols-2 gap-2 mb-8">
+                    {product.features.map((f, fi) => (
+                      <li key={fi} className="flex items-center gap-2 text-sm text-gray-600">
+                        <span className="text-green-500 font-bold">✓</span>{f}
+                      </li>
+                    ))}
+                  </ul>
+                  <Link
+                    href={product.cta.href}
+                    className="self-start px-6 py-3 rounded-lg font-semibold text-sm transition border-2"
+                    style={{ borderColor: product.accent, color: product.accent }}
+                  >
+                    {product.cta.label}
+                  </Link>
+                </div>
+
+                {/* Visual panel */}
+                <div
+                  className="min-h-[280px] flex items-center justify-center p-10"
+                  style={{ background: `linear-gradient(135deg, ${product.accent}15 0%, ${product.accent}05 100%)` }}
+                >
+                  <div className="bg-white rounded-xl shadow-xl border border-gray-100 p-6 w-full max-w-xs">
+                    <div className="flex items-center gap-2 mb-4">
+                      <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: product.accent }}>
+                        <span className="text-white text-xs font-bold">I</span>
+                      </div>
+                      <div>
+                        <p className="text-xs font-bold text-gray-800">{product.eyebrow}</p>
+                        <p className="text-[10px] text-gray-400">IEBC Platform</p>
+                      </div>
+                    </div>
+                    <div className="space-y-2">
+                      {product.features.slice(0, 4).map((f, fi) => (
+                        <div key={fi} className="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2">
+                          <span className="text-xs font-bold" style={{ color: product.accent }}>✓</span>
+                          <span className="text-xs text-gray-600">{f}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
               </div>
             ))}
           </div>
         </div>
       </section>
 
-      {/* Stats */}
-      <section className="py-16 px-6 bg-[#0F4C81] text-white">
-        <div className="max-w-4xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
-          {[['22 hrs', 'Saved per week'], ['60', 'Consultants on demand'], ['$10M', 'MRR target'], ['3 tiers', 'Starting at $9/mo']].map(([val, label], i) => (
-            <div key={i}>
-              <p className="text-3xl font-extrabold">{val}</p>
-              <p className="text-sm text-blue-200 mt-1">{label}</p>
-            </div>
-          ))}
+      {/* ── Why IEBC ── */}
+      <section className="py-20 px-6 bg-gray-50">
+        <div className="max-w-6xl mx-auto">
+          <div className="text-center mb-12">
+            <p className="text-xs font-bold text-[#0F4C81] uppercase tracking-widest mb-3">Why IEBC</p>
+            <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900">Built different. Runs different.</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {WHY.map((w, i) => (
+              <div key={i} className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-md hover:border-[#0F4C81] transition">
+                <div className="text-3xl mb-4">{w.icon}</div>
+                <h3 className="font-bold text-gray-900 mb-2">{w.title}</h3>
+                <p className="text-sm text-gray-500 leading-relaxed">{w.body}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </section>
 
-      {/* Pricing */}
-      <section id="pricing" className="py-20 px-6 bg-gray-50">
+      {/* ── Pricing ── */}
+      <section id="pricing" className="py-24 px-6 bg-white">
         <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-12">
-            <h2 className="text-3xl font-bold text-[#0F4C81]">Simple, Transparent Pricing</h2>
-            <p className="text-gray-500 mt-3">Choose the plan that fits your business. Upgrade as you grow.</p>
+          <div className="text-center mb-14">
+            <p className="text-xs font-bold text-[#0F4C81] uppercase tracking-widest mb-3">Pricing</p>
+            <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900">Simple, transparent pricing.</h2>
+            <p className="text-gray-500 mt-4">Choose the plan that fits your business. No hidden fees, no long-term contracts.</p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
-            {plans.map(p => (
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
+            {PLANS.map(p => (
               <div
                 key={p.id}
-                className={`bg-white rounded-xl border flex flex-col transition ${
-                  p.highlight ? 'border-[#0F4C81] shadow-xl scale-105' : 'border-gray-200 hover:border-[#0F4C81] hover:shadow-md'
+                className={`rounded-2xl border flex flex-col transition relative ${
+                  p.highlight
+                    ? 'border-[#0F4C81] shadow-2xl shadow-blue-100 ring-2 ring-[#0F4C81]/20'
+                    : 'border-gray-200 hover:border-[#0F4C81] hover:shadow-lg'
                 }`}
               >
                 {p.highlight && (
-                  <div className="bg-[#0F4C81] text-white text-xs font-bold text-center py-1.5 rounded-t-xl tracking-widest uppercase">
-                    Most Popular
+                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
+                    <span className="bg-[#0F4C81] text-white text-xs font-bold px-4 py-1 rounded-full uppercase tracking-widest whitespace-nowrap">
+                      Most Popular
+                    </span>
                   </div>
                 )}
-                <div className="p-6 flex flex-col flex-1">
-                  <h3 className="text-xl font-bold">{p.label}</h3>
-                  <div className="mt-3 mb-1">
-                    <span className="text-4xl font-extrabold text-[#0F4C81]">{p.price}</span>
-                    <span className="text-gray-500 text-sm">{p.period}</span>
+                <div className={`p-7 flex flex-col flex-1 ${p.highlight ? 'bg-white' : 'bg-white'}`}>
+                  <div className="mb-5">
+                    <span className={`inline-block px-2.5 py-0.5 rounded-md text-xs font-bold mb-3 ${
+                      p.id === 'silver' ? 'bg-slate-100 text-slate-600' :
+                      p.id === 'gold' ? 'bg-amber-50 text-amber-700' :
+                      'bg-blue-50 text-blue-700'
+                    }`}>{p.label}</span>
+                    <div className="flex items-baseline gap-1">
+                      <span className="text-4xl font-extrabold text-gray-900">{p.price}</span>
+                      <span className="text-gray-400 text-sm">{p.period}</span>
+                    </div>
+                    <p className="text-sm text-gray-500 mt-1">{p.desc}</p>
+                    <p className="text-xs text-gray-400 mt-1">
+                      {p.consultants > 0 ? `${p.consultants} consultants · ` : ''}Up to {p.users} user{p.users > 1 ? 's' : ''}
+                    </p>
                   </div>
-                  <p className="text-xs text-gray-400 mb-4">
-                    {p.consultants > 0 ? `${p.consultants} consultants · ` : ''}Up to {p.users} user{p.users > 1 ? 's' : ''}
-                  </p>
-                  <ul className="space-y-2 flex-1 mb-6">
+
+                  <ul className="space-y-2.5 flex-1 mb-7">
                     {p.features.map((f, i) => (
                       <li key={i} className="flex items-start gap-2 text-sm text-gray-600">
-                        <span className="text-green-500 mt-0.5">✓</span>{f}
+                        <span className="text-green-500 font-bold mt-0.5 shrink-0">✓</span>
+                        <span>{f}</span>
                       </li>
                     ))}
                   </ul>
+
                   <Link
                     href={p.link}
-                    className={`text-center py-3 rounded-lg font-semibold transition text-sm block ${
+                    className={`text-center py-3 rounded-xl font-semibold text-sm transition block ${
                       p.highlight
-                        ? 'bg-[#0F4C81] text-white hover:bg-[#082D4F]'
+                        ? 'bg-[#0F4C81] text-white hover:bg-[#082D4F] shadow-md shadow-blue-200'
                         : 'border-2 border-[#0F4C81] text-[#0F4C81] hover:bg-blue-50'
                     }`}
                   >
-                    Get {p.label}
+                    {p.cta}
                   </Link>
                 </div>
               </div>
             ))}
           </div>
+
           <p className="text-center text-xs text-gray-400 mt-8">
             All plans billed monthly. Cancel anytime. Secure payments via Stripe.
           </p>
         </div>
       </section>
 
-      {/* Footer CTA */}
-      <section className="py-16 px-6 bg-white text-center">
-        <h2 className="text-2xl font-bold text-[#0F4C81] mb-3">Ready to build a better business?</h2>
-        <p className="text-gray-500 mb-6">Join IEBC and get your formation, accounting, and consultant team in one place.</p>
-        <Link href="/accounting/checkout" className="btn-primary">
-          Start Today — From $9/mo
-        </Link>
+      {/* ── CTA Banner ── */}
+      <section className="py-20 px-6 bg-[#050F1C] text-white text-center relative overflow-hidden">
+        <div className="absolute inset-0 opacity-[0.04]" style={{
+          backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)',
+          backgroundSize: '60px 60px',
+        }} />
+        <div className="relative max-w-2xl mx-auto">
+          <h2 className="text-3xl md:text-4xl font-extrabold mb-4">Ready to build a better business?</h2>
+          <p className="text-slate-400 mb-8 text-lg">Join IEBC and get your formation, accounting, and consultant team working for you from day one.</p>
+          <div className="flex flex-wrap gap-3 justify-center">
+            <Link href="/accounting/checkout" className="bg-[#0F4C81] hover:bg-[#1560A0] text-white px-8 py-3.5 rounded-xl font-semibold transition shadow-lg shadow-blue-900/30">
+              Start Today — From $9/mo
+            </Link>
+            <Link href="/auth/login" className="bg-white/10 hover:bg-white/20 border border-white/20 text-white px-8 py-3.5 rounded-xl font-semibold transition">
+              Sign In
+            </Link>
+          </div>
+        </div>
       </section>
+
+      {/* ── Footer ── */}
+      <footer className="bg-gray-50 border-t border-gray-200 px-6 py-14">
+        <div className="max-w-6xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-10">
+            {/* Brand */}
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-8 h-8 bg-[#0F4C81] rounded-lg flex items-center justify-center">
+                  <span className="text-white text-sm font-extrabold">I</span>
+                </div>
+                <span className="text-[#0F4C81] font-extrabold text-lg">IEBC</span>
+              </div>
+              <p className="text-xs text-gray-400 leading-relaxed max-w-[200px]">
+                Integrated Efficiency Business Consultants. Formation to growth, in one platform.
+              </p>
+            </div>
+
+            {/* Link columns */}
+            {Object.entries(FOOTER_LINKS).map(([group, links]) => (
+              <div key={group}>
+                <p className="text-xs font-bold text-gray-800 uppercase tracking-widest mb-4">{group}</p>
+                <ul className="space-y-2.5">
+                  {links.map(l => (
+                    <li key={l.href}>
+                      <Link href={l.href} className="text-sm text-gray-500 hover:text-[#0F4C81] transition">{l.label}</Link>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+
+          <div className="border-t border-gray-200 pt-6 flex flex-col md:flex-row justify-between items-center gap-2">
+            <p className="text-xs text-gray-400">© {new Date().getFullYear()} IEBC. All rights reserved.</p>
+            <p className="text-xs text-gray-400">Secured by Supabase · Payments by Stripe</p>
+          </div>
+        </div>
+      </footer>
 
     </main>
   )

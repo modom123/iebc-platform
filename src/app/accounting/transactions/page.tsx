@@ -10,7 +10,11 @@ type Transaction = {
   type: 'income' | 'expense' | 'transfer'
   category: string
   vendor: string
+  project_id?: string
+  reconciled?: boolean
 }
+
+type Project = { id: string; name: string }
 
 const CATEGORIES = {
   income: ['Service Revenue', 'Product Sales', 'Consulting', 'Refund Received', 'Other Income'],
@@ -22,23 +26,32 @@ const fmt = (n: number) => '$' + Number(n).toLocaleString('en-US', { minimumFrac
 
 export default function TransactionsPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([])
+  const [projects, setProjects] = useState<Project[]>([])
   const [loading, setLoading] = useState(true)
   const [showForm, setShowForm] = useState(false)
   const [filterType, setFilterType] = useState('')
-  const [form, setForm] = useState({ date: new Date().toISOString().split('T')[0], description: '', amount: '', type: 'income', category: '', vendor: '' })
+  const [filterProject, setFilterProject] = useState('')
+  const [form, setForm] = useState({ date: new Date().toISOString().split('T')[0], description: '', amount: '', type: 'income', category: '', vendor: '', project_id: '' })
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
 
   const load = async () => {
     setLoading(true)
-    const params = filterType ? `?type=${filterType}` : ''
-    const res = await fetch(`/api/accounting/transactions${params}`)
+    const params = new URLSearchParams()
+    if (filterType) params.set('type', filterType)
+    if (filterProject) params.set('project_id', filterProject)
+    const qs = params.toString()
+    const res = await fetch(`/api/accounting/transactions${qs ? '?' + qs : ''}`)
     const data = await res.json()
     setTransactions(Array.isArray(data) ? data : [])
     setLoading(false)
   }
 
-  useEffect(() => { load() }, [filterType])
+  useEffect(() => {
+    fetch('/api/accounting/projects').then(r => r.json()).then(d => setProjects(Array.isArray(d) ? d : []))
+  }, [])
+
+  useEffect(() => { load() }, [filterType, filterProject])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -51,7 +64,7 @@ export default function TransactionsPage() {
     })
     if (res.ok) {
       setShowForm(false)
-      setForm({ date: new Date().toISOString().split('T')[0], description: '', amount: '', type: 'income', category: '', vendor: '' })
+      setForm({ date: new Date().toISOString().split('T')[0], description: '', amount: '', type: 'income', category: '', vendor: '', project_id: '' })
       load()
     } else {
       const d = await res.json()
@@ -101,12 +114,20 @@ export default function TransactionsPage() {
         </div>
 
         {/* Filter */}
-        <div className="flex gap-2">
-          {['', 'income', 'expense', 'transfer'].map(t => (
-            <button key={t} onClick={() => setFilterType(t)} className={`px-4 py-1.5 rounded-full text-sm font-medium transition ${filterType === t ? 'bg-[#0F4C81] text-white' : 'bg-white border border-gray-200 hover:border-[#0F4C81]'}`}>
-              {t === '' ? 'All' : t.charAt(0).toUpperCase() + t.slice(1)}
-            </button>
-          ))}
+        <div className="flex flex-wrap gap-2 items-center">
+          <div className="flex gap-1">
+            {['', 'income', 'expense', 'transfer'].map(t => (
+              <button key={t} onClick={() => setFilterType(t)} className={`px-4 py-1.5 rounded-full text-sm font-medium transition ${filterType === t ? 'bg-[#0F4C81] text-white' : 'bg-white border border-gray-200 hover:border-[#0F4C81]'}`}>
+                {t === '' ? 'All' : t.charAt(0).toUpperCase() + t.slice(1)}
+              </button>
+            ))}
+          </div>
+          {projects.length > 0 && (
+            <select value={filterProject} onChange={e => setFilterProject(e.target.value)} className="ml-auto border border-gray-200 rounded-lg px-3 py-1.5 text-sm bg-white">
+              <option value="">All Projects</option>
+              {projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+            </select>
+          )}
         </div>
 
         {/* Add Form */}
@@ -145,6 +166,15 @@ export default function TransactionsPage() {
                 <label className="text-xs font-medium text-gray-600 block mb-1">Vendor / Payer</label>
                 <input type="text" value={form.vendor} onChange={e => setForm({...form, vendor: e.target.value})} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" placeholder="Company or person" />
               </div>
+              {projects.length > 0 && (
+                <div>
+                  <label className="text-xs font-medium text-gray-600 block mb-1">Project (optional)</label>
+                  <select value={form.project_id} onChange={e => setForm({...form, project_id: e.target.value})} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm">
+                    <option value="">No project</option>
+                    {projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                  </select>
+                </div>
+              )}
               {error && <p className="col-span-full text-red-600 text-sm">{error}</p>}
               <div className="col-span-full flex gap-3">
                 <button type="submit" disabled={saving} className="btn-primary text-sm">{saving ? 'Saving...' : 'Save Transaction'}</button>
@@ -170,24 +200,32 @@ export default function TransactionsPage() {
                 <th className="p-3 text-left">Description</th>
                 <th className="p-3 text-left">Vendor</th>
                 <th className="p-3 text-left">Category</th>
+                <th className="p-3 text-left">Project</th>
                 <th className="p-3 text-right">Amount</th>
                 <th className="p-3 text-center">Actions</th>
               </tr></thead>
               <tbody className="divide-y divide-gray-50">
-                {transactions.map(t => (
-                  <tr key={t.id} className="hover:bg-gray-50">
-                    <td className="p-3 text-gray-500 whitespace-nowrap">{t.date}</td>
-                    <td className="p-3 font-medium">{t.description}</td>
-                    <td className="p-3 text-gray-500">{t.vendor || '—'}</td>
-                    <td className="p-3"><span className="px-2 py-0.5 bg-gray-100 rounded text-xs">{t.category || 'Uncategorized'}</span></td>
-                    <td className={`p-3 text-right font-mono font-semibold whitespace-nowrap ${t.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
-                      {t.type === 'income' ? '+' : '-'}{fmt(t.amount)}
-                    </td>
-                    <td className="p-3 text-center">
-                      <button onClick={() => handleDelete(t.id)} className="text-red-400 hover:text-red-600 text-xs">Delete</button>
-                    </td>
-                  </tr>
-                ))}
+                {transactions.map(t => {
+                  const proj = projects.find(p => p.id === t.project_id)
+                  return (
+                    <tr key={t.id} className="hover:bg-gray-50">
+                      <td className="p-3 text-gray-500 whitespace-nowrap">{t.date}</td>
+                      <td className="p-3 font-medium">{t.description}</td>
+                      <td className="p-3 text-gray-500">{t.vendor || '—'}</td>
+                      <td className="p-3"><span className="px-2 py-0.5 bg-gray-100 rounded text-xs">{t.category || 'Uncategorized'}</span></td>
+                      <td className="p-3">
+                        {proj ? <Link href="/accounting/projects" className="text-xs text-[#0F4C81] hover:underline">{proj.name}</Link> : <span className="text-gray-300 text-xs">—</span>}
+                      </td>
+                      <td className={`p-3 text-right font-mono font-semibold whitespace-nowrap ${t.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
+                        {t.reconciled && <span className="text-green-400 mr-1 text-xs">✓</span>}
+                        {t.type === 'income' ? '+' : '-'}{fmt(t.amount)}
+                      </td>
+                      <td className="p-3 text-center">
+                        <button onClick={() => handleDelete(t.id)} className="text-red-400 hover:text-red-600 text-xs">Delete</button>
+                      </td>
+                    </tr>
+                  )
+                })}
               </tbody>
             </table>
           )}

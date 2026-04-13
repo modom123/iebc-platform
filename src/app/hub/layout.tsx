@@ -1,6 +1,8 @@
 import AppShell from '@/components/AppShell'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 
+export const dynamic = 'force-dynamic'
+
 export default async function HubLayout({ children }: { children: React.ReactNode }) {
   const supabase = createServerSupabaseClient()
   const { data: { session } } = await supabase.auth.getSession()

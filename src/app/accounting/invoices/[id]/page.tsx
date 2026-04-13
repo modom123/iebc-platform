@@ -54,12 +54,6 @@ export default async function InvoiceDetailPage({ params }: { params: { id: stri
           <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[invoice.status] || ''}`}>{invoice.status}</span>
         </div>
         <div className="flex gap-2">
-          <Link
-            href={`/api/export?type=invoice&id=${invoice.id}`}
-            className="btn-secondary text-sm py-2"
-          >
-            Export PDF
-          </Link>
           <PrintButton />
         </div>
       </div>

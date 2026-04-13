@@ -98,7 +98,9 @@ export default async function Accounting() {
           <Link href="/accounting/bills" className="hover:text-[#0F4C81] text-gray-600">Bills</Link>
           <Link href="/accounting/budgets" className="hover:text-[#0F4C81] text-gray-600">Budgets</Link>
           <Link href="/accounting/tracker" className="hover:text-[#0F4C81] text-gray-600">Tracker</Link>
+          <Link href="/accounting/forecast" className="hover:text-[#0F4C81] text-gray-600">Forecast</Link>
           <Link href="/accounting/reports" className="hover:text-[#0F4C81] text-gray-600">Reports</Link>
+          <Link href="/accounting/journal" className="hover:text-[#0F4C81] text-gray-600">Journal</Link>
           <Link href="/hub" className="hover:text-[#0F4C81] text-gray-600">Hub</Link>
           <Link href="/settings" className="hover:text-[#0F4C81] text-gray-600">Settings</Link>
           {!sub && <Link href="/accounting/checkout" className="bg-[#0F4C81] text-white px-3 py-1 rounded-lg">Upgrade</Link>}
@@ -199,6 +201,10 @@ export default async function Accounting() {
             { href: '/accounting/tax', icon: '💸', label: 'Tax Center' },
             { href: '/accounting/rules', icon: '⚡', label: 'Auto Rules' },
             { href: '/accounting/customers', icon: '👥', label: 'Customers' },
+            { href: '/accounting/forecast', icon: '📈', label: 'Cash Forecast' },
+            { href: '/accounting/accounts', icon: '📒', label: 'Chart of Accounts' },
+            { href: '/accounting/aged-receivables', icon: '⏱️', label: 'Aged AR' },
+            { href: '/accounting/journal', icon: '📝', label: 'Journal' },
             { href: '/api/export?type=transactions', icon: '⬇️', label: 'Export CSV' },
           ].map(({ href, icon, label }) => (
             <Link key={href} href={href}

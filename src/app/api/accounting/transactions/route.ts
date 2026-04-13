@@ -11,6 +11,8 @@ export async function GET(req: Request) {
   const category = searchParams.get('category')
   const from = searchParams.get('from')
   const to = searchParams.get('to')
+  const project_id = searchParams.get('project_id')
+  const reconciled = searchParams.get('reconciled')
   const limit = parseInt(searchParams.get('limit') || '50')
 
   let query = supabase
@@ -24,6 +26,8 @@ export async function GET(req: Request) {
   if (category) query = query.eq('category', category)
   if (from) query = query.gte('date', from)
   if (to) query = query.lte('date', to)
+  if (project_id) query = query.eq('project_id', project_id)
+  if (reconciled !== null && reconciled !== undefined) query = query.eq('reconciled', reconciled === 'true')
 
   const { data, error } = await query
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
@@ -42,9 +46,11 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'description, amount, and type are required' }, { status: 400 })
   }
 
+  const { project_id } = body
+
   const { data, error } = await supabase
     .from('transactions')
-    .insert({ user_id: session.user.id, date, description, amount: parseFloat(amount), type, category, vendor, reference, account_id })
+    .insert({ user_id: session.user.id, date, description, amount: parseFloat(amount), type, category, vendor, reference, account_id, project_id: project_id || null })
     .select()
     .single()
 

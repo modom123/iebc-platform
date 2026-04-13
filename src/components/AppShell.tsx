@@ -16,7 +16,7 @@ const NAV_SECTIONS = [
   {
     title: 'Accounting',
     items: [
-      { href: '/accounting', icon: '◈', label: 'Overview', exact: true },
+      { href: '/accounting', icon: '◈', label: 'Accounting Overview', exact: true },
       { href: '/accounting/transactions', icon: '⇄', label: 'Transactions' },
       { href: '/accounting/invoices', icon: '▤', label: 'Invoices' },
       { href: '/accounting/estimates', icon: '◻', label: 'Estimates' },
@@ -31,10 +31,13 @@ const NAV_SECTIONS = [
     items: [
       { href: '/accounting/coa', icon: '≡', label: 'Chart of Accounts' },
       { href: '/accounting/journal', icon: '⊟', label: 'Journal Entries' },
-      { href: '/accounting/reconcile', icon: '⇌', label: 'Reconciliation' },
       { href: '/accounting/reports', icon: '▦', label: 'Reports' },
+      { href: '/accounting/aged-receivables', icon: '⏱', label: 'Aged Receivables' },
+      { href: '/accounting/forecast', icon: '▲', label: 'Cash Forecast' },
+      { href: '/accounting/reconcile', icon: '⇌', label: 'Reconciliation' },
       { href: '/accounting/tax', icon: '◈', label: 'Tax Center' },
       { href: '/accounting/budgets', icon: '◎', label: 'Budgets' },
+      { href: '/accounting/rules', icon: '⚡', label: 'Auto Rules' },
       { href: '/accounting/scanner', icon: '✦', label: 'AI Receipt Scanner' },
     ],
   },
@@ -49,8 +52,17 @@ const NAV_SECTIONS = [
     ],
   },
   {
+    title: 'Connect & Portals',
+    items: [
+      { href: '/accounting/connect', icon: '⬡', label: 'Bank Connect' },
+      { href: '/accounting/clients', icon: '◈', label: 'Client Portals' },
+      { href: '/accounting/audit', icon: '◉', label: 'Audit Trail' },
+    ],
+  },
+  {
     title: 'Workspace',
     items: [
+      { href: '/hub/consultants', icon: '🤖', label: 'AI Consultants' },
       { href: '/hub/leads', icon: '◆', label: 'CRM / Leads' },
       { href: '/hub/tasks', icon: '☑', label: 'Tasks' },
       { href: '/hub/team', icon: '◉', label: 'Team Members' },
@@ -183,8 +195,22 @@ export default function AppShell({ user, children }: { user?: User; children: Re
             </svg>
           </button>
 
-          {/* Breadcrumb / spacer */}
-          <div className="flex-1" />
+          {/* Current section label */}
+          <div className="flex-1 hidden sm:block">
+            {(() => {
+              const allItems = NAV_SECTIONS.flatMap(s => s.items)
+              const match = allItems.filter(i => i.exact ? pathname === i.href : pathname === i.href || pathname.startsWith(i.href + '/')).pop()
+              const section = NAV_SECTIONS.find(s => s.items.some(i => i.href === match?.href))
+              if (!match) return null
+              return (
+                <div className="flex items-center gap-1.5 text-xs text-gray-400">
+                  {section && <span>{section.title}</span>}
+                  {section && <span>/</span>}
+                  <span className="font-semibold text-gray-600">{match.label}</span>
+                </div>
+              )
+            })()}
+          </div>
 
           {/* Top-right actions */}
           <Link

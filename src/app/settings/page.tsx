@@ -2,6 +2,7 @@ import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 import SignOutButton from './SignOutButton'
+import ProfileForm from './ProfileForm'
 
 const TIER_INFO: Record<string, { label: string; color: string; price: string }> = {
   silver:   { label: 'Silver',   color: 'bg-gray-100 text-gray-700',    price: '$9/mo' },
@@ -28,11 +29,7 @@ export default async function SettingsPage() {
         {/* Profile */}
         <div className="bg-white rounded-xl border border-gray-200 p-6">
           <h2 className="font-bold text-gray-800 mb-4">Profile</h2>
-          <div className="space-y-3">
-            <div>
-              <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Full Name</label>
-              <p className="mt-1 font-medium text-gray-800">{profile?.full_name || '—'}</p>
-            </div>
+          <div className="space-y-3 mb-4">
             <div>
               <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Email</label>
               <p className="mt-1 font-medium text-gray-800">{session.user.email}</p>
@@ -47,6 +44,12 @@ export default async function SettingsPage() {
               <label className="text-xs font-medium text-gray-500 uppercase tracking-wide">Member Since</label>
               <p className="mt-1 text-sm text-gray-600">{new Date(session.user.created_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}</p>
             </div>
+          </div>
+          <div className="border-t border-gray-100 pt-4">
+            <ProfileForm
+              initialName={profile?.full_name || ''}
+              initialCompany={(profile as { company_name?: string } | null)?.company_name || ''}
+            />
           </div>
         </div>
 

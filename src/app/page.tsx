@@ -12,7 +12,7 @@ const PRODUCTS = [
     eyebrow: 'Efficient Accounting',
     headline: 'Books that run themselves.',
     body: 'Full-stack accounting suite — invoicing, payroll, reconciliation, AI receipt scanning, tax center, and real-time cash flow. Everything a growing business needs, none of the complexity.',
-    cta: { label: 'Explore Efficient →', href: '/efficient' },
+    cta: { label: 'Explore Efficient Accounting', href: '/efficient' },
     accent: '#0F4C81',
     features: ['Invoicing & estimates', 'Bank reconciliation', 'AI receipt scanner', 'Tax center & 1099s', 'Cash flow forecasting', 'Client payment portal'],
   },
@@ -20,7 +20,7 @@ const PRODUCTS = [
     eyebrow: 'Master Hub',
     headline: 'Your command center.',
     body: 'One dashboard for leads, tasks, team, formations, and your AI consultant workforce. Stop juggling five tools — run your entire operation from a single hub.',
-    cta: { label: 'Open Hub →', href: '/hub' },
+    cta: { label: 'Open Master Hub', href: '/hub' },
     accent: '#C9A02E',
     features: ['Lead pipeline & CRM', 'Task & project tracking', 'Team management', 'Business formation', 'Document vault', '60-consultant AI workforce'],
   },
@@ -146,20 +146,18 @@ export default function Home() {
     <main className="min-h-screen bg-white text-slate-900 font-sans">
 
       {/* ── Navigation ── */}
-      <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-gray-100 px-6 py-0">
+      <nav className="sticky top-0 z-50 bg-white border-b border-gray-200 px-6 py-0 shadow-sm">
         <div className="max-w-7xl mx-auto flex items-center justify-between h-16">
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="w-9 h-9 bg-[#0F4C81] rounded-lg flex items-center justify-center">
+          <Link href="/" className="flex items-center gap-3">
+            <div className="w-9 h-9 bg-[#0F4C81] rounded-lg flex items-center justify-center shadow-md">
               <span className="text-white text-base font-extrabold">I</span>
             </div>
             <div className="leading-tight">
               <span className="text-[#0F4C81] font-extrabold text-lg tracking-tight">IEBC</span>
-              <span className="hidden md:block text-[10px] text-gray-400 font-medium tracking-wide -mt-1">Integrated Efficiency Business Consultants</span>
+              <span className="hidden md:block text-[10px] text-gray-400 font-medium tracking-wide -mt-0.5">Integrated Efficiency Business Consultants</span>
             </div>
           </Link>
 
-          {/* Center links */}
           <div className="hidden md:flex items-center gap-1">
             {NAV_LINKS.map(l => (
               <Link
@@ -172,12 +170,11 @@ export default function Home() {
             ))}
           </div>
 
-          {/* Right CTAs */}
           <div className="flex items-center gap-2">
             <Link href="/auth/login" className="hidden md:block px-4 py-2 text-sm font-medium text-gray-600 hover:text-[#0F4C81] transition">
               Sign In
             </Link>
-            <Link href="/accounting/checkout" className="bg-[#0F4C81] text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-[#082D4F] transition">
+            <Link href="/accounting/checkout" className="bg-[#C02020] hover:bg-[#A01818] text-white px-5 py-2 rounded-lg text-sm font-bold transition shadow-sm">
               Get Started
             </Link>
           </div>
@@ -185,24 +182,20 @@ export default function Home() {
       </nav>
 
       {/* ── Hero ── */}
-      <header className="relative bg-[#050F1C] text-white overflow-hidden">
-        {/* Background grid */}
-        <div className="absolute inset-0 opacity-[0.04]" style={{
-          backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)',
-          backgroundSize: '60px 60px',
-        }} />
-        {/* Glow */}
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-[#0F4C81] opacity-20 blur-[120px] rounded-full pointer-events-none" />
+      <header className="relative bg-gradient-to-br from-[#F0F5FF] via-white to-[#FFF8E8] overflow-hidden border-b border-gray-100">
+        {/* Decorative circles */}
+        <div className="absolute -top-24 -right-24 w-96 h-96 bg-[#0F4C81] opacity-5 rounded-full pointer-events-none" />
+        <div className="absolute -bottom-16 -left-16 w-72 h-72 bg-[#C9A02E] opacity-5 rounded-full pointer-events-none" />
 
-        <div className="relative max-w-5xl mx-auto px-6 py-28 text-center">
-          <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 text-white text-xs font-semibold px-4 py-1.5 rounded-full mb-8 tracking-widest uppercase">
-            <span className="w-1.5 h-1.5 bg-green-400 rounded-full animate-pulse" />
+        <div className="relative max-w-5xl mx-auto px-6 py-24 text-center">
+          <div className="inline-flex items-center gap-2 bg-[#0F4C81]/10 border border-[#0F4C81]/20 text-[#0F4C81] text-xs font-bold px-4 py-1.5 rounded-full mb-7 tracking-widest uppercase">
+            <span className="w-1.5 h-1.5 bg-green-500 rounded-full" />
             Integrated Efficiency Business Consultants
           </div>
 
-          <h1 className="text-5xl md:text-7xl font-extrabold leading-tight mb-6 tracking-tight">
+          <h1 className="text-5xl md:text-6xl font-extrabold leading-tight mb-6 tracking-tight text-gray-900">
             Stop Working{' '}
-            <span className="text-[#4A9EE8]">In</span>{' '}
+            <span className="text-[#0F4C81]">In</span>{' '}
             Your Business.
             <br />
             Start Working{' '}
@@ -210,30 +203,31 @@ export default function Home() {
             It.
           </h1>
 
-          <p className="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto mb-10 leading-relaxed">
-            Formation · Accounting · 60 AI Consultants · Operations Hub.<br />
-            <span className="text-white font-semibold">One platform that runs your business while you build it.</span>
+          <p className="text-lg md:text-xl text-gray-500 max-w-2xl mx-auto mb-10 leading-relaxed">
+            Formation · Accounting · 60 AI Consultants · Operations Hub.
+            <br />
+            <span className="text-gray-800 font-semibold">One platform that runs your business while you build it.</span>
           </p>
 
-          <div className="flex flex-wrap gap-3 justify-center mb-10">
-            <Link href="/accounting/checkout" className="bg-[#0F4C81] hover:bg-[#1560A0] text-white px-7 py-3.5 rounded-xl font-semibold text-base transition shadow-lg shadow-blue-900/30">
+          <div className="flex flex-wrap gap-3 justify-center mb-8">
+            <Link href="/accounting/checkout" className="bg-[#C02020] hover:bg-[#A01818] text-white px-8 py-3.5 rounded-xl font-bold text-base transition shadow-lg shadow-red-200">
               Get Started Free
             </Link>
-            <Link href="/efficient" className="bg-white/10 hover:bg-white/20 border border-white/20 text-white px-7 py-3.5 rounded-xl font-semibold text-base transition">
+            <Link href="/efficient" className="bg-white hover:bg-blue-50 border-2 border-[#0F4C81] text-[#0F4C81] px-8 py-3.5 rounded-xl font-bold text-base transition shadow-sm">
               Explore Efficient Accounting
             </Link>
           </div>
 
-          <p className="text-sm text-slate-500">No contracts · Cancel anytime · Starts at $9/mo</p>
+          <p className="text-sm text-gray-400">No contracts · Cancel anytime · Starts at $9/mo</p>
         </div>
 
         {/* Stats bar */}
-        <div className="relative border-t border-white/10 bg-white/5 backdrop-blur-sm">
-          <div className="max-w-5xl mx-auto px-6 py-6 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+        <div className="bg-[#0F4C81] border-t border-[#0F4C81]">
+          <div className="max-w-5xl mx-auto px-6 py-5 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             {STATS.map((s, i) => (
               <div key={i}>
                 <p className="text-2xl font-extrabold text-white">{s.value}</p>
-                <p className="text-xs text-slate-400 mt-0.5">{s.label}</p>
+                <p className="text-xs text-blue-200 mt-0.5">{s.label}</p>
               </div>
             ))}
           </div>
@@ -244,7 +238,7 @@ export default function Home() {
       <section className="py-24 px-6 bg-white">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <p className="text-xs font-bold text-[#0F4C81] uppercase tracking-widest mb-3">The Platform</p>
+            <p className="text-xs font-bold text-[#C9A02E] uppercase tracking-widest mb-3">The Platform</p>
             <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900">Two products. One complete business.</h2>
             <p className="text-gray-500 mt-4 max-w-xl mx-auto">IEBC combines an accounting suite and an operations hub into a single platform — no integrations required.</p>
           </div>
@@ -253,10 +247,9 @@ export default function Home() {
             {PRODUCTS.map((product, idx) => (
               <div
                 key={idx}
-                className={`rounded-2xl border border-gray-200 overflow-hidden hover:border-gray-300 hover:shadow-lg transition grid md:grid-cols-2 ${idx % 2 === 1 ? 'md:[&>*:first-child]:order-2' : ''}`}
+                className={`rounded-2xl border border-gray-200 overflow-hidden hover:shadow-xl transition grid md:grid-cols-2 bg-white`}
               >
-                {/* Content */}
-                <div className="p-10 flex flex-col justify-center">
+                <div className={`p-10 flex flex-col justify-center ${idx % 2 === 1 ? 'md:order-2' : ''}`}>
                   <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: product.accent }}>{product.eyebrow}</p>
                   <h3 className="text-2xl md:text-3xl font-extrabold text-gray-900 mb-4">{product.headline}</h3>
                   <p className="text-gray-500 leading-relaxed mb-6">{product.body}</p>
@@ -269,19 +262,18 @@ export default function Home() {
                   </ul>
                   <Link
                     href={product.cta.href}
-                    className="self-start px-6 py-3 rounded-lg font-semibold text-sm transition border-2"
-                    style={{ borderColor: product.accent, color: product.accent }}
+                    className="self-start px-6 py-3 rounded-lg font-bold text-sm transition text-white shadow-md"
+                    style={{ background: product.accent }}
                   >
                     {product.cta.label}
                   </Link>
                 </div>
 
-                {/* Visual panel */}
                 <div
-                  className="min-h-[280px] flex items-center justify-center p-10"
-                  style={{ background: `linear-gradient(135deg, ${product.accent}15 0%, ${product.accent}05 100%)` }}
+                  className={`min-h-[280px] flex items-center justify-center p-10 ${idx % 2 === 1 ? 'md:order-1' : ''}`}
+                  style={{ background: `linear-gradient(135deg, ${product.accent}12 0%, ${product.accent}04 100%)` }}
                 >
-                  <div className="bg-white rounded-xl shadow-xl border border-gray-100 p-6 w-full max-w-xs">
+                  <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 w-full max-w-xs">
                     <div className="flex items-center gap-2 mb-4">
                       <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: product.accent }}>
                         <span className="text-white text-xs font-bold">I</span>
@@ -308,10 +300,10 @@ export default function Home() {
       </section>
 
       {/* ── Why IEBC ── */}
-      <section className="py-20 px-6 bg-gray-50">
+      <section className="py-20 px-6 bg-[#F5F7FA]">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
-            <p className="text-xs font-bold text-[#0F4C81] uppercase tracking-widest mb-3">Why IEBC</p>
+            <p className="text-xs font-bold text-[#C9A02E] uppercase tracking-widest mb-3">Why IEBC</p>
             <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900">Built different. Runs different.</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -330,7 +322,7 @@ export default function Home() {
       <section id="pricing" className="py-24 px-6 bg-white">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-14">
-            <p className="text-xs font-bold text-[#0F4C81] uppercase tracking-widest mb-3">Pricing</p>
+            <p className="text-xs font-bold text-[#C9A02E] uppercase tracking-widest mb-3">Pricing</p>
             <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900">Simple, transparent pricing.</h2>
             <p className="text-gray-500 mt-4">Choose the plan that fits your business. No hidden fees, no long-term contracts.</p>
           </div>
@@ -339,7 +331,7 @@ export default function Home() {
             {PLANS.map(p => (
               <div
                 key={p.id}
-                className={`rounded-2xl border flex flex-col transition relative ${
+                className={`rounded-2xl border flex flex-col transition relative bg-white ${
                   p.highlight
                     ? 'border-[#0F4C81] shadow-2xl shadow-blue-100 ring-2 ring-[#0F4C81]/20'
                     : 'border-gray-200 hover:border-[#0F4C81] hover:shadow-lg'
@@ -347,17 +339,17 @@ export default function Home() {
               >
                 {p.highlight && (
                   <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-                    <span className="bg-[#0F4C81] text-white text-xs font-bold px-4 py-1 rounded-full uppercase tracking-widest whitespace-nowrap">
+                    <span className="bg-[#C9A02E] text-white text-xs font-bold px-4 py-1 rounded-full uppercase tracking-widest whitespace-nowrap shadow-md">
                       Most Popular
                     </span>
                   </div>
                 )}
-                <div className={`p-7 flex flex-col flex-1 ${p.highlight ? 'bg-white' : 'bg-white'}`}>
+                <div className="p-7 flex flex-col flex-1">
                   <div className="mb-5">
                     <span className={`inline-block px-2.5 py-0.5 rounded-md text-xs font-bold mb-3 ${
                       p.id === 'silver' ? 'bg-slate-100 text-slate-600' :
-                      p.id === 'gold' ? 'bg-amber-50 text-amber-700' :
-                      'bg-blue-50 text-blue-700'
+                      p.id === 'gold' ? 'bg-amber-50 text-amber-700 border border-amber-200' :
+                      'bg-blue-50 text-[#0F4C81] border border-blue-200'
                     }`}>{p.label}</span>
                     <div className="flex items-baseline gap-1">
                       <span className="text-4xl font-extrabold text-gray-900">{p.price}</span>
@@ -380,10 +372,10 @@ export default function Home() {
 
                   <Link
                     href={p.link}
-                    className={`text-center py-3 rounded-xl font-semibold text-sm transition block ${
+                    className={`text-center py-3 rounded-xl font-bold text-sm transition block shadow-sm ${
                       p.highlight
-                        ? 'bg-[#0F4C81] text-white hover:bg-[#082D4F] shadow-md shadow-blue-200'
-                        : 'border-2 border-[#0F4C81] text-[#0F4C81] hover:bg-blue-50'
+                        ? 'bg-[#C02020] hover:bg-[#A01818] text-white shadow-red-200'
+                        : 'bg-[#0F4C81] hover:bg-[#082D4F] text-white'
                     }`}
                   >
                     {p.cta}
@@ -400,19 +392,20 @@ export default function Home() {
       </section>
 
       {/* ── CTA Banner ── */}
-      <section className="py-20 px-6 bg-[#050F1C] text-white text-center relative overflow-hidden">
-        <div className="absolute inset-0 opacity-[0.04]" style={{
+      <section className="py-20 px-6 bg-[#0F4C81] text-white text-center relative overflow-hidden">
+        <div className="absolute inset-0 opacity-[0.06]" style={{
           backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)',
           backgroundSize: '60px 60px',
         }} />
+        <div className="absolute -top-16 right-1/4 w-64 h-64 bg-[#C9A02E] opacity-10 rounded-full pointer-events-none" />
         <div className="relative max-w-2xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-extrabold mb-4">Ready to build a better business?</h2>
-          <p className="text-slate-400 mb-8 text-lg">Join IEBC and get your formation, accounting, and consultant team working for you from day one.</p>
+          <p className="text-blue-200 mb-8 text-lg">Join IEBC and get your formation, accounting, and consultant team working for you from day one.</p>
           <div className="flex flex-wrap gap-3 justify-center">
-            <Link href="/accounting/checkout" className="bg-[#0F4C81] hover:bg-[#1560A0] text-white px-8 py-3.5 rounded-xl font-semibold transition shadow-lg shadow-blue-900/30">
+            <Link href="/accounting/checkout" className="bg-[#C02020] hover:bg-[#A01818] text-white px-8 py-3.5 rounded-xl font-bold transition shadow-lg shadow-black/20">
               Start Today — From $9/mo
             </Link>
-            <Link href="/auth/login" className="bg-white/10 hover:bg-white/20 border border-white/20 text-white px-8 py-3.5 rounded-xl font-semibold transition">
+            <Link href="/auth/login" className="bg-white hover:bg-blue-50 text-[#0F4C81] px-8 py-3.5 rounded-xl font-bold transition shadow-md">
               Sign In
             </Link>
           </div>
@@ -423,10 +416,9 @@ export default function Home() {
       <footer className="bg-gray-50 border-t border-gray-200 px-6 py-14">
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-10">
-            {/* Brand */}
             <div>
               <div className="flex items-center gap-2 mb-3">
-                <div className="w-8 h-8 bg-[#0F4C81] rounded-lg flex items-center justify-center">
+                <div className="w-8 h-8 bg-[#0F4C81] rounded-lg flex items-center justify-center shadow-sm">
                   <span className="text-white text-sm font-extrabold">I</span>
                 </div>
                 <span className="text-[#0F4C81] font-extrabold text-lg">IEBC</span>
@@ -436,7 +428,6 @@ export default function Home() {
               </p>
             </div>
 
-            {/* Link columns */}
             {Object.entries(FOOTER_LINKS).map(([group, links]) => (
               <div key={group}>
                 <p className="text-xs font-bold text-gray-800 uppercase tracking-widest mb-4">{group}</p>

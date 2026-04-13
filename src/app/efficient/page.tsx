@@ -37,7 +37,7 @@ const PLANS = [
     label: 'Silver',
     price: '$9',
     period: '/mo',
-    badge: 'bg-slate-100 text-slate-600',
+    badgeCls: 'bg-slate-100 text-slate-600',
     features: ['Core accounting dashboard', 'Invoicing & estimates', 'Income & expense tracking', 'Client payment portal', 'Email support'],
     cta: 'Start with Silver',
     href: '/accounting/checkout',
@@ -48,7 +48,7 @@ const PLANS = [
     label: 'Gold',
     price: '$22',
     period: '/mo',
-    badge: 'bg-amber-50 text-amber-700',
+    badgeCls: 'bg-amber-50 text-amber-700 border border-amber-200',
     features: ['Everything in Silver', 'Bank reconciliation', 'Reports & dashboards', 'Cash flow forecast', 'AI receipt scanner', 'Recurring transactions', 'Budgets & rules', 'Priority support'],
     cta: 'Start with Gold',
     href: '/accounting/checkout',
@@ -59,7 +59,7 @@ const PLANS = [
     label: 'Platinum',
     price: '$42',
     period: '/mo',
-    badge: 'bg-blue-50 text-blue-700',
+    badgeCls: 'bg-blue-50 text-[#0F4C81] border border-blue-200',
     features: ['Everything in Gold', 'Full 22-module suite', 'Payroll', 'Inventory & POs', 'Tax center & 1099s', 'Mileage & time tracker', 'Projects & job costing', 'Audit trail'],
     cta: 'Start with Platinum',
     href: 'https://buy.stripe.com/bJe14h1aVeRj58CfrVgEg01',
@@ -72,15 +72,15 @@ export default function EfficientPage() {
     <main className="min-h-screen bg-white text-slate-900 font-sans">
 
       {/* ── Nav ── */}
-      <nav className="sticky top-0 z-50 bg-white/95 backdrop-blur border-b border-gray-100 px-6 py-0">
+      <nav className="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm px-6 py-0">
         <div className="max-w-7xl mx-auto flex items-center justify-between h-16">
           <Link href="/" className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-[#0F4C81] rounded-lg flex items-center justify-center">
+            <div className="w-9 h-9 bg-[#0F4C81] rounded-lg flex items-center justify-center shadow-md">
               <span className="text-white text-base font-extrabold">I</span>
             </div>
             <div className="leading-tight">
               <span className="text-[#0F4C81] font-extrabold text-lg tracking-tight">IEBC</span>
-              <span className="hidden md:block text-[10px] text-gray-400 font-medium tracking-wide -mt-1">Efficient Accounting</span>
+              <span className="hidden md:block text-[10px] text-gray-400 font-medium tracking-wide -mt-0.5">Efficient Accounting</span>
             </div>
           </Link>
 
@@ -88,12 +88,12 @@ export default function EfficientPage() {
             <Link href="#features" className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-[#0F4C81] hover:bg-blue-50 rounded-lg transition">Features</Link>
             <Link href="#how-it-works" className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-[#0F4C81] hover:bg-blue-50 rounded-lg transition">How It Works</Link>
             <Link href="#pricing" className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-[#0F4C81] hover:bg-blue-50 rounded-lg transition">Pricing</Link>
-            <Link href="/" className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-[#0F4C81] hover:bg-blue-50 rounded-lg transition">Back to IEBC</Link>
+            <Link href="/" className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-[#0F4C81] hover:bg-blue-50 rounded-lg transition">← IEBC Home</Link>
           </div>
 
           <div className="flex items-center gap-2">
             <Link href="/auth/login" className="hidden md:block px-4 py-2 text-sm font-medium text-gray-600 hover:text-[#0F4C81] transition">Sign In</Link>
-            <Link href="/accounting/checkout" className="bg-[#0F4C81] text-white px-4 py-2 rounded-lg text-sm font-semibold hover:bg-[#082D4F] transition">
+            <Link href="/accounting/checkout" className="bg-[#C02020] hover:bg-[#A01818] text-white px-5 py-2 rounded-lg text-sm font-bold transition shadow-sm">
               Start Free
             </Link>
           </div>
@@ -101,44 +101,43 @@ export default function EfficientPage() {
       </nav>
 
       {/* ── Hero ── */}
-      <header className="relative bg-[#050F1C] text-white overflow-hidden">
-        <div className="absolute inset-0 opacity-[0.04]" style={{
-          backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)',
-          backgroundSize: '60px 60px',
-        }} />
-        <div className="absolute top-0 left-1/3 w-[600px] h-[300px] bg-[#0F4C81] opacity-25 blur-[100px] rounded-full pointer-events-none" />
+      <header className="relative bg-gradient-to-br from-[#EEF4FF] via-white to-[#FFF8E8] border-b border-gray-100 overflow-hidden">
+        <div className="absolute -top-20 -right-20 w-80 h-80 bg-[#0F4C81] opacity-5 rounded-full pointer-events-none" />
+        <div className="absolute bottom-0 left-1/4 w-64 h-64 bg-[#C9A02E] opacity-5 rounded-full pointer-events-none" />
 
-        <div className="relative max-w-5xl mx-auto px-6 py-28 text-center">
-          <div className="inline-flex items-center gap-2 bg-white/10 border border-white/20 text-white text-xs font-semibold px-4 py-1.5 rounded-full mb-8 tracking-widest uppercase">
-            <span className="w-1.5 h-1.5 bg-green-400 rounded-full" />
+        <div className="relative max-w-5xl mx-auto px-6 py-24 text-center">
+          <div className="inline-flex items-center gap-2 bg-[#0F4C81]/10 border border-[#0F4C81]/20 text-[#0F4C81] text-xs font-bold px-4 py-1.5 rounded-full mb-7 tracking-widest uppercase">
+            <span className="w-1.5 h-1.5 bg-green-500 rounded-full" />
             Efficient Accounting by IEBC
           </div>
 
-          <h1 className="text-5xl md:text-7xl font-extrabold leading-tight mb-6 tracking-tight">
-            Accounting that works<br />
-            <span className="text-[#4A9EE8]">as hard as you do.</span>
+          <h1 className="text-5xl md:text-6xl font-extrabold leading-tight mb-6 tracking-tight text-gray-900">
+            Accounting that works
+            <br />
+            <span className="text-[#0F4C81]">as hard as you do.</span>
           </h1>
 
-          <p className="text-lg md:text-xl text-slate-300 max-w-2xl mx-auto mb-10 leading-relaxed">
-            22 modules. One dashboard. No accountant required.<br />
-            <span className="text-white font-semibold">From invoices to payroll to tax prep — Efficient does it all.</span>
+          <p className="text-lg md:text-xl text-gray-500 max-w-2xl mx-auto mb-10 leading-relaxed">
+            22 modules. One dashboard. No accountant required.
+            <br />
+            <span className="text-gray-800 font-semibold">From invoices to payroll to tax prep — Efficient does it all.</span>
           </p>
 
-          <div className="flex flex-wrap gap-3 justify-center mb-10">
-            <Link href="/accounting/checkout" className="bg-[#0F4C81] hover:bg-[#1560A0] text-white px-7 py-3.5 rounded-xl font-semibold text-base transition shadow-lg shadow-blue-900/30">
+          <div className="flex flex-wrap gap-3 justify-center mb-8">
+            <Link href="/accounting/checkout" className="bg-[#C02020] hover:bg-[#A01818] text-white px-8 py-3.5 rounded-xl font-bold text-base transition shadow-lg shadow-red-200">
               Get Started — From $9/mo
             </Link>
-            <Link href="/accounting" className="bg-white/10 hover:bg-white/20 border border-white/20 text-white px-7 py-3.5 rounded-xl font-semibold text-base transition">
-              View Dashboard Demo
+            <Link href="/accounting" className="bg-white hover:bg-blue-50 border-2 border-[#0F4C81] text-[#0F4C81] px-8 py-3.5 rounded-xl font-bold text-base transition shadow-sm">
+              View Dashboard
             </Link>
           </div>
 
-          <p className="text-sm text-slate-500">No contracts · Cancel anytime · Secure via Stripe</p>
+          <p className="text-sm text-gray-400">No contracts · Cancel anytime · Secure via Stripe</p>
         </div>
 
         {/* Metric bar */}
-        <div className="relative border-t border-white/10 bg-white/5">
-          <div className="max-w-4xl mx-auto px-6 py-6 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+        <div className="bg-[#0F4C81]">
+          <div className="max-w-4xl mx-auto px-6 py-5 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             {[
               ['22+', 'accounting modules'],
               ['60 sec', 'to create an invoice'],
@@ -147,7 +146,7 @@ export default function EfficientPage() {
             ].map(([val, label], i) => (
               <div key={i}>
                 <p className="text-2xl font-extrabold text-white">{val}</p>
-                <p className="text-xs text-slate-400 mt-0.5">{label}</p>
+                <p className="text-xs text-blue-200 mt-0.5">{label}</p>
               </div>
             ))}
           </div>
@@ -155,26 +154,21 @@ export default function EfficientPage() {
       </header>
 
       {/* ── How It Works ── */}
-      <section id="how-it-works" className="py-20 px-6 bg-gray-50">
+      <section id="how-it-works" className="py-20 px-6 bg-[#F5F7FA]">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-14">
-            <p className="text-xs font-bold text-[#0F4C81] uppercase tracking-widest mb-3">How It Works</p>
+            <p className="text-xs font-bold text-[#C9A02E] uppercase tracking-widest mb-3">How It Works</p>
             <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900">Up and running in minutes.</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {HOW_IT_WORKS.map((step, i) => (
-              <div key={i} className="relative">
-                {i < HOW_IT_WORKS.length - 1 && (
-                  <div className="hidden md:block absolute top-6 left-full w-full h-px bg-gray-200 -translate-x-4 z-0" />
-                )}
-                <div className="relative bg-white rounded-xl border border-gray-200 p-7 hover:shadow-md hover:border-[#0F4C81] transition">
-                  <div className="w-10 h-10 bg-[#0F4C81] text-white rounded-xl flex items-center justify-center text-sm font-extrabold mb-5">
-                    {step.step}
-                  </div>
-                  <h3 className="font-bold text-gray-900 mb-2">{step.title}</h3>
-                  <p className="text-sm text-gray-500 leading-relaxed">{step.body}</p>
+              <div key={i} className="bg-white rounded-xl border border-gray-200 p-7 hover:shadow-md hover:border-[#0F4C81] transition">
+                <div className="w-10 h-10 bg-[#0F4C81] text-white rounded-xl flex items-center justify-center text-sm font-extrabold mb-5 shadow-sm">
+                  {step.step}
                 </div>
+                <h3 className="font-bold text-gray-900 mb-2">{step.title}</h3>
+                <p className="text-sm text-gray-500 leading-relaxed">{step.body}</p>
               </div>
             ))}
           </div>
@@ -185,7 +179,7 @@ export default function EfficientPage() {
       <section id="features" className="py-24 px-6 bg-white">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-14">
-            <p className="text-xs font-bold text-[#0F4C81] uppercase tracking-widest mb-3">Full Module Suite</p>
+            <p className="text-xs font-bold text-[#C9A02E] uppercase tracking-widest mb-3">Full Module Suite</p>
             <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900">Everything your books need.</h2>
             <p className="text-gray-500 mt-4 max-w-xl mx-auto">22 modules designed to cover every corner of your financial operations — without the enterprise price tag.</p>
           </div>
@@ -194,7 +188,7 @@ export default function EfficientPage() {
             {MODULES.map((m, i) => (
               <div
                 key={i}
-                className="group flex gap-4 p-5 rounded-xl border border-gray-200 hover:border-[#0F4C81] hover:shadow-md transition cursor-default"
+                className="group flex gap-4 p-5 rounded-xl border border-gray-200 hover:border-[#0F4C81] hover:shadow-md bg-white transition cursor-default"
               >
                 <div className="text-2xl shrink-0 mt-0.5">{m.icon}</div>
                 <div>
@@ -208,10 +202,10 @@ export default function EfficientPage() {
       </section>
 
       {/* ── Pricing ── */}
-      <section id="pricing" className="py-24 px-6 bg-gray-50">
+      <section id="pricing" className="py-24 px-6 bg-[#F5F7FA]">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-14">
-            <p className="text-xs font-bold text-[#0F4C81] uppercase tracking-widest mb-3">Pricing</p>
+            <p className="text-xs font-bold text-[#C9A02E] uppercase tracking-widest mb-3">Pricing</p>
             <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900">Start at $9. Scale as you grow.</h2>
             <p className="text-gray-500 mt-4">All plans include the core accounting suite. No setup fees. Cancel anytime.</p>
           </div>
@@ -228,14 +222,14 @@ export default function EfficientPage() {
               >
                 {p.highlight && (
                   <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-                    <span className="bg-[#0F4C81] text-white text-xs font-bold px-4 py-1 rounded-full uppercase tracking-widest whitespace-nowrap">
+                    <span className="bg-[#C9A02E] text-white text-xs font-bold px-4 py-1 rounded-full uppercase tracking-widest whitespace-nowrap shadow-md">
                       Most Popular
                     </span>
                   </div>
                 )}
                 <div className="p-7 flex flex-col flex-1">
                   <div className="mb-5">
-                    <span className={`inline-block px-2.5 py-0.5 rounded-md text-xs font-bold mb-3 ${p.badge}`}>{p.label}</span>
+                    <span className={`inline-block px-2.5 py-0.5 rounded-md text-xs font-bold mb-3 ${p.badgeCls}`}>{p.label}</span>
                     <div className="flex items-baseline gap-1">
                       <span className="text-4xl font-extrabold text-gray-900">{p.price}</span>
                       <span className="text-gray-400 text-sm">{p.period}</span>
@@ -251,10 +245,10 @@ export default function EfficientPage() {
                   </ul>
                   <Link
                     href={p.href}
-                    className={`text-center py-3 rounded-xl font-semibold text-sm transition block ${
+                    className={`text-center py-3 rounded-xl font-bold text-sm transition block shadow-sm ${
                       p.highlight
-                        ? 'bg-[#0F4C81] text-white hover:bg-[#082D4F] shadow-md shadow-blue-200'
-                        : 'border-2 border-[#0F4C81] text-[#0F4C81] hover:bg-blue-50'
+                        ? 'bg-[#C02020] hover:bg-[#A01818] text-white shadow-red-200'
+                        : 'bg-[#0F4C81] hover:bg-[#082D4F] text-white'
                     }`}
                   >
                     {p.cta}
@@ -268,19 +262,20 @@ export default function EfficientPage() {
       </section>
 
       {/* ── Bottom CTA ── */}
-      <section className="py-20 px-6 bg-[#050F1C] text-white text-center relative overflow-hidden">
-        <div className="absolute inset-0 opacity-[0.04]" style={{
+      <section className="py-20 px-6 bg-[#0F4C81] text-white text-center relative overflow-hidden">
+        <div className="absolute inset-0 opacity-[0.06]" style={{
           backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)',
           backgroundSize: '60px 60px',
         }} />
+        <div className="absolute -top-12 right-1/3 w-56 h-56 bg-[#C9A02E] opacity-10 rounded-full pointer-events-none" />
         <div className="relative max-w-2xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-extrabold mb-4">Your books won't keep themselves.</h2>
-          <p className="text-slate-400 mb-8 text-lg">Start with Efficient Accounting and close your books faster every month.</p>
+          <p className="text-blue-200 mb-8 text-lg">Start with Efficient Accounting and close your books faster every month.</p>
           <div className="flex flex-wrap gap-3 justify-center">
-            <Link href="/accounting/checkout" className="bg-[#0F4C81] hover:bg-[#1560A0] text-white px-8 py-3.5 rounded-xl font-semibold transition shadow-lg shadow-blue-900/30">
+            <Link href="/accounting/checkout" className="bg-[#C02020] hover:bg-[#A01818] text-white px-8 py-3.5 rounded-xl font-bold transition shadow-lg shadow-black/20">
               Get Started — From $9/mo
             </Link>
-            <Link href="/" className="bg-white/10 hover:bg-white/20 border border-white/20 text-white px-8 py-3.5 rounded-xl font-semibold transition">
+            <Link href="/" className="bg-white hover:bg-blue-50 text-[#0F4C81] px-8 py-3.5 rounded-xl font-bold transition shadow-md">
               Back to IEBC
             </Link>
           </div>
@@ -290,7 +285,7 @@ export default function EfficientPage() {
       {/* ── Footer ── */}
       <footer className="bg-gray-50 border-t border-gray-200 px-6 py-10 text-center">
         <Link href="/" className="flex items-center gap-2 justify-center mb-3">
-          <div className="w-7 h-7 bg-[#0F4C81] rounded-lg flex items-center justify-center">
+          <div className="w-7 h-7 bg-[#0F4C81] rounded-lg flex items-center justify-center shadow-sm">
             <span className="text-white text-xs font-extrabold">I</span>
           </div>
           <span className="text-[#0F4C81] font-extrabold">IEBC</span>

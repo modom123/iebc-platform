@@ -81,34 +81,7 @@ export default async function Accounting() {
   const fmt = (n: number) => '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
 
   return (
-    <main className="min-h-screen bg-gray-50 text-slate-900">
-      {/* Top Nav */}
-      <div className="bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
-        <div className="flex items-center gap-4">
-          <Link href="/" className="text-xl font-bold text-[#0F4C81]">IEBC</Link>
-          <span className="text-gray-300">|</span>
-          <span className="text-sm font-semibold text-gray-700">Efficient Accounting</span>
-        </div>
-        <div className="flex gap-3 text-sm items-center flex-wrap">
-          <Link href="/accounting/transactions" className="hover:text-[#0F4C81] text-gray-600">Transactions</Link>
-          <Link href="/accounting/invoices" className="hover:text-[#0F4C81] text-gray-600">Invoices</Link>
-          <Link href="/accounting/estimates" className="hover:text-[#0F4C81] text-gray-600">Estimates</Link>
-          <Link href="/accounting/scanner" className="hover:text-[#0F4C81] text-gray-600 font-medium">🤖 AI Scan</Link>
-          <Link href="/accounting/connect" className="hover:text-[#0F4C81] text-gray-600 font-medium">🏦 Connect Bank</Link>
-          <Link href="/accounting/customers" className="hover:text-[#0F4C81] text-gray-600">Customers</Link>
-          <Link href="/accounting/clients" className="hover:text-[#0F4C81] text-gray-600">Portals</Link>
-          <Link href="/accounting/bills" className="hover:text-[#0F4C81] text-gray-600">Bills</Link>
-          <Link href="/accounting/budgets" className="hover:text-[#0F4C81] text-gray-600">Budgets</Link>
-          <Link href="/accounting/forecast" className="hover:text-[#0F4C81] text-gray-600">Forecast</Link>
-          <Link href="/accounting/reports" className="hover:text-[#0F4C81] text-gray-600">Reports</Link>
-          <Link href="/accounting/journal" className="hover:text-[#0F4C81] text-gray-600">Journal</Link>
-          <Link href="/accounting/audit" className="hover:text-[#0F4C81] text-gray-600">Audit</Link>
-          <Link href="/hub" className="hover:text-[#0F4C81] text-gray-600">Hub</Link>
-          <Link href="/settings" className="hover:text-[#0F4C81] text-gray-600">Settings</Link>
-          {!sub && <Link href="/accounting/checkout" className="bg-[#0F4C81] text-white px-3 py-1 rounded-lg">Upgrade</Link>}
-        </div>
-      </div>
-
+    <div className="text-slate-900">
       <div className="max-w-7xl mx-auto p-6 space-y-6">
 
         {/* Alerts */}
@@ -195,6 +168,8 @@ export default async function Accounting() {
             { href: '/accounting/scanner', icon: '🤖', label: 'AI Scanner' },
             { href: '/accounting/bills', icon: '🧾', label: 'Pay a Bill' },
             { href: '/accounting/tracker', icon: '🚗', label: 'Mileage & Time' },
+            { href: '/accounting/payroll', icon: '👔', label: 'Payroll' },
+            { href: '/accounting/vendors', icon: '🏢', label: 'Vendors' },
             { href: '/accounting/recurring', icon: '🔁', label: 'Recurring' },
             { href: '/accounting/projects', icon: '🏗️', label: 'Projects' },
             { href: '/accounting/reconcile', icon: '🏦', label: 'Reconcile' },
@@ -203,13 +178,6 @@ export default async function Accounting() {
             { href: '/accounting/tax', icon: '💸', label: 'Tax Center' },
             { href: '/accounting/rules', icon: '⚡', label: 'Auto Rules' },
             { href: '/accounting/customers', icon: '👥', label: 'Customers' },
-            { href: '/accounting/forecast', icon: '📈', label: 'Cash Forecast' },
-            { href: '/accounting/accounts', icon: '📒', label: 'Chart of Accounts' },
-            { href: '/accounting/aged-receivables', icon: '⏱️', label: 'Aged AR' },
-            { href: '/accounting/journal', icon: '📝', label: 'Journal' },
-            { href: '/accounting/connect', icon: '🏦', label: 'Connect Bank' },
-            { href: '/accounting/clients', icon: '🔗', label: 'Client Portals' },
-            { href: '/accounting/audit', icon: '🔒', label: 'Audit Trail' },
             { href: '/api/export?type=transactions', icon: '⬇️', label: 'Export CSV' },
           ].map(({ href, icon, label }) => (
             <Link key={href} href={href}
@@ -311,6 +279,6 @@ export default async function Accounting() {
           </div>
         </div>
       </div>
-    </main>
+    </div>
   )
 }

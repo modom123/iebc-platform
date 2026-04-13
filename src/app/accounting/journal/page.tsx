@@ -1,15 +1,6 @@
 'use client'
-import { useEffect, useState } from 'react'
-import Link from 'next/link'
 
-type JournalLine = {
-  id: string
-  account_id: string
-  description: string
-  debit: number
-  credit: number
-  accounts?: { code: string; name: string; type: string }
-}
+import { useState, useEffect } from 'react'
 
 type JournalEntry = {
   id: string
@@ -17,283 +8,312 @@ type JournalEntry = {
   date: string
   description: string
   reference: string
-  created_at: string
-  journal_entry_lines: JournalLine[]
+  status: 'draft' | 'posted'
+  total_debit: number
+  total_credit: number
+  lines: JournalLine[]
 }
 
-const fmt = (n: number) => n > 0 ? '$' + Number(n).toLocaleString('en-US', { minimumFractionDigits: 2 }) : '—'
+type JournalLine = {
+  id?: string
+  account_code: string
+  account_name: string
+  description: string
+  debit: number
+  credit: number
+}
 
-export default function JournalPage() {
+type CoAAccount = { id: string; code: string; name: string; account_type: string }
+
+const fmt = (n: number) => n === 0 ? '—' : '$' + Number(n).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })
+
+const EMPTY_LINE: JournalLine = { account_code: '', account_name: '', description: '', debit: 0, credit: 0 }
+
+export default function JournalEntriesPage() {
   const [entries, setEntries] = useState<JournalEntry[]>([])
-  const [accounts, setAccounts] = useState<{ id: string; code: string; name: string; type: string }[]>([])
+  const [accounts, setAccounts] = useState<CoAAccount[]>([])
   const [loading, setLoading] = useState(true)
-  const [showForm, setShowForm] = useState(false)
-  const [expanded, setExpanded] = useState<Set<string>>(new Set())
+  const [showNew, setShowNew] = useState(false)
+  const [saving, setSaving] = useState(false)
+  const [msg, setMsg] = useState('')
+  const [expanded, setExpanded] = useState<string | null>(null)
+
   const [form, setForm] = useState({
     date: new Date().toISOString().split('T')[0],
     description: '',
     reference: '',
-    lines: [
-      { account_id: '', description: '', debit: '', credit: '' },
-      { account_id: '', description: '', debit: '', credit: '' },
-    ],
+    lines: [{ ...EMPTY_LINE }, { ...EMPTY_LINE }] as JournalLine[],
   })
-  const [saving, setSaving] = useState(false)
-  const [error, setError] = useState('')
 
-  const load = async () => {
+  useEffect(() => {
+    Promise.all([fetchEntries(), fetchAccounts()])
+  }, [])
+
+  async function fetchEntries() {
     setLoading(true)
     const res = await fetch('/api/accounting/journal')
     const data = await res.json()
-    setEntries(Array.isArray(data) ? data : [])
+    setEntries(data.entries || [])
     setLoading(false)
   }
 
-  useEffect(() => {
-    Promise.all([
-      fetch('/api/accounting/accounts').then(r => r.json()),
-      load(),
-    ]).then(([accts]) => setAccounts(Array.isArray(accts) ? accts : []))
-  }, [])
+  async function fetchAccounts() {
+    const res = await fetch('/api/accounting/coa')
+    const data = await res.json()
+    setAccounts(data.accounts || [])
+  }
 
-  const toggleExpand = (id: string) => {
-    setExpanded(prev => {
-      const next = new Set(prev)
-      next.has(id) ? next.delete(id) : next.add(id)
-      return next
+  function updateLine(i: number, field: keyof JournalLine, value: string | number) {
+    setForm(p => {
+      const lines = [...p.lines]
+      if (field === 'account_code') {
+        const acct = accounts.find(a => a.code === value)
+        lines[i] = { ...lines[i], account_code: String(value), account_name: acct?.name || '' }
+      } else {
+        lines[i] = { ...lines[i], [field]: field === 'debit' || field === 'credit' ? Number(value) || 0 : value }
+      }
+      return { ...p, lines }
     })
   }
 
-  const addLine = () => setForm(f => ({ ...f, lines: [...f.lines, { account_id: '', description: '', debit: '', credit: '' }] }))
-  const removeLine = (i: number) => setForm(f => ({ ...f, lines: f.lines.filter((_, idx) => idx !== i) }))
-  const updateLine = (i: number, field: string, value: string) => {
-    setForm(f => {
-      const lines = [...f.lines]
-      lines[i] = { ...lines[i], [field]: value }
-      return { ...f, lines }
-    })
+  function addLine() {
+    setForm(p => ({ ...p, lines: [...p.lines, { ...EMPTY_LINE }] }))
   }
 
-  const totalDebits = form.lines.reduce((s, l) => s + (parseFloat(l.debit) || 0), 0)
-  const totalCredits = form.lines.reduce((s, l) => s + (parseFloat(l.credit) || 0), 0)
-  const isBalanced = Math.abs(totalDebits - totalCredits) < 0.005
+  function removeLine(i: number) {
+    if (form.lines.length <= 2) return
+    setForm(p => ({ ...p, lines: p.lines.filter((_, idx) => idx !== i) }))
+  }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (!isBalanced) { setError('Debits must equal credits'); return }
+  const totalDebit = form.lines.reduce((s, l) => s + (l.debit || 0), 0)
+  const totalCredit = form.lines.reduce((s, l) => s + (l.credit || 0), 0)
+  const isBalanced = Math.abs(totalDebit - totalCredit) < 0.01
+
+  async function handleSubmit(status: 'draft' | 'posted') {
+    if (!isBalanced) { setMsg('Debits must equal credits before posting'); return }
     setSaving(true)
-    setError('')
     const res = await fetch('/api/accounting/journal', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        date: form.date,
-        description: form.description,
-        reference: form.reference,
-        lines: form.lines.map(l => ({
-          account_id: l.account_id,
-          description: l.description,
-          debit: parseFloat(l.debit) || 0,
-          credit: parseFloat(l.credit) || 0,
-        })).filter(l => l.account_id && (l.debit > 0 || l.credit > 0)),
-      }),
+      body: JSON.stringify({ ...form, status }),
     })
     if (res.ok) {
-      setShowForm(false)
-      setForm({
-        date: new Date().toISOString().split('T')[0],
-        description: '',
-        reference: '',
-        lines: [
-          { account_id: '', description: '', debit: '', credit: '' },
-          { account_id: '', description: '', debit: '', credit: '' },
-        ],
-      })
-      load()
+      setMsg(status === 'posted' ? 'Journal entry posted!' : 'Draft saved')
+      setShowNew(false)
+      setForm({ date: new Date().toISOString().split('T')[0], description: '', reference: '', lines: [{ ...EMPTY_LINE }, { ...EMPTY_LINE }] })
+      fetchEntries()
     } else {
       const d = await res.json()
-      setError(d.error || 'Failed to save')
+      setMsg(d.error || 'Error saving entry')
     }
     setSaving(false)
+    setTimeout(() => setMsg(''), 3000)
+  }
+
+  async function postEntry(id: string) {
+    await fetch('/api/accounting/journal', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, status: 'posted' }),
+    })
+    fetchEntries()
   }
 
   return (
-    <main className="min-h-screen bg-gray-50">
-      <div className="bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
-        <div className="flex items-center gap-3">
-          <Link href="/accounting" className="text-gray-400 hover:text-gray-600 text-sm">← Dashboard</Link>
-          <span className="text-gray-300">|</span>
-          <h1 className="font-bold text-gray-800">General Journal</h1>
-          <span className="bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded-full">{entries.length} entries</span>
+    <div className="p-6 max-w-6xl mx-auto space-y-5">
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-xl font-bold text-gray-900">Journal Entries</h1>
+          <p className="text-sm text-gray-500 mt-0.5">Manual double-entry bookkeeping — debits equal credits</p>
         </div>
-        <button onClick={() => setShowForm(true)} className="btn-primary text-sm">+ New Journal Entry</button>
+        <button onClick={() => setShowNew(true)}
+          className="bg-[#0F4C81] text-white text-sm px-4 py-1.5 rounded-lg hover:bg-blue-800 transition font-medium">
+          + New Entry
+        </button>
       </div>
 
-      <div className="max-w-5xl mx-auto p-6 space-y-5">
+      {msg && (
+        <div className={`px-4 py-2.5 rounded-lg text-sm font-medium border ${msg.includes('Error') || msg.includes('must') ? 'bg-red-50 text-red-700 border-red-200' : 'bg-green-50 text-green-700 border-green-200'}`}>
+          {msg}
+        </div>
+      )}
 
-        {/* New Entry Form */}
-        {showForm && (
-          <div className="bg-white rounded-xl border border-[#0F4C81] p-6 shadow-sm">
-            <div className="flex justify-between items-center mb-4">
-              <h3 className="font-bold text-[#0F4C81]">New Journal Entry</h3>
-              <div className={`text-xs font-medium px-2 py-1 rounded ${isBalanced && totalDebits > 0 ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}`}>
-                {isBalanced && totalDebits > 0 ? '✓ Balanced' : `Out of balance: $${Math.abs(totalDebits - totalCredits).toFixed(2)}`}
+      {/* New Entry Form */}
+      {showNew && (
+        <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
+          <div className="p-5 border-b border-gray-100 flex justify-between items-center">
+            <h3 className="font-semibold text-gray-800">New Journal Entry</h3>
+            <button onClick={() => setShowNew(false)} className="text-gray-400 hover:text-gray-600 text-xl leading-none">×</button>
+          </div>
+          <div className="p-5 space-y-4">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div>
+                <label className="label-sm">Date*</label>
+                <input className="input-field" type="date" value={form.date}
+                  onChange={e => setForm(p => ({ ...p, date: e.target.value }))} />
+              </div>
+              <div className="md:col-span-2">
+                <label className="label-sm">Memo / Description*</label>
+                <input className="input-field" placeholder="e.g. Monthly depreciation, Accrued interest..." required value={form.description}
+                  onChange={e => setForm(p => ({ ...p, description: e.target.value }))} />
+              </div>
+              <div>
+                <label className="label-sm">Reference #</label>
+                <input className="input-field" placeholder="e.g. INV-001" value={form.reference}
+                  onChange={e => setForm(p => ({ ...p, reference: e.target.value }))} />
               </div>
             </div>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="grid grid-cols-3 gap-4">
-                <div>
-                  <label className="text-xs font-medium text-gray-600 block mb-1">Date</label>
-                  <input type="date" required value={form.date} onChange={e => setForm({...form, date: e.target.value})} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" />
-                </div>
-                <div>
-                  <label className="text-xs font-medium text-gray-600 block mb-1">Description / Memo</label>
-                  <input type="text" required value={form.description} onChange={e => setForm({...form, description: e.target.value})} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" placeholder="Journal entry description" />
-                </div>
-                <div>
-                  <label className="text-xs font-medium text-gray-600 block mb-1">Reference</label>
-                  <input type="text" value={form.reference} onChange={e => setForm({...form, reference: e.target.value})} className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm" placeholder="INV-001, etc." />
-                </div>
-              </div>
 
-              {/* Lines */}
-              <div className="border border-gray-200 rounded-lg overflow-hidden">
-                <table className="w-full text-sm">
-                  <thead>
-                    <tr className="bg-gray-50 text-gray-500 text-xs uppercase">
-                      <th className="p-2 text-left">Account</th>
-                      <th className="p-2 text-left">Description</th>
-                      <th className="p-2 text-right w-28">Debit</th>
-                      <th className="p-2 text-right w-28">Credit</th>
-                      <th className="p-2 w-8"></th>
+            {/* Lines Table */}
+            <div className="border border-gray-200 rounded-xl overflow-hidden">
+              <table className="w-full text-sm">
+                <thead><tr className="bg-gray-50 text-gray-500 text-xs uppercase">
+                  <th className="p-2.5 text-left w-32">Account Code</th>
+                  <th className="p-2.5 text-left">Account Name</th>
+                  <th className="p-2.5 text-left hidden md:table-cell">Line Memo</th>
+                  <th className="p-2.5 text-right w-28">Debit</th>
+                  <th className="p-2.5 text-right w-28">Credit</th>
+                  <th className="p-2.5 w-8"></th>
+                </tr></thead>
+                <tbody className="divide-y divide-gray-50">
+                  {form.lines.map((line, i) => (
+                    <tr key={i}>
+                      <td className="p-2">
+                        <input list={`codes-${i}`} className="input-field font-mono text-xs" placeholder="1000" value={line.account_code}
+                          onChange={e => updateLine(i, 'account_code', e.target.value)} />
+                        <datalist id={`codes-${i}`}>
+                          {accounts.map(a => <option key={a.id} value={a.code}>{a.code} — {a.name}</option>)}
+                        </datalist>
+                      </td>
+                      <td className="p-2">
+                        <input className="input-field text-xs" placeholder="Auto-fills from code" value={line.account_name}
+                          onChange={e => updateLine(i, 'account_name', e.target.value)} />
+                      </td>
+                      <td className="p-2 hidden md:table-cell">
+                        <input className="input-field text-xs" placeholder="Optional line note" value={line.description}
+                          onChange={e => updateLine(i, 'description', e.target.value)} />
+                      </td>
+                      <td className="p-2">
+                        <input type="number" min="0" step="0.01" className="input-field text-right font-mono text-xs" placeholder="0.00" value={line.debit || ''}
+                          onChange={e => updateLine(i, 'debit', e.target.value)} />
+                      </td>
+                      <td className="p-2">
+                        <input type="number" min="0" step="0.01" className="input-field text-right font-mono text-xs" placeholder="0.00" value={line.credit || ''}
+                          onChange={e => updateLine(i, 'credit', e.target.value)} />
+                      </td>
+                      <td className="p-2 text-center">
+                        <button onClick={() => removeLine(i)} className="text-gray-300 hover:text-red-400 transition text-lg leading-none">×</button>
+                      </td>
                     </tr>
-                  </thead>
-                  <tbody className="divide-y divide-gray-100">
-                    {form.lines.map((line, i) => (
-                      <tr key={i}>
-                        <td className="p-1.5">
-                          <select value={line.account_id} onChange={e => updateLine(i, 'account_id', e.target.value)} className="w-full border border-gray-200 rounded px-2 py-1 text-xs">
-                            <option value="">Select account</option>
-                            {accounts.map(a => <option key={a.id} value={a.id}>{a.code} — {a.name}</option>)}
-                          </select>
-                        </td>
-                        <td className="p-1.5">
-                          <input type="text" value={line.description} onChange={e => updateLine(i, 'description', e.target.value)} className="w-full border border-gray-200 rounded px-2 py-1 text-xs" placeholder="Optional note" />
-                        </td>
-                        <td className="p-1.5">
-                          <input type="number" step="0.01" min="0" value={line.debit} onChange={e => updateLine(i, 'debit', e.target.value)} className="w-full border border-gray-200 rounded px-2 py-1 text-xs text-right font-mono" placeholder="0.00" />
-                        </td>
-                        <td className="p-1.5">
-                          <input type="number" step="0.01" min="0" value={line.credit} onChange={e => updateLine(i, 'credit', e.target.value)} className="w-full border border-gray-200 rounded px-2 py-1 text-xs text-right font-mono" placeholder="0.00" />
-                        </td>
-                        <td className="p-1.5 text-center">
-                          {form.lines.length > 2 && <button type="button" onClick={() => removeLine(i)} className="text-red-400 hover:text-red-600 text-xs">✕</button>}
-                        </td>
-                      </tr>
-                    ))}
-                  </tbody>
-                  <tfoot className="bg-gray-50 border-t-2 border-gray-200">
-                    <tr>
-                      <td colSpan={2} className="p-2 text-right text-xs font-semibold text-gray-600">Totals:</td>
-                      <td className={`p-2 text-right font-mono text-sm font-bold ${isBalanced ? 'text-gray-800' : 'text-red-600'}`}>${totalDebits.toFixed(2)}</td>
-                      <td className={`p-2 text-right font-mono text-sm font-bold ${isBalanced ? 'text-gray-800' : 'text-red-600'}`}>${totalCredits.toFixed(2)}</td>
-                      <td></td>
-                    </tr>
-                  </tfoot>
-                </table>
-              </div>
+                  ))}
+                </tbody>
+                <tfoot>
+                  <tr className={`font-bold text-sm ${isBalanced ? 'bg-green-50' : 'bg-red-50'}`}>
+                    <td className="p-3" colSpan={3}>
+                      <button onClick={addLine} className="text-[#0F4C81] text-xs hover:underline">+ Add Line</button>
+                    </td>
+                    <td className="p-3 text-right font-mono">{fmt(totalDebit)}</td>
+                    <td className="p-3 text-right font-mono">{fmt(totalCredit)}</td>
+                    <td className="p-3 text-center text-xs">{isBalanced ? '✓' : '!'}</td>
+                  </tr>
+                </tfoot>
+              </table>
+            </div>
 
-              <button type="button" onClick={addLine} className="text-xs text-[#0F4C81] hover:underline">+ Add Line</button>
+            {!isBalanced && totalDebit > 0 && (
+              <p className="text-sm text-red-600 font-medium">
+                Out of balance by {fmt(Math.abs(totalDebit - totalCredit))} — debits must equal credits.
+              </p>
+            )}
 
-              {error && <p className="text-red-600 text-sm">{error}</p>}
-              <div className="flex gap-3">
-                <button type="submit" disabled={saving || !isBalanced || totalDebits === 0} className="btn-primary text-sm disabled:opacity-50">
-                  {saving ? 'Posting...' : 'Post Journal Entry'}
-                </button>
-                <button type="button" onClick={() => setShowForm(false)} className="btn-secondary text-sm">Cancel</button>
-              </div>
-            </form>
+            <div className="flex gap-3">
+              <button onClick={() => handleSubmit('posted')} disabled={saving || !isBalanced || !form.description}
+                className="bg-[#0F4C81] text-white px-5 py-2 rounded-lg text-sm font-medium hover:bg-blue-800 disabled:opacity-40 transition">
+                {saving ? 'Posting...' : 'Post Entry'}
+              </button>
+              <button onClick={() => handleSubmit('draft')} disabled={saving}
+                className="border border-gray-200 text-gray-600 px-5 py-2 rounded-lg text-sm hover:bg-gray-50 disabled:opacity-40">
+                Save Draft
+              </button>
+              <button onClick={() => setShowNew(false)} className="text-gray-400 text-sm hover:text-gray-600">Cancel</button>
+            </div>
           </div>
-        )}
+        </div>
+      )}
 
-        {/* Entries List */}
+      {/* Entries List */}
+      <div className="bg-white rounded-xl border border-gray-200 shadow-sm">
+        <div className="p-4 border-b border-gray-100 flex justify-between items-center">
+          <h2 className="font-semibold text-gray-800">All Entries</h2>
+          <span className="text-xs text-gray-400">{entries.length} entries</span>
+        </div>
         {loading ? (
-          <div className="bg-white rounded-xl border border-gray-200 p-8 text-center text-gray-400">Loading journal entries...</div>
+          <div className="p-12 text-center text-gray-400">Loading...</div>
         ) : entries.length === 0 ? (
-          <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
-            <p className="text-gray-400 mb-3">No journal entries yet</p>
-            <button onClick={() => setShowForm(true)} className="btn-primary text-sm">Create First Entry</button>
+          <div className="p-12 text-center">
+            <p className="text-gray-400 text-sm mb-3">No journal entries yet</p>
+            <button onClick={() => setShowNew(true)} className="bg-[#0F4C81] text-white text-sm px-4 py-2 rounded-lg">Create First Entry</button>
           </div>
         ) : (
-          <div className="space-y-2">
-            {entries.map(entry => {
-              const totalDebitsEntry = (entry.journal_entry_lines || []).reduce((s, l) => s + Number(l.debit), 0)
-              const isOpen = expanded.has(entry.id)
-              return (
-                <div key={entry.id} className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-                  <button
-                    onClick={() => toggleExpand(entry.id)}
-                    className="w-full px-5 py-3.5 flex items-center justify-between hover:bg-gray-50 transition"
-                  >
-                    <div className="flex items-center gap-4 text-left">
-                      <span className="font-mono text-xs text-gray-400 w-20 shrink-0">{entry.entry_number || 'JE'}</span>
-                      <span className="text-gray-500 text-sm shrink-0">{entry.date}</span>
-                      <span className="font-medium text-gray-800">{entry.description}</span>
-                      {entry.reference && <span className="text-xs text-gray-400 bg-gray-100 px-2 py-0.5 rounded">{entry.reference}</span>}
+          <div className="divide-y divide-gray-50">
+            {entries.map(entry => (
+              <div key={entry.id}>
+                <button
+                  onClick={() => setExpanded(expanded === entry.id ? null : entry.id)}
+                  className="w-full p-4 flex items-center gap-4 hover:bg-gray-50 text-left transition"
+                >
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-mono text-xs text-gray-500">{entry.entry_number}</span>
+                      <span className="font-medium text-sm text-gray-800">{entry.description}</span>
+                      {entry.reference && <span className="text-xs text-gray-400">Ref: {entry.reference}</span>}
                     </div>
-                    <div className="flex items-center gap-3 shrink-0">
-                      <span className="font-mono font-semibold text-gray-700">${totalDebitsEntry.toLocaleString('en-US', { minimumFractionDigits: 2 })}</span>
-                      <span className="text-gray-400 text-xs">{isOpen ? '▲' : '▼'}</span>
+                    <p className="text-xs text-gray-400 mt-0.5">{entry.date}</p>
+                  </div>
+                  <div className="flex items-center gap-4 shrink-0">
+                    <div className="text-right hidden md:block">
+                      <p className="text-xs text-gray-500">Debit</p>
+                      <p className="text-sm font-mono font-semibold">{fmt(entry.total_debit)}</p>
                     </div>
-                  </button>
-                  {isOpen && (
-                    <div className="border-t border-gray-100">
-                      <table className="w-full text-sm">
-                        <thead>
-                          <tr className="bg-gray-50 text-gray-400 text-xs uppercase">
-                            <th className="px-5 py-2 text-left">Account</th>
-                            <th className="px-5 py-2 text-left">Description</th>
-                            <th className="px-5 py-2 text-right">Debit</th>
-                            <th className="px-5 py-2 text-right">Credit</th>
+                    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${entry.status === 'posted' ? 'bg-green-100 text-green-700' : 'bg-yellow-100 text-yellow-700'}`}>
+                      {entry.status}
+                    </span>
+                    {entry.status === 'draft' && (
+                      <button onClick={e => { e.stopPropagation(); postEntry(entry.id) }}
+                        className="text-xs text-[#0F4C81] hover:underline font-medium">Post</button>
+                    )}
+                    <span className="text-gray-400 text-sm">{expanded === entry.id ? '▲' : '▼'}</span>
+                  </div>
+                </button>
+                {expanded === entry.id && entry.lines && (
+                  <div className="px-4 pb-4">
+                    <table className="w-full text-xs border border-gray-100 rounded-lg overflow-hidden">
+                      <thead><tr className="bg-gray-50 text-gray-400 uppercase">
+                        <th className="p-2 text-left">Code</th>
+                        <th className="p-2 text-left">Account</th>
+                        <th className="p-2 text-left">Memo</th>
+                        <th className="p-2 text-right">Debit</th>
+                        <th className="p-2 text-right">Credit</th>
+                      </tr></thead>
+                      <tbody className="divide-y divide-gray-50">
+                        {entry.lines.map((l, i) => (
+                          <tr key={i} className="hover:bg-gray-50">
+                            <td className="p-2 font-mono text-gray-500">{l.account_code}</td>
+                            <td className="p-2 font-medium">{l.account_name}</td>
+                            <td className="p-2 text-gray-500">{l.description}</td>
+                            <td className="p-2 text-right font-mono">{l.debit > 0 ? fmt(l.debit) : '—'}</td>
+                            <td className="p-2 text-right font-mono">{l.credit > 0 ? fmt(l.credit) : '—'}</td>
                           </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-50">
-                          {(entry.journal_entry_lines || []).map(line => (
-                            <tr key={line.id} className="hover:bg-gray-50">
-                              <td className="px-5 py-2.5">
-                                {line.accounts ? (
-                                  <span>
-                                    <span className="font-mono text-xs text-gray-400 mr-2">{line.accounts.code}</span>
-                                    <span className="text-gray-700">{line.accounts.name}</span>
-                                  </span>
-                                ) : '—'}
-                              </td>
-                              <td className="px-5 py-2.5 text-gray-500">{line.description || '—'}</td>
-                              <td className="px-5 py-2.5 text-right font-mono text-gray-800">{fmt(Number(line.debit))}</td>
-                              <td className="px-5 py-2.5 text-right font-mono text-gray-800">{fmt(Number(line.credit))}</td>
-                            </tr>
-                          ))}
-                        </tbody>
-                        <tfoot className="border-t-2 border-gray-200 bg-gray-50">
-                          <tr>
-                            <td colSpan={2} className="px-5 py-2 text-xs font-semibold text-gray-500 uppercase">Totals</td>
-                            <td className="px-5 py-2 text-right font-mono font-bold text-gray-800">
-                              ${(entry.journal_entry_lines || []).reduce((s, l) => s + Number(l.debit), 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}
-                            </td>
-                            <td className="px-5 py-2 text-right font-mono font-bold text-gray-800">
-                              ${(entry.journal_entry_lines || []).reduce((s, l) => s + Number(l.credit), 0).toLocaleString('en-US', { minimumFractionDigits: 2 })}
-                            </td>
-                          </tr>
-                        </tfoot>
-                      </table>
-                    </div>
-                  )}
-                </div>
-              )
-            })}
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
+            ))}
           </div>
         )}
       </div>
-    </main>
+    </div>
   )
 }

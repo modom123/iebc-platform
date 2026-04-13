@@ -1,58 +1,80 @@
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
-import { logAudit } from '@/lib/audit'
+import { randomBytes } from 'crypto'
 
-// GET — validate a portal token and return client data (public, no auth required)
-export async function GET(req: Request) {
+// GET: list portal tokens for a user's invoices
+export async function GET(req: NextRequest) {
   const supabase = createServerSupabaseClient()
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
   const { searchParams } = new URL(req.url)
-  const token = searchParams.get('token')
+  const invoiceId = searchParams.get('invoice_id')
 
-  if (!token) return NextResponse.json({ error: 'Token required' }, { status: 400 })
-
-  // Find the token
-  const { data: portalToken, error } = await supabase
+  let query = supabase
     .from('client_portal_tokens')
-    .select(`
-      id, user_id, customer_id, label, expires_at, is_active, access_count,
-      customers ( id, name, email, phone, address )
-    `)
-    .eq('token', token)
-    .eq('is_active', true)
-    .single()
-
-  if (error || !portalToken) return NextResponse.json({ error: 'Invalid or expired portal link' }, { status: 404 })
-  if (portalToken.expires_at && new Date(portalToken.expires_at) < new Date()) {
-    return NextResponse.json({ error: 'This portal link has expired' }, { status: 410 })
-  }
-
-  // Fetch invoices for this customer
-  const { data: invoices } = await supabase
-    .from('invoices')
-    .select('id, invoice_number, status, total, amount_paid, due_date, created_at, notes')
-    .eq('user_id', portalToken.user_id)
-    .eq('customer_id', portalToken.customer_id)
+    .select('*')
+    .eq('user_id', session.user.id)
     .order('created_at', { ascending: false })
 
-  // Fetch company info
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('full_name, company_name, notification_email')
-    .eq('id', portalToken.user_id)
+  if (invoiceId) query = query.eq('invoice_id', invoiceId)
+
+  const { data, error } = await query
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  return NextResponse.json({ tokens: data || [] })
+}
+
+// POST: generate a portal token for an invoice
+export async function POST(req: NextRequest) {
+  const supabase = createServerSupabaseClient()
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const body = await req.json()
+  const { invoice_id, expires_days = 30 } = body
+
+  if (!invoice_id) return NextResponse.json({ error: 'invoice_id required' }, { status: 400 })
+
+  // Verify invoice belongs to user
+  const { data: invoice } = await supabase
+    .from('invoices')
+    .select('id')
+    .eq('id', invoice_id)
+    .eq('user_id', session.user.id)
     .single()
 
-  // Update access count
-  await supabase
+  if (!invoice) return NextResponse.json({ error: 'Invoice not found' }, { status: 404 })
+
+  const token = randomBytes(32).toString('hex')
+  const expiresAt = new Date()
+  expiresAt.setDate(expiresAt.getDate() + expires_days)
+
+  const { data, error } = await supabase.from('client_portal_tokens').insert({
+    user_id: session.user.id,
+    invoice_id,
+    token,
+    expires_at: expiresAt.toISOString(),
+    is_active: true,
+  }).select().single()
+
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  return NextResponse.json({ token: data })
+}
+
+// PATCH: revoke a portal token
+export async function PATCH(req: NextRequest) {
+  const supabase = createServerSupabaseClient()
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+
+  const { id, is_active } = await req.json()
+  const { data, error } = await supabase
     .from('client_portal_tokens')
-    .update({ access_count: (portalToken.access_count || 0) + 1, last_accessed_at: new Date().toISOString() })
-    .eq('id', portalToken.id)
+    .update({ is_active })
+    .eq('id', id)
+    .eq('user_id', session.user.id)
+    .select().single()
 
-  await logAudit(portalToken.user_id, 'portal_view', 'client_portal_tokens', portalToken.id, { token_id: portalToken.id })
-
-  return NextResponse.json({
-    customer: portalToken.customers,
-    invoices: invoices || [],
-    company: profile || null,
-    label: portalToken.label,
-  })
+  if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+  return NextResponse.json({ token: data })
 }

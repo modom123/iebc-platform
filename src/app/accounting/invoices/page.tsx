@@ -13,6 +13,13 @@ type Invoice = {
   customers: { name: string; email: string } | null
 }
 
+type ShareModal = {
+  invoiceId: string
+  invoiceNumber: string
+  link: string | null
+  loading: boolean
+}
+
 const STATUS_STYLES: Record<string, string> = {
   draft: 'bg-gray-100 text-gray-600',
   sent: 'bg-blue-100 text-blue-700',
@@ -27,6 +34,8 @@ export default function InvoicesPage() {
   const [invoices, setInvoices] = useState<Invoice[]>([])
   const [loading, setLoading] = useState(true)
   const [filterStatus, setFilterStatus] = useState('')
+  const [shareModal, setShareModal] = useState<ShareModal | null>(null)
+  const [copied, setCopied] = useState(false)
 
   const load = async () => {
     setLoading(true)
@@ -38,6 +47,30 @@ export default function InvoicesPage() {
   }
 
   useEffect(() => { load() }, [filterStatus])
+
+  const openShare = async (inv: Invoice) => {
+    setShareModal({ invoiceId: inv.id, invoiceNumber: inv.invoice_number, link: null, loading: true })
+    const res = await fetch('/api/portal', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ invoice_id: inv.id, expires_days: 30 }),
+    })
+    const data = await res.json()
+    if (res.ok && data.token) {
+      const link = `${window.location.origin}/portal/${data.token.token}`
+      setShareModal(p => p ? { ...p, link, loading: false } : null)
+    } else {
+      setShareModal(p => p ? { ...p, loading: false } : null)
+    }
+  }
+
+  const copyLink = () => {
+    if (shareModal?.link) {
+      navigator.clipboard.writeText(shareModal.link)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    }
+  }
 
   const markAs = async (id: string, status: string) => {
     await fetch('/api/accounting/invoices', {
@@ -53,6 +86,50 @@ export default function InvoicesPage() {
 
   return (
     <main className="min-h-screen bg-gray-50">
+
+      {/* Share Invoice Modal */}
+      {shareModal && (
+        <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-md space-y-4">
+            <div className="flex justify-between items-center">
+              <h3 className="font-bold text-gray-800">Share Invoice {shareModal.invoiceNumber}</h3>
+              <button onClick={() => setShareModal(null)} className="text-gray-400 hover:text-gray-600 text-xl">×</button>
+            </div>
+            <p className="text-sm text-gray-500">
+              Generate a secure payment link to send to your client. The link expires in 30 days and lets them view the invoice and pay online.
+            </p>
+            {shareModal.loading ? (
+              <div className="flex items-center gap-2 py-3">
+                <div className="w-4 h-4 border-2 border-[#0F4C81] border-t-transparent rounded-full animate-spin" />
+                <span className="text-sm text-gray-500">Generating secure link...</span>
+              </div>
+            ) : shareModal.link ? (
+              <div className="space-y-3">
+                <div className="bg-gray-50 border border-gray-200 rounded-lg p-3 flex items-center gap-2">
+                  <span className="text-xs text-gray-600 font-mono flex-1 truncate">{shareModal.link}</span>
+                  <button onClick={copyLink}
+                    className={`text-xs font-medium px-3 py-1 rounded-md transition ${copied ? 'bg-green-100 text-green-700' : 'bg-[#0F4C81] text-white hover:bg-blue-800'}`}>
+                    {copied ? '✓ Copied' : 'Copy'}
+                  </button>
+                </div>
+                <div className="flex gap-3">
+                  <a href={`mailto:?subject=Invoice ${shareModal.invoiceNumber}&body=Please find your invoice here: ${shareModal.link}`}
+                    className="flex-1 border border-gray-200 text-gray-700 text-sm text-center py-2 rounded-lg hover:bg-gray-50 transition">
+                    📧 Email Client
+                  </a>
+                  <a href={shareModal.link} target="_blank" rel="noopener noreferrer"
+                    className="flex-1 bg-[#0F4C81] text-white text-sm text-center py-2 rounded-lg hover:bg-blue-800 transition">
+                    Preview Portal
+                  </a>
+                </div>
+                <p className="text-xs text-gray-400 text-center">Link expires in 30 days · One-time use after payment</p>
+              </div>
+            ) : (
+              <p className="text-sm text-red-600">Failed to generate link. Please try again.</p>
+            )}
+          </div>
+        </div>
+      )}
       <div className="bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
         <div className="flex items-center gap-3">
           <Link href="/accounting" className="text-gray-400 hover:text-gray-600 text-sm">← Dashboard</Link>
@@ -125,9 +202,12 @@ export default function InvoicesPage() {
                     <td className="p-3"><span className={`px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_STYLES[inv.status] || ''}`}>{inv.status}</span></td>
                     <td className="p-3 text-right font-semibold">{fmt(inv.total)}</td>
                     <td className="p-3 text-center">
-                      <div className="flex gap-1 justify-center">
+                      <div className="flex gap-1 justify-center flex-wrap">
                         {inv.status === 'draft' && <button onClick={() => markAs(inv.id, 'sent')} className="text-xs text-blue-600 hover:underline">Mark Sent</button>}
                         {inv.status === 'sent' && <button onClick={() => markAs(inv.id, 'paid')} className="text-xs text-green-600 hover:underline">Mark Paid</button>}
+                        {inv.status !== 'void' && inv.status !== 'paid' && (
+                          <button onClick={() => openShare(inv)} className="text-xs text-[#C9A02E] hover:underline font-medium">Share</button>
+                        )}
                         {inv.status !== 'void' && inv.status !== 'paid' && <button onClick={() => markAs(inv.id, 'void')} className="text-xs text-gray-400 hover:underline ml-1">Void</button>}
                       </div>
                     </td>

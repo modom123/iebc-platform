@@ -94,13 +94,15 @@ export default async function Accounting() {
           <Link href="/accounting/invoices" className="hover:text-[#0F4C81] text-gray-600">Invoices</Link>
           <Link href="/accounting/estimates" className="hover:text-[#0F4C81] text-gray-600">Estimates</Link>
           <Link href="/accounting/scanner" className="hover:text-[#0F4C81] text-gray-600 font-medium">🤖 AI Scan</Link>
+          <Link href="/accounting/connect" className="hover:text-[#0F4C81] text-gray-600 font-medium">🏦 Connect Bank</Link>
           <Link href="/accounting/customers" className="hover:text-[#0F4C81] text-gray-600">Customers</Link>
+          <Link href="/accounting/clients" className="hover:text-[#0F4C81] text-gray-600">Portals</Link>
           <Link href="/accounting/bills" className="hover:text-[#0F4C81] text-gray-600">Bills</Link>
           <Link href="/accounting/budgets" className="hover:text-[#0F4C81] text-gray-600">Budgets</Link>
-          <Link href="/accounting/tracker" className="hover:text-[#0F4C81] text-gray-600">Tracker</Link>
           <Link href="/accounting/forecast" className="hover:text-[#0F4C81] text-gray-600">Forecast</Link>
           <Link href="/accounting/reports" className="hover:text-[#0F4C81] text-gray-600">Reports</Link>
           <Link href="/accounting/journal" className="hover:text-[#0F4C81] text-gray-600">Journal</Link>
+          <Link href="/accounting/audit" className="hover:text-[#0F4C81] text-gray-600">Audit</Link>
           <Link href="/hub" className="hover:text-[#0F4C81] text-gray-600">Hub</Link>
           <Link href="/settings" className="hover:text-[#0F4C81] text-gray-600">Settings</Link>
           {!sub && <Link href="/accounting/checkout" className="bg-[#0F4C81] text-white px-3 py-1 rounded-lg">Upgrade</Link>}
@@ -205,6 +207,9 @@ export default async function Accounting() {
             { href: '/accounting/accounts', icon: '📒', label: 'Chart of Accounts' },
             { href: '/accounting/aged-receivables', icon: '⏱️', label: 'Aged AR' },
             { href: '/accounting/journal', icon: '📝', label: 'Journal' },
+            { href: '/accounting/connect', icon: '🏦', label: 'Connect Bank' },
+            { href: '/accounting/clients', icon: '🔗', label: 'Client Portals' },
+            { href: '/accounting/audit', icon: '🔒', label: 'Audit Trail' },
             { href: '/api/export?type=transactions', icon: '⬇️', label: 'Export CSV' },
           ].map(({ href, icon, label }) => (
             <Link key={href} href={href}

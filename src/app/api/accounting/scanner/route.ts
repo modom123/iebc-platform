@@ -15,35 +15,22 @@ export async function POST(req: NextRequest) {
 
     if (!file) return NextResponse.json({ error: 'No file uploaded' }, { status: 400 })
 
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif']
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'application/pdf']
     if (!allowedTypes.includes(file.type)) {
-      return NextResponse.json({ error: 'Only JPG, PNG, WebP, or GIF images are supported' }, { status: 400 })
+      return NextResponse.json({ error: 'Only JPG, PNG, WebP, GIF, or PDF files are supported' }, { status: 400 })
     }
 
-    if (file.size > 5 * 1024 * 1024) {
-      return NextResponse.json({ error: 'File too large. Maximum 5MB.' }, { status: 400 })
+    if (file.size > 20 * 1024 * 1024) {
+      return NextResponse.json({ error: 'File too large. Maximum 20MB.' }, { status: 400 })
     }
 
-    // Convert file to base64
     const arrayBuffer = await file.arrayBuffer()
     const base64 = Buffer.from(arrayBuffer).toString('base64')
+    const isPdf = file.type === 'application/pdf'
     const mediaType = file.type as 'image/jpeg' | 'image/png' | 'image/webp' | 'image/gif'
 
-    const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-6',
-      max_tokens: 512,
-      messages: [
-        {
-          role: 'user',
-          content: [
-            {
-              type: 'image',
-              source: { type: 'base64', media_type: mediaType, data: base64 },
-            },
-            {
-              type: 'text',
-              text: `You are a receipt/invoice scanning assistant for an accounting system.
-Analyze this image and extract the following fields. Respond ONLY with a valid JSON object — no markdown, no explanation.
+    const promptText = `You are a receipt/invoice scanning assistant for an accounting system.
+Analyze this ${isPdf ? 'PDF document' : 'image'} and extract the following fields. Respond ONLY with a valid JSON object — no markdown, no explanation.
 
 {
   "vendor": "vendor/business name (string)",
@@ -55,9 +42,19 @@ Analyze this image and extract the following fields. Respond ONLY with a valid J
   "confidence": "high, medium, or low"
 }
 
-If a field cannot be determined, use null. Be conservative — if the image is not a receipt or invoice, return {"error": "Not a receipt or invoice"}.`,
-            },
-          ],
+If a field cannot be determined, use null. Be conservative — if the document is not a receipt or invoice, return {"error": "Not a receipt or invoice"}.`
+
+    const contentBlock = isPdf
+      ? { type: 'document' as const, source: { type: 'base64' as const, media_type: 'application/pdf' as const, data: base64 } }
+      : { type: 'image' as const, source: { type: 'base64' as const, media_type: mediaType, data: base64 } }
+
+    const response = await anthropic.messages.create({
+      model: 'claude-sonnet-4-6',
+      max_tokens: 512,
+      messages: [
+        {
+          role: 'user',
+          content: [contentBlock, { type: 'text', text: promptText }],
         },
       ],
     })

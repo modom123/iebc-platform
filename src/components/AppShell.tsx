@@ -17,7 +17,6 @@ const NAV_SECTIONS = [
     title: 'Accounting',
     items: [
       { href: '/accounting', icon: '◈', label: 'Overview', exact: true },
-      { href: '/accounting', icon: '◈', label: 'Accounting Overview', exact: true },
       { href: '/accounting/transactions', icon: '⇄', label: 'Transactions' },
       { href: '/accounting/invoices', icon: '▤', label: 'Invoices' },
       { href: '/accounting/estimates', icon: '◻', label: 'Estimates' },
@@ -36,12 +35,8 @@ const NAV_SECTIONS = [
       { href: '/accounting/reports', icon: '▦', label: 'Reports' },
       { href: '/accounting/tax', icon: '◈', label: 'Tax Center' },
       { href: '/accounting/budgets', icon: '◎', label: 'Budgets' },
-      { href: '/accounting/reports', icon: '▦', label: 'Reports' },
       { href: '/accounting/aged-receivables', icon: '⏱', label: 'Aged Receivables' },
       { href: '/accounting/forecast', icon: '▲', label: 'Cash Forecast' },
-      { href: '/accounting/reconcile', icon: '⇌', label: 'Reconciliation' },
-      { href: '/accounting/tax', icon: '◈', label: 'Tax Center' },
-      { href: '/accounting/budgets', icon: '◎', label: 'Budgets' },
       { href: '/accounting/rules', icon: '⚡', label: 'Auto Rules' },
       { href: '/accounting/scanner', icon: '✦', label: 'AI Receipt Scanner' },
     ],
@@ -57,8 +52,6 @@ const NAV_SECTIONS = [
     ],
   },
   {
-    title: 'Workspace',
-    items: [
     title: 'Connect & Portals',
     items: [
       { href: '/accounting/connect', icon: '⬡', label: 'Bank Connect' },
@@ -85,7 +78,6 @@ export default function AppShell({ user, children }: { user?: User; children: Re
 
   function active(href: string, exact?: boolean) {
     if (exact) return pathname === href
-    // Special case: /hub matches hub items but not /hub/leads etc. conflicting with /hub exact
     if (href === '/hub') return pathname === '/hub'
     return pathname === href || pathname.startsWith(href + '/')
   }
@@ -119,7 +111,7 @@ export default function AppShell({ user, children }: { user?: User; children: Re
                 const isActive = active(href, exact)
                 return (
                   <Link
-                    key={href}
+                    key={label}
                     href={href}
                     onClick={() => setMobileOpen(false)}
                     className={`flex items-center gap-2.5 px-2.5 py-[7px] rounded-lg text-[13px] transition-all duration-100 ${
@@ -192,7 +184,6 @@ export default function AppShell({ user, children }: { user?: User; children: Re
       <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
         {/* Top bar */}
         <header className="h-14 bg-white border-b border-gray-200 flex items-center px-4 gap-3 shrink-0 shadow-sm">
-          {/* Mobile menu button */}
           <button
             onClick={() => setMobileOpen(true)}
             className="lg:hidden p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 transition"
@@ -201,10 +192,6 @@ export default function AppShell({ user, children }: { user?: User; children: Re
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h7" />
             </svg>
           </button>
-
-          {/* Breadcrumb / spacer */}
-          <div className="flex-1" />
-          {/* Current section label */}
           <div className="flex-1 hidden sm:block">
             {(() => {
               const allItems = NAV_SECTIONS.flatMap(s => s.items)
@@ -220,8 +207,7 @@ export default function AppShell({ user, children }: { user?: User; children: Re
               )
             })()}
           </div>
-
-          {/* Top-right actions */}
+          <div className="flex-1" />
           <Link
             href="/accounting/scanner"
             className="hidden sm:flex items-center gap-1.5 text-[13px] text-[#0F4C81] hover:bg-blue-50 px-3 py-1.5 rounded-lg font-medium transition border border-blue-100"

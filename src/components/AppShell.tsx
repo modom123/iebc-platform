@@ -94,8 +94,8 @@ export default function AppShell({ user, children }: { user?: User; children: Re
           <span className="text-white font-black text-[11px] tracking-tight">IEBC</span>
         </div>
         <div className="leading-tight">
-          <p className="text-white font-bold text-sm">Business Suite</p>
-          <p className="text-blue-300 text-[10px]">Enterprise Platform</p>
+          <p className="text-white font-bold text-sm">Integrated Efficiency</p>
+          <p className="text-blue-300 text-[10px]">Infrastructure · Automation</p>
         </div>
       </div>
 

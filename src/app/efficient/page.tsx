@@ -80,7 +80,7 @@ export default function EfficientPage() {
             </div>
             <div className="leading-tight">
               <span className="text-[#0F4C81] font-extrabold text-lg tracking-tight">IEBC</span>
-              <span className="hidden md:block text-[10px] text-gray-400 font-medium tracking-wide -mt-0.5">Efficient Accounting</span>
+              <span className="hidden md:block text-[10px] text-gray-400 font-medium tracking-wide -mt-0.5">Business Infrastructure</span>
             </div>
           </Link>
 
@@ -108,19 +108,19 @@ export default function EfficientPage() {
         <div className="relative max-w-5xl mx-auto px-6 py-24 text-center">
           <div className="inline-flex items-center gap-2 bg-[#0F4C81]/10 border border-[#0F4C81]/20 text-[#0F4C81] text-xs font-bold px-4 py-1.5 rounded-full mb-7 tracking-widest uppercase">
             <span className="w-1.5 h-1.5 bg-green-500 rounded-full" />
-            Efficient Accounting by IEBC
+            Business Infrastructure by IEBC
           </div>
 
           <h1 className="text-5xl md:text-6xl font-extrabold leading-tight mb-6 tracking-tight text-gray-900">
-            Accounting that works
+            The financial infrastructure
             <br />
-            <span className="text-[#0F4C81]">as hard as you do.</span>
+            <span className="text-[#0F4C81]">your business runs on.</span>
           </h1>
 
           <p className="text-lg md:text-xl text-gray-500 max-w-2xl mx-auto mb-10 leading-relaxed">
-            22 modules. One dashboard. No accountant required.
+            22 modules. One dashboard. Fully automated.
             <br />
-            <span className="text-gray-800 font-semibold">From invoices to payroll to tax prep — Efficient does it all.</span>
+            <span className="text-gray-800 font-semibold">From invoices to payroll to tax prep — built into your business infrastructure.</span>
           </p>
 
           <div className="flex flex-wrap gap-3 justify-center mb-8">
@@ -270,7 +270,7 @@ export default function EfficientPage() {
         <div className="absolute -top-12 right-1/3 w-56 h-56 bg-[#C9A02E] opacity-10 rounded-full pointer-events-none" />
         <div className="relative max-w-2xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-extrabold mb-4">Your books won't keep themselves.</h2>
-          <p className="text-blue-200 mb-8 text-lg">Start with Efficient Accounting and close your books faster every month.</p>
+          <p className="text-blue-200 mb-8 text-lg">Build your financial infrastructure today and close your books faster every month.</p>
           <div className="flex flex-wrap gap-3 justify-center">
             <Link href="/accounting/checkout" className="bg-[#C02020] hover:bg-[#A01818] text-white px-8 py-3.5 rounded-xl font-bold transition shadow-lg shadow-black/20">
               Get Started — From $9/mo
@@ -290,7 +290,7 @@ export default function EfficientPage() {
           </div>
           <span className="text-[#0F4C81] font-extrabold">IEBC</span>
         </Link>
-        <p className="text-xs text-gray-400">© {new Date().getFullYear()} IEBC. Integrated Efficiency Business Consultants.</p>
+        <p className="text-xs text-gray-400">© {new Date().getFullYear()} Integrated Efficiency (IEBC). All rights reserved.</p>
         <div className="flex gap-4 justify-center mt-3 text-xs text-gray-400">
           <Link href="/" className="hover:text-[#0F4C81] transition">Home</Link>
           <Link href="/auth/login" className="hover:text-[#0F4C81] transition">Sign In</Link>

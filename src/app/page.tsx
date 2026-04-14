@@ -1,58 +1,58 @@
 import Link from 'next/link'
 
 const NAV_LINKS = [
-  { label: 'Efficient Accounting', href: '/efficient' },
-  { label: 'Master Hub', href: '/hub' },
+  { label: 'Business Infrastructure', href: '/efficient' },
+  { label: 'Business Automation', href: '/hub' },
   { label: 'Client Portal', href: '/portal' },
   { label: 'Pricing', href: '#pricing' },
 ]
 
 const PRODUCTS = [
   {
-    eyebrow: 'Efficient Accounting',
-    headline: 'Books that run themselves.',
-    body: 'Full-stack accounting suite — invoicing, payroll, reconciliation, AI receipt scanning, tax center, and real-time cash flow. Everything a growing business needs, none of the complexity.',
-    cta: { label: 'Explore Efficient Accounting', href: '/efficient' },
+    eyebrow: 'Business Infrastructure',
+    headline: 'The financial backbone your business runs on.',
+    body: 'Full-stack accounting, invoicing, payroll, reconciliation, tax center, and real-time cash flow — all automated. The infrastructure layer that keeps your business compliant, funded, and financially clear.',
+    cta: { label: 'Explore Business Infrastructure', href: '/efficient' },
     accent: '#0F4C81',
-    features: ['Invoicing & estimates', 'Bank reconciliation', 'AI receipt scanner', 'Tax center & 1099s', 'Cash flow forecasting', 'Client payment portal'],
+    features: ['Invoicing & estimates', 'Bank reconciliation', 'Payroll & 1099s', 'Tax center', 'Cash flow forecasting', 'Client payment portal'],
   },
   {
-    eyebrow: 'Master Hub',
-    headline: 'Your command center.',
-    body: 'One dashboard for leads, tasks, team, formations, and your AI consultant workforce. Stop juggling five tools — run your entire operation from a single hub.',
-    cta: { label: 'Open Master Hub', href: '/hub' },
+    eyebrow: 'Business Automation',
+    headline: 'Automate the work that runs your business.',
+    body: 'AI consultants, lead pipeline, task management, team coordination, business formation, and document vault — all connected. Replace manual operations with automated workflows that scale without hiring.',
+    cta: { label: 'Explore Business Automation', href: '/hub' },
     accent: '#C9A02E',
-    features: ['Lead pipeline & CRM', 'Task & project tracking', 'Team management', 'Business formation', 'Document vault', '60-consultant AI workforce'],
+    features: ['60-consultant AI workforce', 'Lead pipeline & CRM', 'Task & project tracking', 'Team management', 'Business formation', 'Document vault'],
   },
 ]
 
 const STATS = [
   { value: '22 hrs', label: 'saved per week, on average' },
   { value: '60', label: 'AI consultants on demand' },
-  { value: '25+', label: 'accounting modules' },
+  { value: '25+', label: 'infrastructure modules' },
   { value: '$9/mo', label: 'to get started' },
 ]
 
 const WHY = [
   {
+    icon: '🏗️',
+    title: 'Infrastructure first',
+    body: 'Every business needs a foundation — accounting, compliance, cash flow. IEBC builds that foundation for you and keeps it running automatically.',
+  },
+  {
     icon: '⚡',
-    title: 'Built for operators',
-    body: 'Not accountants, not developers. IEBC is designed for founders and operators who need to move fast without breaking their books.',
+    title: 'Automation at the core',
+    body: 'From auto-categorizing transactions to routing AI consultant requests, IEBC automates the work that eats your time so you stay focused on growth.',
   },
   {
     icon: '🔒',
     title: 'Secure by default',
-    body: 'Row-level security, encrypted client portals, and Stripe-powered billing. Your data and your clients\' data are protected at every layer.',
-  },
-  {
-    icon: '🤖',
-    title: 'AI embedded throughout',
-    body: 'From auto-categorizing transactions to routing consultant requests, AI handles the repetitive work so you stay focused on growth.',
+    body: 'Row-level security, encrypted client portals, and Stripe-powered billing. Your business data is protected at every layer.',
   },
   {
     icon: '📈',
     title: 'Scales with you',
-    body: 'Start solo at $9/mo. Add users, unlock consultants, and access the full suite as your business grows — no migration, no new tools.',
+    body: 'Start solo at $9/mo. Add users, unlock automation, and access the full platform as your business grows — no migration, no new tools.',
   },
 ]
 
@@ -62,7 +62,7 @@ const PLANS = [
     label: 'Silver',
     price: '$9',
     period: '/mo',
-    desc: 'For solo founders getting started.',
+    desc: 'Business infrastructure for solo founders.',
     consultants: 0,
     users: 1,
     highlight: false,
@@ -82,7 +82,7 @@ const PLANS = [
     label: 'Gold',
     price: '$22',
     period: '/mo',
-    desc: 'For growing teams with more to manage.',
+    desc: 'Infrastructure + automation for growing teams.',
     consultants: 3,
     users: 5,
     highlight: true,
@@ -90,8 +90,8 @@ const PLANS = [
       'Everything in Silver',
       '3 IEBC AI consultants',
       'Up to 5 users',
+      'Business automation hub',
       'Lead pipeline & CRM',
-      'Task & project hub',
       'Bank reconciliation',
       'Priority support',
     ],
@@ -103,7 +103,7 @@ const PLANS = [
     label: 'Platinum',
     price: '$42',
     period: '/mo',
-    desc: 'Full power for serious operators.',
+    desc: 'Full infrastructure & automation platform.',
     consultants: 5,
     users: 10,
     highlight: false,
@@ -111,9 +111,9 @@ const PLANS = [
       'Everything in Gold',
       '5 IEBC AI consultants',
       'Up to 10 users',
-      'Full accounting suite',
+      'Full infrastructure suite',
       'Business formation',
-      'AI workforce dispatch',
+      'Full AI workforce dispatch',
       'Dedicated account manager',
     ],
     link: 'https://buy.stripe.com/bJe14h1aVeRj58CfrVgEg01',
@@ -122,9 +122,9 @@ const PLANS = [
 ]
 
 const FOOTER_LINKS = {
-  Products: [
-    { label: 'Efficient Accounting', href: '/efficient' },
-    { label: 'Master Hub', href: '/hub' },
+  Platform: [
+    { label: 'Business Infrastructure', href: '/efficient' },
+    { label: 'Business Automation', href: '/hub' },
     { label: 'Client Portal', href: '/portal' },
     { label: 'Pricing', href: '#pricing' },
   ],
@@ -154,7 +154,7 @@ export default function Home() {
             </div>
             <div className="leading-tight">
               <span className="text-[#0F4C81] font-extrabold text-lg tracking-tight">IEBC</span>
-              <span className="hidden md:block text-[10px] text-gray-400 font-medium tracking-wide -mt-0.5">Integrated Efficiency Business Consultants</span>
+              <span className="hidden md:block text-[10px] text-gray-400 font-medium tracking-wide -mt-0.5">Integrated Efficiency</span>
             </div>
           </Link>
 
@@ -183,30 +183,28 @@ export default function Home() {
 
       {/* ── Hero ── */}
       <header className="relative bg-gradient-to-br from-[#F0F5FF] via-white to-[#FFF8E8] overflow-hidden border-b border-gray-100">
-        {/* Decorative circles */}
         <div className="absolute -top-24 -right-24 w-96 h-96 bg-[#0F4C81] opacity-5 rounded-full pointer-events-none" />
         <div className="absolute -bottom-16 -left-16 w-72 h-72 bg-[#C9A02E] opacity-5 rounded-full pointer-events-none" />
 
         <div className="relative max-w-5xl mx-auto px-6 py-24 text-center">
           <div className="inline-flex items-center gap-2 bg-[#0F4C81]/10 border border-[#0F4C81]/20 text-[#0F4C81] text-xs font-bold px-4 py-1.5 rounded-full mb-7 tracking-widest uppercase">
             <span className="w-1.5 h-1.5 bg-green-500 rounded-full" />
-            Integrated Efficiency Business Consultants
+            Integrated Efficiency
           </div>
 
           <h1 className="text-5xl md:text-6xl font-extrabold leading-tight mb-6 tracking-tight text-gray-900">
-            Stop Working{' '}
-            <span className="text-[#0F4C81]">In</span>{' '}
-            Your Business.
+            Business{' '}
+            <span className="text-[#0F4C81]">Infrastructure.</span>
             <br />
-            Start Working{' '}
-            <span className="text-[#C9A02E]">On</span>{' '}
-            It.
+            Business{' '}
+            <span className="text-[#C9A02E]">Automation.</span>
           </h1>
 
           <p className="text-lg md:text-xl text-gray-500 max-w-2xl mx-auto mb-10 leading-relaxed">
-            Formation · Accounting · 60 AI Consultants · Operations Hub.
+            The platform that builds and runs your business backbone —
+            accounting, compliance, AI consultants, and operations.
             <br />
-            <span className="text-gray-800 font-semibold">One platform that runs your business while you build it.</span>
+            <span className="text-gray-800 font-semibold">Stop managing your business. Start running it.</span>
           </p>
 
           <div className="flex flex-wrap gap-3 justify-center mb-8">
@@ -214,14 +212,13 @@ export default function Home() {
               Get Started Free
             </Link>
             <Link href="/efficient" className="bg-white hover:bg-blue-50 border-2 border-[#0F4C81] text-[#0F4C81] px-8 py-3.5 rounded-xl font-bold text-base transition shadow-sm">
-              Explore Efficient Accounting
+              Explore the Platform
             </Link>
           </div>
 
           <p className="text-sm text-gray-400">No contracts · Cancel anytime · Starts at $9/mo</p>
         </div>
 
-        {/* Stats bar */}
         <div className="bg-[#0F4C81] border-t border-[#0F4C81]">
           <div className="max-w-5xl mx-auto px-6 py-5 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             {STATS.map((s, i) => (
@@ -239,15 +236,15 @@ export default function Home() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <p className="text-xs font-bold text-[#C9A02E] uppercase tracking-widest mb-3">The Platform</p>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900">Two products. One complete business.</h2>
-            <p className="text-gray-500 mt-4 max-w-xl mx-auto">IEBC combines an accounting suite and an operations hub into a single platform — no integrations required.</p>
+            <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900">Two layers. One complete business.</h2>
+            <p className="text-gray-500 mt-4 max-w-xl mx-auto">Business Infrastructure handles your finances. Business Automation handles your operations. Together, they run your entire company.</p>
           </div>
 
           <div className="space-y-8">
             {PRODUCTS.map((product, idx) => (
               <div
                 key={idx}
-                className={`rounded-2xl border border-gray-200 overflow-hidden hover:shadow-xl transition grid md:grid-cols-2 bg-white`}
+                className="rounded-2xl border border-gray-200 overflow-hidden hover:shadow-xl transition grid md:grid-cols-2 bg-white"
               >
                 <div className={`p-10 flex flex-col justify-center ${idx % 2 === 1 ? 'md:order-2' : ''}`}>
                   <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: product.accent }}>{product.eyebrow}</p>
@@ -276,11 +273,11 @@ export default function Home() {
                   <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 w-full max-w-xs">
                     <div className="flex items-center gap-2 mb-4">
                       <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: product.accent }}>
-                        <span className="text-white text-xs font-bold">I</span>
+                        <span className="text-white text-xs font-bold">IE</span>
                       </div>
                       <div>
                         <p className="text-xs font-bold text-gray-800">{product.eyebrow}</p>
-                        <p className="text-[10px] text-gray-400">IEBC Platform</p>
+                        <p className="text-[10px] text-gray-400">Integrated Efficiency</p>
                       </div>
                     </div>
                     <div className="space-y-2">
@@ -303,8 +300,8 @@ export default function Home() {
       <section className="py-20 px-6 bg-[#F5F7FA]">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-12">
-            <p className="text-xs font-bold text-[#C9A02E] uppercase tracking-widest mb-3">Why IEBC</p>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900">Built different. Runs different.</h2>
+            <p className="text-xs font-bold text-[#C9A02E] uppercase tracking-widest mb-3">Why Integrated Efficiency</p>
+            <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900">Built to run your business. Not just manage it.</h2>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
             {WHY.map((w, i) => (
@@ -324,7 +321,7 @@ export default function Home() {
           <div className="text-center mb-14">
             <p className="text-xs font-bold text-[#C9A02E] uppercase tracking-widest mb-3">Pricing</p>
             <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900">Simple, transparent pricing.</h2>
-            <p className="text-gray-500 mt-4">Choose the plan that fits your business. No hidden fees, no long-term contracts.</p>
+            <p className="text-gray-500 mt-4">Infrastructure and automation, bundled in one plan. No hidden fees, no long-term contracts.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
@@ -357,7 +354,7 @@ export default function Home() {
                     </div>
                     <p className="text-sm text-gray-500 mt-1">{p.desc}</p>
                     <p className="text-xs text-gray-400 mt-1">
-                      {p.consultants > 0 ? `${p.consultants} consultants · ` : ''}Up to {p.users} user{p.users > 1 ? 's' : ''}
+                      {p.consultants > 0 ? `${p.consultants} AI consultants · ` : ''}Up to {p.users} user{p.users > 1 ? 's' : ''}
                     </p>
                   </div>
 
@@ -400,7 +397,7 @@ export default function Home() {
         <div className="absolute -top-16 right-1/4 w-64 h-64 bg-[#C9A02E] opacity-10 rounded-full pointer-events-none" />
         <div className="relative max-w-2xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-extrabold mb-4">Ready to build a better business?</h2>
-          <p className="text-blue-200 mb-8 text-lg">Join IEBC and get your formation, accounting, and consultant team working for you from day one.</p>
+          <p className="text-blue-200 mb-8 text-lg">Get the infrastructure and automation your business needs — in one platform, from day one.</p>
           <div className="flex flex-wrap gap-3 justify-center">
             <Link href="/accounting/checkout" className="bg-[#C02020] hover:bg-[#A01818] text-white px-8 py-3.5 rounded-xl font-bold transition shadow-lg shadow-black/20">
               Start Today — From $9/mo
@@ -424,7 +421,7 @@ export default function Home() {
                 <span className="text-[#0F4C81] font-extrabold text-lg">IEBC</span>
               </div>
               <p className="text-xs text-gray-400 leading-relaxed max-w-[200px]">
-                Integrated Efficiency Business Consultants. Formation to growth, in one platform.
+                Integrated Efficiency — Business Infrastructure and Business Automation in one platform.
               </p>
             </div>
 
@@ -443,7 +440,7 @@ export default function Home() {
           </div>
 
           <div className="border-t border-gray-200 pt-6 flex flex-col md:flex-row justify-between items-center gap-2">
-            <p className="text-xs text-gray-400">© {new Date().getFullYear()} IEBC. All rights reserved.</p>
+            <p className="text-xs text-gray-400">© {new Date().getFullYear()} Integrated Efficiency (IEBC). All rights reserved.</p>
             <p className="text-xs text-gray-400">Secured by Supabase · Payments by Stripe</p>
           </div>
         </div>

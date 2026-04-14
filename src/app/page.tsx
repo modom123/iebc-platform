@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import AgencyLeadForm from '@/components/AgencyLeadForm'
+import IndustriesSection from '@/components/IndustriesSection'
 
 // Font loaded via Google Fonts in layout.tsx — class defined in globals.css
 const playfair = { className: 'font-playfair', variable: '' }
@@ -37,16 +38,6 @@ const SERVICES = [
   },
 ]
 
-const INDUSTRIES = [
-  { icon: '🚛', label: 'Logistics & Trucking' },
-  { icon: '🔨', label: 'Contractors & 1099' },
-  { icon: '🎨', label: 'Creative & Freelance' },
-  { icon: '🛍️', label: 'Retail & E-commerce' },
-  { icon: '🍽️', label: 'Restaurant & Food' },
-  { icon: '♥️', label: 'Nonprofit' },
-  { icon: '⚽', label: 'Sports & NIL' },
-  { icon: '🏢', label: 'Professional Services' },
-]
 
 const PLANS = [
   {
@@ -343,38 +334,7 @@ export default function AgencyHomepage() {
       </section>
 
       {/* ── Industries ── */}
-      <section id="industries" className="py-20 px-6" style={{ background: '#F8F6F1' }}>
-        <div className="max-w-5xl mx-auto">
-          <div className="text-center mb-12">
-            <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: '#C8902A' }}>
-              Industries
-            </p>
-            <h2
-              className={`${playfair.className} text-3xl font-bold`}
-              style={{ color: '#0B2140' }}
-            >
-              Built for your type of business.
-            </h2>
-            <p className="text-gray-500 mt-3 max-w-md mx-auto">
-              Every industry has unique needs. We build systems that fit your specific workflows.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            {INDUSTRIES.map((ind, i) => (
-              <div
-                key={i}
-                className="rounded-xl border border-gray-200 bg-white p-5 text-center hover:shadow-md hover:border-[#C8902A]/40 transition-all"
-              >
-                <div className="text-2xl mb-2">{ind.icon}</div>
-                <p className="text-sm font-semibold" style={{ color: '#0B2140' }}>
-                  {ind.label}
-                </p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
+      <IndustriesSection />
 
       {/* ── How It Works ── */}
       <section id="how" className="py-24 px-6 bg-white">

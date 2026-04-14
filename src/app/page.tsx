@@ -1,59 +1,75 @@
 import Link from 'next/link'
 
 const NAV_LINKS = [
-  { label: 'Business Infrastructure', href: '/efficient' },
-  { label: 'Business Automation', href: '/hub' },
-  { label: 'Client Portal', href: '/portal' },
+  { label: 'Services', href: '#services' },
+  { label: 'Infrastructure', href: '/efficient' },
+  { label: 'Automation Hub', href: '/hub' },
   { label: 'Pricing', href: '#pricing' },
 ]
 
-const PRODUCTS = [
+const SERVICES = [
   {
-    eyebrow: 'Business Infrastructure',
-    headline: 'The financial backbone your business runs on.',
-    body: 'Full-stack accounting, invoicing, payroll, reconciliation, tax center, and real-time cash flow — all automated. The infrastructure layer that keeps your business compliant, funded, and financially clear.',
-    cta: { label: 'Explore Business Infrastructure', href: '/efficient' },
+    number: '01',
+    icon: '🏛️',
+    title: 'Business Formation',
+    subtitle: 'Start the right way.',
+    body: 'LLC, S-Corp, and C-Corp setup handled for you. EIN registration, operating agreements, registered agent services, and compliance checklists — your legal foundation built in days, not weeks.',
+    features: ['LLC · S-Corp · C-Corp', 'EIN registration', 'Operating agreements', 'Compliance checklists'],
+    cta: { label: 'Start Formation', href: '/hub/formation' },
     accent: '#0F4C81',
-    features: ['Invoicing & estimates', 'Bank reconciliation', 'Payroll & 1099s', 'Tax center', 'Cash flow forecasting', 'Client payment portal'],
+    bg: '#EEF4FF',
   },
   {
-    eyebrow: 'Business Automation',
-    headline: 'Automate the work that runs your business.',
-    body: 'AI consultants, lead pipeline, task management, team coordination, business formation, and document vault — all connected. Replace manual operations with automated workflows that scale without hiring.',
-    cta: { label: 'Explore Business Automation', href: '/hub' },
+    number: '02',
+    icon: '🌐',
+    title: 'Intelligent Websites',
+    subtitle: 'A web presence that works for you.',
+    body: 'We design and build high-performance websites powered by automation — lead capture, client portals, booking, and AI-driven content. Not just a site, a conversion engine for your business.',
+    features: ['Custom design & build', 'Lead capture & CRM sync', 'Client payment portal', 'AI-powered content'],
+    cta: { label: 'Learn More', href: '#services' },
+    accent: '#7C3AED',
+    bg: '#F5F3FF',
+  },
+  {
+    number: '03',
+    icon: '⚡',
+    title: 'Automated Business Hubs',
+    subtitle: 'Run your operations on autopilot.',
+    body: 'A unified command center that automates your leads, tasks, team, and operations. Replace five disconnected tools with one hub that runs your business while you focus on growing it.',
+    features: ['Lead pipeline & CRM', 'Task & project automation', 'Team management', 'Document vault'],
+    cta: { label: 'Open the Hub', href: '/hub' },
     accent: '#C9A02E',
-    features: ['60-consultant AI workforce', 'Lead pipeline & CRM', 'Task & project tracking', 'Team management', 'Business formation', 'Document vault'],
+    bg: '#FFFBEB',
+  },
+  {
+    number: '04',
+    icon: '🏗️',
+    title: 'Business Infrastructure',
+    subtitle: 'The financial backbone of your business.',
+    body: 'Full-stack accounting, invoicing, payroll, reconciliation, tax center, and real-time cash flow — all automated. The infrastructure layer that keeps your business compliant, funded, and financially clear.',
+    features: ['Invoicing & payroll', 'Bank reconciliation', 'Tax center & 1099s', 'Cash flow forecasting'],
+    cta: { label: 'Explore Infrastructure', href: '/efficient' },
+    accent: '#059669',
+    bg: '#ECFDF5',
+  },
+  {
+    number: '05',
+    icon: '🤖',
+    title: 'IEBC Consultants',
+    subtitle: '60 AI consultants. On demand.',
+    body: 'A workforce of 60 specialized AI consultants across finance, marketing, operations, legal, HR, technology, and strategy — automatically routed to your business based on what you need, when you need it.',
+    features: ['60 specialist consultants', 'Finance · Legal · Marketing', 'Operations · HR · Tech', 'Always available, no retainer'],
+    cta: { label: 'Meet the Consultants', href: '/hub/consultants' },
+    accent: '#0F4C81',
+    bg: '#EEF4FF',
   },
 ]
 
 const STATS = [
-  { value: '22 hrs', label: 'saved per week, on average' },
+  { value: '5', label: 'core services' },
   { value: '60', label: 'AI consultants on demand' },
   { value: '25+', label: 'infrastructure modules' },
   { value: '$9/mo', label: 'to get started' },
-]
-
-const WHY = [
-  {
-    icon: '🏗️',
-    title: 'Infrastructure first',
-    body: 'Every business needs a foundation — accounting, compliance, cash flow. IEBC builds that foundation for you and keeps it running automatically.',
-  },
-  {
-    icon: '⚡',
-    title: 'Automation at the core',
-    body: 'From auto-categorizing transactions to routing AI consultant requests, IEBC automates the work that eats your time so you stay focused on growth.',
-  },
-  {
-    icon: '🔒',
-    title: 'Secure by default',
-    body: 'Row-level security, encrypted client portals, and Stripe-powered billing. Your business data is protected at every layer.',
-  },
-  {
-    icon: '📈',
-    title: 'Scales with you',
-    body: 'Start solo at $9/mo. Add users, unlock automation, and access the full platform as your business grows — no migration, no new tools.',
-  },
 ]
 
 const PLANS = [
@@ -67,10 +83,9 @@ const PLANS = [
     users: 1,
     highlight: false,
     features: [
-      'Core accounting dashboard',
-      'Income & expense tracking',
+      'Business Infrastructure suite',
       'Invoicing & estimates',
-      'Transaction history',
+      'Income & expense tracking',
       'Client payment portal',
       'Email support',
     ],
@@ -89,10 +104,10 @@ const PLANS = [
     features: [
       'Everything in Silver',
       '3 IEBC AI consultants',
-      'Up to 5 users',
-      'Business automation hub',
+      'Automated Business Hub',
       'Lead pipeline & CRM',
       'Bank reconciliation',
+      'Up to 5 users',
       'Priority support',
     ],
     link: '/accounting/checkout',
@@ -103,17 +118,17 @@ const PLANS = [
     label: 'Platinum',
     price: '$42',
     period: '/mo',
-    desc: 'Full infrastructure & automation platform.',
+    desc: 'All 5 services. Full platform access.',
     consultants: 5,
     users: 10,
     highlight: false,
     features: [
       'Everything in Gold',
       '5 IEBC AI consultants',
-      'Up to 10 users',
+      'Business Formation',
+      'Intelligent Website setup',
       'Full infrastructure suite',
-      'Business formation',
-      'Full AI workforce dispatch',
+      'Up to 10 users',
       'Dedicated account manager',
     ],
     link: 'https://buy.stripe.com/bJe14h1aVeRj58CfrVgEg01',
@@ -122,11 +137,12 @@ const PLANS = [
 ]
 
 const FOOTER_LINKS = {
-  Platform: [
+  Services: [
+    { label: 'Business Formation', href: '/hub/formation' },
+    { label: 'Intelligent Websites', href: '#services' },
+    { label: 'Automated Business Hubs', href: '/hub' },
     { label: 'Business Infrastructure', href: '/efficient' },
-    { label: 'Business Automation', href: '/hub' },
-    { label: 'Client Portal', href: '/portal' },
-    { label: 'Pricing', href: '#pricing' },
+    { label: 'IEBC Consultants', href: '/hub/consultants' },
   ],
   Company: [
     { label: 'About IEBC', href: '#' },
@@ -137,7 +153,7 @@ const FOOTER_LINKS = {
   Account: [
     { label: 'Sign In', href: '/auth/login' },
     { label: 'Create Account', href: '/auth/signup' },
-    { label: 'Forgot Password', href: '/auth/forgot-password' },
+    { label: 'Pricing', href: '#pricing' },
   ],
 }
 
@@ -193,33 +209,33 @@ export default function Home() {
           </div>
 
           <h1 className="text-5xl md:text-6xl font-extrabold leading-tight mb-6 tracking-tight text-gray-900">
-            Business{' '}
-            <span className="text-[#0F4C81]">Infrastructure.</span>
+            Everything your business
             <br />
-            Business{' '}
-            <span className="text-[#C9A02E]">Automation.</span>
+            needs to{' '}
+            <span className="text-[#0F4C81]">build</span>,{' '}
+            <span className="text-[#C9A02E]">run</span>, and{' '}
+            <span className="text-[#059669]">grow</span>.
           </h1>
 
           <p className="text-lg md:text-xl text-gray-500 max-w-2xl mx-auto mb-10 leading-relaxed">
-            The platform that builds and runs your business backbone —
-            accounting, compliance, AI consultants, and operations.
+            5 integrated services — Formation, Websites, Automation Hubs, Infrastructure, and AI Consultants.
             <br />
-            <span className="text-gray-800 font-semibold">Stop managing your business. Start running it.</span>
+            <span className="text-gray-800 font-semibold">One company. One platform. Everything working together.</span>
           </p>
 
           <div className="flex flex-wrap gap-3 justify-center mb-8">
             <Link href="/accounting/checkout" className="bg-[#C02020] hover:bg-[#A01818] text-white px-8 py-3.5 rounded-xl font-bold text-base transition shadow-lg shadow-red-200">
               Get Started Free
             </Link>
-            <Link href="/efficient" className="bg-white hover:bg-blue-50 border-2 border-[#0F4C81] text-[#0F4C81] px-8 py-3.5 rounded-xl font-bold text-base transition shadow-sm">
-              Explore the Platform
+            <Link href="#services" className="bg-white hover:bg-blue-50 border-2 border-[#0F4C81] text-[#0F4C81] px-8 py-3.5 rounded-xl font-bold text-base transition shadow-sm">
+              Explore Our Services
             </Link>
           </div>
 
           <p className="text-sm text-gray-400">No contracts · Cancel anytime · Starts at $9/mo</p>
         </div>
 
-        <div className="bg-[#0F4C81] border-t border-[#0F4C81]">
+        <div className="bg-[#0F4C81]">
           <div className="max-w-5xl mx-auto px-6 py-5 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
             {STATS.map((s, i) => (
               <div key={i}>
@@ -231,97 +247,73 @@ export default function Home() {
         </div>
       </header>
 
-      {/* ── Products ── */}
-      <section className="py-24 px-6 bg-white">
+      {/* ── Services ── */}
+      <section id="services" className="py-24 px-6 bg-white">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <p className="text-xs font-bold text-[#C9A02E] uppercase tracking-widest mb-3">The Platform</p>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900">Two layers. One complete business.</h2>
-            <p className="text-gray-500 mt-4 max-w-xl mx-auto">Business Infrastructure handles your finances. Business Automation handles your operations. Together, they run your entire company.</p>
+            <p className="text-xs font-bold text-[#C9A02E] uppercase tracking-widest mb-3">What We Do</p>
+            <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900">5 services. One integrated platform.</h2>
+            <p className="text-gray-500 mt-4 max-w-xl mx-auto">
+              IEBC is not a single product — it's a complete business operating system. Each service is powerful alone, and unstoppable together.
+            </p>
           </div>
 
-          <div className="space-y-8">
-            {PRODUCTS.map((product, idx) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {SERVICES.map((s) => (
               <div
-                key={idx}
-                className="rounded-2xl border border-gray-200 overflow-hidden hover:shadow-xl transition grid md:grid-cols-2 bg-white"
+                key={s.number}
+                className="rounded-2xl border border-gray-200 overflow-hidden hover:shadow-xl hover:border-transparent transition group flex flex-col"
               >
-                <div className={`p-10 flex flex-col justify-center ${idx % 2 === 1 ? 'md:order-2' : ''}`}>
-                  <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: product.accent }}>{product.eyebrow}</p>
-                  <h3 className="text-2xl md:text-3xl font-extrabold text-gray-900 mb-4">{product.headline}</h3>
-                  <p className="text-gray-500 leading-relaxed mb-6">{product.body}</p>
-                  <ul className="grid grid-cols-2 gap-2 mb-8">
-                    {product.features.map((f, fi) => (
-                      <li key={fi} className="flex items-center gap-2 text-sm text-gray-600">
-                        <span className="text-green-500 font-bold">✓</span>{f}
+                <div className="p-1.5" style={{ background: s.bg }}>
+                  <div className="flex items-center gap-2 px-4 py-3">
+                    <span className="text-2xl">{s.icon}</span>
+                    <span className="text-xs font-black tracking-widest uppercase" style={{ color: s.accent }}>{s.number}</span>
+                  </div>
+                </div>
+                <div className="p-6 flex flex-col flex-1">
+                  <h3 className="text-xl font-extrabold text-gray-900 mb-1">{s.title}</h3>
+                  <p className="text-sm font-semibold mb-3" style={{ color: s.accent }}>{s.subtitle}</p>
+                  <p className="text-sm text-gray-500 leading-relaxed mb-5">{s.body}</p>
+                  <ul className="grid grid-cols-2 gap-1.5 mb-6 flex-1">
+                    {s.features.map((f, fi) => (
+                      <li key={fi} className="flex items-center gap-1.5 text-xs text-gray-600">
+                        <span className="font-bold shrink-0" style={{ color: s.accent }}>✓</span>{f}
                       </li>
                     ))}
                   </ul>
                   <Link
-                    href={product.cta.href}
-                    className="self-start px-6 py-3 rounded-lg font-bold text-sm transition text-white shadow-md"
-                    style={{ background: product.accent }}
+                    href={s.cta.href}
+                    className="text-center py-2.5 rounded-lg font-bold text-sm transition text-white"
+                    style={{ background: s.accent }}
                   >
-                    {product.cta.label}
+                    {s.cta.label}
                   </Link>
                 </div>
-
-                <div
-                  className={`min-h-[280px] flex items-center justify-center p-10 ${idx % 2 === 1 ? 'md:order-1' : ''}`}
-                  style={{ background: `linear-gradient(135deg, ${product.accent}12 0%, ${product.accent}04 100%)` }}
-                >
-                  <div className="bg-white rounded-xl shadow-lg border border-gray-200 p-6 w-full max-w-xs">
-                    <div className="flex items-center gap-2 mb-4">
-                      <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: product.accent }}>
-                        <span className="text-white text-xs font-bold">IE</span>
-                      </div>
-                      <div>
-                        <p className="text-xs font-bold text-gray-800">{product.eyebrow}</p>
-                        <p className="text-[10px] text-gray-400">Integrated Efficiency</p>
-                      </div>
-                    </div>
-                    <div className="space-y-2">
-                      {product.features.slice(0, 4).map((f, fi) => (
-                        <div key={fi} className="flex items-center gap-2 bg-gray-50 rounded-lg px-3 py-2">
-                          <span className="text-xs font-bold" style={{ color: product.accent }}>✓</span>
-                          <span className="text-xs text-gray-600">{f}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
               </div>
             ))}
-          </div>
-        </div>
-      </section>
 
-      {/* ── Why IEBC ── */}
-      <section className="py-20 px-6 bg-[#F5F7FA]">
-        <div className="max-w-6xl mx-auto">
-          <div className="text-center mb-12">
-            <p className="text-xs font-bold text-[#C9A02E] uppercase tracking-widest mb-3">Why Integrated Efficiency</p>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900">Built to run your business. Not just manage it.</h2>
-          </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-            {WHY.map((w, i) => (
-              <div key={i} className="bg-white rounded-xl border border-gray-200 p-6 hover:shadow-md hover:border-[#0F4C81] transition">
-                <div className="text-3xl mb-4">{w.icon}</div>
-                <h3 className="font-bold text-gray-900 mb-2">{w.title}</h3>
-                <p className="text-sm text-gray-500 leading-relaxed">{w.body}</p>
+            {/* Spacer card — "All in one" */}
+            <div className="rounded-2xl border-2 border-dashed border-gray-200 p-6 flex flex-col items-center justify-center text-center bg-gray-50 hover:border-[#0F4C81] transition">
+              <div className="w-12 h-12 bg-[#0F4C81] rounded-xl flex items-center justify-center mb-4 shadow-md">
+                <span className="text-white font-black text-sm">IE</span>
               </div>
-            ))}
+              <h3 className="text-lg font-extrabold text-gray-900 mb-2">All 5 Services</h3>
+              <p className="text-sm text-gray-500 mb-5">Get every IEBC service bundled in one Platinum plan. Formation to consultants — fully integrated.</p>
+              <Link href="#pricing" className="bg-[#0F4C81] hover:bg-[#082D4F] text-white px-6 py-2.5 rounded-lg font-bold text-sm transition">
+                See Platinum Plan
+              </Link>
+            </div>
           </div>
         </div>
       </section>
 
       {/* ── Pricing ── */}
-      <section id="pricing" className="py-24 px-6 bg-white">
+      <section id="pricing" className="py-24 px-6 bg-[#F5F7FA]">
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-14">
             <p className="text-xs font-bold text-[#C9A02E] uppercase tracking-widest mb-3">Pricing</p>
             <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900">Simple, transparent pricing.</h2>
-            <p className="text-gray-500 mt-4">Infrastructure and automation, bundled in one plan. No hidden fees, no long-term contracts.</p>
+            <p className="text-gray-500 mt-4">All 5 services, bundled by plan. No hidden fees, no long-term contracts.</p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
@@ -397,7 +389,7 @@ export default function Home() {
         <div className="absolute -top-16 right-1/4 w-64 h-64 bg-[#C9A02E] opacity-10 rounded-full pointer-events-none" />
         <div className="relative max-w-2xl mx-auto">
           <h2 className="text-3xl md:text-4xl font-extrabold mb-4">Ready to build a better business?</h2>
-          <p className="text-blue-200 mb-8 text-lg">Get the infrastructure and automation your business needs — in one platform, from day one.</p>
+          <p className="text-blue-200 mb-8 text-lg">Formation to consultants — get every IEBC service working for your business from day one.</p>
           <div className="flex flex-wrap gap-3 justify-center">
             <Link href="/accounting/checkout" className="bg-[#C02020] hover:bg-[#A01818] text-white px-8 py-3.5 rounded-xl font-bold transition shadow-lg shadow-black/20">
               Start Today — From $9/mo
@@ -421,7 +413,7 @@ export default function Home() {
                 <span className="text-[#0F4C81] font-extrabold text-lg">IEBC</span>
               </div>
               <p className="text-xs text-gray-400 leading-relaxed max-w-[200px]">
-                Integrated Efficiency — Business Infrastructure and Business Automation in one platform.
+                Integrated Efficiency — 5 services to build, run, and grow your business.
               </p>
             </div>
 

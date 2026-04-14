@@ -160,6 +160,33 @@ export default function FormationPage() {
 
       <div className="max-w-3xl mx-auto p-6 space-y-6">
 
+        {/* ── À La Carte Formation Services Banner ── */}
+        <div className="rounded-xl overflow-hidden border border-[#C8902A]/30 shadow-sm">
+          <div
+            className="px-6 py-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4"
+            style={{ background: 'linear-gradient(135deg, #0B2140 0%, #1a3a5c 100%)' }}
+          >
+            <div>
+              <p className="text-[#C8902A] text-xs font-black uppercase tracking-widest mb-1">
+                Done-For-You Services
+              </p>
+              <h3 className="text-white font-bold text-base leading-snug">
+                Need help with formation? Shop our à la carte services.
+              </h3>
+              <p className="text-blue-200 text-xs mt-1">
+                LLC · S-Corp · EIN · Operating Agreements · Registered Agent · and more
+              </p>
+            </div>
+            <a
+              href="/checkout/formation"
+              className="shrink-0 px-5 py-2.5 rounded-lg text-sm font-bold transition-opacity hover:opacity-90 shadow-md whitespace-nowrap"
+              style={{ background: '#C8902A', color: '#fff' }}
+            >
+              Shop Formation Services →
+            </a>
+          </div>
+        </div>
+
         {!formation?.entity_type ? (
           /* Setup: Choose entity type */
           <div className="space-y-6">

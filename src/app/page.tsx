@@ -14,8 +14,8 @@ const SERVICES = [
     body: 'LLC, S-Corp, C-Corp, or Nonprofit filed in any U.S. state. EIN registration, operating agreements, registered agent, and compliance checklists — your legal foundation built right, the first time.',
     features: ['LLC · S-Corp · C-Corp · Nonprofit', 'EIN & operating agreement', 'All 50 states · docs delivered', 'Compliance checklist included'],
     detail: 'from $150 · one-time · all 50 states',
-    cta: 'Start Formation',
-    href: '/hub/formation',
+    cta: 'View Services & Pricing',
+    href: '/checkout/formation',
     accent: '#0B2140',
     bg: 'rgba(11,33,64,0.04)',
   },
@@ -165,6 +165,7 @@ export default function AgencyHomepage() {
             {[
               ['Services', '#services'],
               ['Industries', '#industries'],
+              ['Accounting', '/platform'],
               ['How It Works', '#how'],
               ['Pricing', '#pricing'],
             ].map(([label, href]) => (
@@ -393,11 +394,11 @@ export default function AgencyHomepage() {
               </p>
               <div className="flex flex-col gap-2.5 w-full">
                 <a
-                  href="/accounting/checkout"
+                  href="/platform"
                   className="px-6 py-2.5 rounded-lg text-sm font-bold transition-opacity hover:opacity-90 shadow-md text-center"
                   style={{ background: '#C8902A', color: '#fff' }}
                 >
-                  Get Efficient SaaS — from $9/mo
+                  View Accounting Plans — from $9/mo
                 </a>
                 <a
                   href="https://calendly.com/new56money/30min"

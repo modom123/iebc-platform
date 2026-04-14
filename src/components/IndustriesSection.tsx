@@ -350,23 +350,39 @@ export default function IndustriesSection() {
                     </div>
                   </div>
 
-                  <div className="flex flex-col sm:flex-row gap-3">
+                  <div className="flex flex-col gap-3">
+                    {/* Primary: Purchase with milestone checkout */}
                     <a
-                      href="https://calendly.com/new56money/30min"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex-1 text-center py-3.5 rounded-xl font-bold text-sm transition-opacity hover:opacity-90 shadow-lg"
-                      style={{ background: '#C8902A', color: '#fff' }}
+                      href={`/checkout/industry/${active.id}`}
+                      className="text-center py-3.5 rounded-xl font-bold text-sm transition-opacity hover:opacity-90 shadow-lg"
+                      style={{ background: '#0B2140', color: '#fff' }}
                     >
-                      Book a Strategy Call
+                      Purchase Package — {active.setup} setup →
                     </a>
-                    <a
-                      href="#contact"
-                      className="flex-1 text-center py-3.5 rounded-xl font-bold text-sm border-2 transition-colors hover:bg-[#0B2140] hover:text-white hover:border-[#0B2140]"
-                      style={{ borderColor: '#0B2140', color: '#0B2140' }}
-                    >
-                      Get Started →
-                    </a>
+
+                    <div className="flex flex-col sm:flex-row gap-3">
+                      <a
+                        href="https://calendly.com/new56money/30min"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex-1 text-center py-3 rounded-xl font-bold text-sm transition-opacity hover:opacity-80"
+                        style={{ background: '#C8902A', color: '#fff' }}
+                      >
+                        Book a Strategy Call
+                      </a>
+                      <a
+                        href="#contact"
+                        className="flex-1 text-center py-3 rounded-xl font-bold text-sm border-2 transition-colors hover:bg-[#0B2140] hover:text-white hover:border-[#0B2140]"
+                        style={{ borderColor: '#0B2140', color: '#0B2140' }}
+                      >
+                        Get Started →
+                      </a>
+                    </div>
+
+                    {/* Payment schedule note */}
+                    <p className="text-xs text-gray-500 text-center leading-snug">
+                      25% down · 50% at deployment · 25% on delivery
+                    </p>
                   </div>
                 </div>
               </div>

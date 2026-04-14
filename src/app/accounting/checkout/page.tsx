@@ -1,25 +1,30 @@
 'use client'
-import { useSearchParams } from 'next/navigation'
-import { Suspense } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
+import { useRouter } from 'next/navigation'
 
-const plans = [
+const PLANS = [
   {
     id: 'silver',
     label: 'Silver',
     price: '$9',
     period: '/mo',
-    consultants: 0,
+    consultants: 1,
     users: 1,
+    desc: 'For individuals & solo founders.',
+    badge: '',
+    highlight: false,
     features: [
-      'Core accounting dashboard',
+      '1 IEBC AI Consultant',
+      '1 user account',
+      'AI receipt scanning',
       'Income & expense tracking',
+      'Invoices & estimates',
+      'Client payment portal',
       'Transaction history',
-      'Monthly financial summary',
+      'Monthly financial reports',
       'Email support',
     ],
-    link: process.env.NEXT_PUBLIC_STRIPE_LINK_SILVER || 'https://buy.stripe.com/dRm7sF9Hr6kNbx0frVgEg03',
-    highlight: false,
   },
   {
     id: 'gold',
@@ -27,17 +32,21 @@ const plans = [
     price: '$22',
     period: '/mo',
     consultants: 3,
-    users: 5,
+    users: 3,
+    desc: 'For small teams & growing businesses.',
+    badge: 'Most Popular',
+    highlight: true,
     features: [
+      '3 IEBC AI Consultants',
+      'Up to 3 users',
+      'AI receipt scanning',
       'Everything in Silver',
-      '3 IEBC consultants assigned',
-      'Up to 5 team users',
-      'Invoice generation',
-      'Lead pipeline access',
+      'Automated Business Hub',
+      'Lead pipeline & CRM',
+      'Bank reconciliation',
+      'Project tracking',
       'Priority support',
     ],
-    link: process.env.NEXT_PUBLIC_STRIPE_LINK_GOLD || 'https://buy.stripe.com/4gM8wJ8Dn10teJc6VpgEg02',
-    highlight: true,
   },
   {
     id: 'platinum',
@@ -46,112 +55,348 @@ const plans = [
     period: '/mo',
     consultants: 5,
     users: 10,
+    desc: 'All features. Full platform access.',
+    badge: '',
+    highlight: false,
     features: [
+      '5 IEBC AI Consultants',
+      'Up to 10 users',
+      'AI receipt scanning',
       'Everything in Gold',
-      '5 IEBC consultants assigned',
-      'Up to 10 team users',
       'Full accounting suite',
-      'Business formation support',
-      'AI workforce dispatch',
+      'Payroll management',
+      'Tax center & 1099s',
+      'Business Formation support',
       'Dedicated account manager',
     ],
-    link: 'https://buy.stripe.com/bJe14h1aVeRj58CfrVgEg01',
-    highlight: false,
   },
 ]
 
-function CheckoutInner() {
-  const searchParams = useSearchParams()
-  const canceled = searchParams.get('canceled')
+const US_STATES = [
+  'AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA','HI','ID','IL','IN','IA',
+  'KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ',
+  'NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT',
+  'VA','WA','WV','WI','WY','DC',
+]
 
-  const handleCheckout = (plan: typeof plans[0]) => {
-    if (plan.link) {
-      window.location.href = plan.link
-    } else {
-      alert(`${plan.label} plan coming soon. Please select Platinum or contact support.`)
+export default function CheckoutPage() {
+  const router = useRouter()
+  const [step, setStep] = useState<1 | 2>(1)
+  const [selectedPlan, setSelectedPlan] = useState<string | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const [canceled, setCanceled] = useState(
+    typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('canceled') === 'true'
+  )
+
+  const [form, setForm] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    street: '',
+    city: '',
+    state: '',
+    zip: '',
+  })
+
+  const plan = PLANS.find(p => p.id === selectedPlan)
+
+  function handleField(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) {
+    setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
+  }
+
+  async function handleSubmit(e: React.FormEvent) {
+    e.preventDefault()
+    if (!selectedPlan) return
+    setLoading(true)
+    setError('')
+
+    try {
+      const res = await fetch('/api/stripe/checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          plan: selectedPlan,
+          name: form.name,
+          email: form.email,
+          phone: form.phone,
+          billing_address: {
+            street: form.street,
+            city: form.city,
+            state: form.state,
+            zip: form.zip,
+          },
+        }),
+      })
+
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Checkout failed')
+      window.location.href = data.url
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.')
+      setLoading(false)
     }
   }
 
   return (
-    <main className="min-h-screen bg-gray-50 p-6">
-      <div className="max-w-5xl mx-auto">
-        <div className="text-center mb-10">
-          <h1 className="text-3xl font-bold text-[#0F4C81]">Choose Your Plan</h1>
-          <p className="text-gray-500 mt-2">
-            Efficient by IEBC — Accounting · Consultants · Business Growth
-          </p>
-          {canceled && (
-            <p className="mt-3 text-red-600 text-sm font-medium">
-              Payment was canceled. Please try again.
-            </p>
-          )}
+    <main className="min-h-screen bg-gray-50">
+      {/* Header */}
+      <div className="bg-white border-b border-gray-200 px-6 py-4">
+        <div className="max-w-5xl mx-auto flex items-center justify-between">
+          <Link href="/" className="flex items-center gap-2.5">
+            <div className="w-8 h-8 bg-[#0F4C81] rounded-lg flex items-center justify-center">
+              <span className="text-white font-extrabold text-sm">I</span>
+            </div>
+            <span className="font-extrabold text-[#0F4C81] text-lg">IEBC</span>
+            <span className="text-gray-400 text-sm">/ Efficient SaaS</span>
+          </Link>
+          <div className="flex items-center gap-2 text-xs text-gray-400">
+            <span className={`font-semibold ${step === 1 ? 'text-[#0F4C81]' : 'text-gray-400'}`}>1. Choose Plan</span>
+            <span className="mx-1">→</span>
+            <span className={`font-semibold ${step === 2 ? 'text-[#0F4C81]' : 'text-gray-400'}`}>2. Your Info</span>
+            <span className="mx-1">→</span>
+            <span className="text-gray-300 font-semibold">3. Payment</span>
+          </div>
         </div>
+      </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {plans.map(p => (
-            <div
-              key={p.id}
-              className={`bg-white rounded-xl border flex flex-col transition ${
-                p.highlight
-                  ? 'border-[#0F4C81] shadow-lg scale-105'
-                  : 'border-gray-200 hover:border-[#0F4C81] hover:shadow-md'
-              }`}
-            >
-              {p.highlight && (
-                <div className="bg-[#0F4C81] text-white text-xs font-bold text-center py-1.5 rounded-t-xl tracking-widest uppercase">
-                  Most Popular
-                </div>
-              )}
-              <div className="p-6 flex flex-col flex-1">
-                <h3 className="text-xl font-bold text-slate-800">{p.label}</h3>
-                <div className="mt-3 mb-1">
-                  <span className="text-4xl font-extrabold text-[#0F4C81]">{p.price}</span>
-                  <span className="text-gray-500 text-sm">{p.period}</span>
-                </div>
-                <p className="text-xs text-gray-400 mb-4">
-                  {p.consultants > 0 ? `${p.consultants} IEBC consultants · ` : ''}
-                  Up to {p.users} user{p.users > 1 ? 's' : ''}
-                </p>
-                <ul className="space-y-2 flex-1 mb-6">
-                  {p.features.map((f, i) => (
-                    <li key={i} className="flex items-start gap-2 text-sm text-gray-600">
-                      <span className="text-green-500 mt-0.5">✓</span>
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <button
-                  onClick={() => handleCheckout(p)}
-                  className={`w-full py-3 rounded-lg font-semibold transition text-sm ${
-                    p.highlight
-                      ? 'bg-[#0F4C81] text-white hover:bg-[#082D4F]'
-                      : 'border-2 border-[#0F4C81] text-[#0F4C81] hover:bg-blue-50'
-                  }`}
-                >
-                  {p.link ? `Get ${p.label}` : 'Coming Soon'}
-                </button>
+      <div className="max-w-5xl mx-auto px-4 py-10">
+        {canceled && (
+          <div className="mb-6 bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg flex items-center gap-2">
+            <span>⚠</span> Payment was canceled. Your info is saved — just select a plan to try again.
+          </div>
+        )}
+
+        {/* ── STEP 1: Plan Selection ── */}
+        {step === 1 && (
+          <>
+            <div className="text-center mb-10">
+              <p className="text-xs font-bold text-[#C9A02E] uppercase tracking-widest mb-2">Step 1 of 3</p>
+              <h1 className="text-3xl font-extrabold text-gray-900 mb-2">Choose your plan</h1>
+              <p className="text-gray-500">All plans include a <span className="font-semibold text-gray-700">7-day free trial</span>. No charge until day 8.</p>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+              {PLANS.map(p => {
+                const isSelected = selectedPlan === p.id
+                return (
+                  <button
+                    key={p.id}
+                    onClick={() => setSelectedPlan(p.id)}
+                    className={`rounded-2xl border-2 flex flex-col text-left transition-all relative bg-white w-full ${
+                      isSelected
+                        ? 'border-[#0F4C81] shadow-xl shadow-blue-100 ring-2 ring-[#0F4C81]/20'
+                        : 'border-gray-200 hover:border-[#0F4C81]/40 hover:shadow-md'
+                    }`}
+                  >
+                    {p.badge && (
+                      <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
+                        <span className="bg-[#C9A02E] text-white text-xs font-bold px-4 py-1 rounded-full uppercase tracking-widest shadow-md whitespace-nowrap">
+                          {p.badge}
+                        </span>
+                      </div>
+                    )}
+                    {isSelected && (
+                      <div className="absolute top-3 right-3 w-5 h-5 bg-[#0F4C81] rounded-full flex items-center justify-center">
+                        <span className="text-white text-[10px] font-bold">✓</span>
+                      </div>
+                    )}
+                    <div className="p-6 flex flex-col flex-1">
+                      <div className="mb-4">
+                        <span className={`inline-block px-2.5 py-0.5 rounded-md text-xs font-bold mb-3 ${
+                          p.id === 'silver' ? 'bg-slate-100 text-slate-600' :
+                          p.id === 'gold' ? 'bg-amber-50 text-amber-700 border border-amber-200' :
+                          'bg-blue-50 text-[#0F4C81] border border-blue-200'
+                        }`}>{p.label}</span>
+                        <div className="flex items-baseline gap-1">
+                          <span className="text-4xl font-extrabold text-gray-900">{p.price}</span>
+                          <span className="text-gray-400 text-sm">{p.period}</span>
+                        </div>
+                        <p className="text-sm text-gray-500 mt-1">{p.desc}</p>
+                        <p className="text-xs text-gray-400 mt-1">
+                          {p.consultants} IEBC AI Consultant{p.consultants > 1 ? 's' : ''} · Up to {p.users} user{p.users > 1 ? 's' : ''}
+                        </p>
+                      </div>
+
+                      <ul className="space-y-2 flex-1 mb-4">
+                        {p.features.map((f, i) => (
+                          <li key={i} className="flex items-start gap-2 text-sm text-gray-600">
+                            <span className="text-green-500 font-bold mt-0.5 shrink-0">✓</span>
+                            <span>{f}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  </button>
+                )
+              })}
+            </div>
+
+            <div className="flex justify-center">
+              <button
+                onClick={() => { if (selectedPlan) setStep(2) }}
+                disabled={!selectedPlan}
+                className="px-10 py-3.5 rounded-xl font-bold text-sm transition disabled:opacity-40 disabled:cursor-not-allowed bg-[#0F4C81] hover:bg-[#082D4F] text-white shadow-lg"
+              >
+                Continue with {plan?.label ?? 'a plan'} →
+              </button>
+            </div>
+            <p className="text-center text-xs text-gray-400 mt-4">
+              7-day free trial · No charge until day 8 · Cancel anytime
+            </p>
+          </>
+        )}
+
+        {/* ── STEP 2: Your Info ── */}
+        {step === 2 && plan && (
+          <div className="max-w-xl mx-auto">
+            <div className="text-center mb-8">
+              <p className="text-xs font-bold text-[#C9A02E] uppercase tracking-widest mb-2">Step 2 of 3</p>
+              <h1 className="text-3xl font-extrabold text-gray-900 mb-2">Your information</h1>
+              <p className="text-gray-500">We&apos;ll use this to set up your account after payment.</p>
+            </div>
+
+            {/* Plan summary */}
+            <div className="bg-white rounded-xl border border-gray-200 p-4 mb-6 flex items-center justify-between">
+              <div>
+                <span className={`inline-block px-2.5 py-0.5 rounded-md text-xs font-bold mr-2 ${
+                  plan.id === 'silver' ? 'bg-slate-100 text-slate-600' :
+                  plan.id === 'gold' ? 'bg-amber-50 text-amber-700' :
+                  'bg-blue-50 text-[#0F4C81]'
+                }`}>{plan.label}</span>
+                <span className="text-sm text-gray-500">{plan.consultants} consultant{plan.consultants > 1 ? 's' : ''} · {plan.users} user{plan.users > 1 ? 's' : ''}</span>
+              </div>
+              <div className="flex items-center gap-3">
+                <span className="text-xl font-extrabold text-gray-900">{plan.price}<span className="text-sm text-gray-400 font-normal">/mo</span></span>
+                <button onClick={() => setStep(1)} className="text-xs text-[#0F4C81] hover:underline">Change</button>
               </div>
             </div>
-          ))}
-        </div>
 
-        <p className="text-center text-xs text-gray-400 mt-8">
-          All plans billed monthly. Cancel anytime. Secure payments via Stripe.
-        </p>
-        <div className="text-center mt-4">
-          <Link href="/" className="text-sm text-gray-500 hover:text-gray-700">
-            ← Back to Home
-          </Link>
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Name */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1.5">Full Name <span className="text-red-500">*</span></label>
+                <input
+                  name="name"
+                  type="text"
+                  required
+                  value={form.name}
+                  onChange={handleField}
+                  placeholder="Jane Smith"
+                  className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F4C81] focus:border-transparent"
+                />
+              </div>
+
+              {/* Email */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1.5">Email Address <span className="text-red-500">*</span></label>
+                <input
+                  name="email"
+                  type="email"
+                  required
+                  value={form.email}
+                  onChange={handleField}
+                  placeholder="jane@company.com"
+                  className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F4C81] focus:border-transparent"
+                />
+                <p className="text-xs text-gray-400 mt-1">Your login credentials will be sent to this email after payment.</p>
+              </div>
+
+              {/* Phone */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1.5">Phone Number</label>
+                <input
+                  name="phone"
+                  type="tel"
+                  value={form.phone}
+                  onChange={handleField}
+                  placeholder="(555) 000-0000"
+                  className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F4C81] focus:border-transparent"
+                />
+              </div>
+
+              {/* Billing Address */}
+              <div className="pt-2">
+                <p className="text-sm font-semibold text-gray-700 mb-3">Billing Address</p>
+                <div className="space-y-3">
+                  <input
+                    name="street"
+                    type="text"
+                    required
+                    value={form.street}
+                    onChange={handleField}
+                    placeholder="Street address"
+                    className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F4C81] focus:border-transparent"
+                  />
+                  <div className="grid grid-cols-2 gap-3">
+                    <input
+                      name="city"
+                      type="text"
+                      required
+                      value={form.city}
+                      onChange={handleField}
+                      placeholder="City"
+                      className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F4C81] focus:border-transparent"
+                    />
+                    <select
+                      name="state"
+                      required
+                      value={form.state}
+                      onChange={handleField}
+                      className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F4C81] focus:border-transparent bg-white"
+                    >
+                      <option value="">State</option>
+                      {US_STATES.map(s => <option key={s} value={s}>{s}</option>)}
+                    </select>
+                  </div>
+                  <input
+                    name="zip"
+                    type="text"
+                    required
+                    value={form.zip}
+                    onChange={handleField}
+                    placeholder="ZIP code"
+                    maxLength={10}
+                    className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F4C81] focus:border-transparent"
+                  />
+                </div>
+              </div>
+
+              {error && (
+                <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg">
+                  {error}
+                </div>
+              )}
+
+              <div className="pt-2">
+                <button
+                  type="submit"
+                  disabled={loading}
+                  className="w-full py-3.5 rounded-xl font-bold text-sm bg-[#0F4C81] hover:bg-[#082D4F] text-white transition shadow-lg disabled:opacity-60 disabled:cursor-not-allowed"
+                >
+                  {loading ? 'Redirecting to payment...' : `Start 7-Day Free Trial — ${plan.price}/mo after`}
+                </button>
+                <p className="text-center text-xs text-gray-400 mt-3">
+                  Secure checkout via Stripe · Your card is saved but not charged for 7 days · Cancel anytime
+                </p>
+              </div>
+            </form>
+
+            <div className="mt-4 text-center">
+              <button onClick={() => setStep(1)} className="text-sm text-gray-500 hover:text-gray-700">
+                ← Back to plans
+              </button>
+            </div>
+          </div>
+        )}
+
+        <div className="text-center mt-8">
+          <p className="text-xs text-gray-400">
+            Already have an account?{' '}
+            <Link href="/auth/login" className="text-[#0F4C81] hover:underline font-medium">Sign in here</Link>
+          </p>
         </div>
       </div>
     </main>
-  )
-}
-
-export default function Checkout() {
-  return (
-    <Suspense>
-      <CheckoutInner />
-    </Suspense>
   )
 }

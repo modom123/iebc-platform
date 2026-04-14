@@ -391,15 +391,24 @@ export default function AgencyHomepage() {
               <p className="text-sm mb-6" style={{ color: 'rgba(255,255,255,0.6)' }}>
                 Every client gets the full stack — built, automated, and delivered in 6 weeks.
               </p>
-              <a
-                href="https://calendly.com/new56money/30min"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="px-6 py-2.5 rounded-lg text-sm font-bold transition-opacity hover:opacity-90 shadow-md"
-                style={{ background: '#C8902A', color: '#fff' }}
-              >
-                Start Your Build
-              </a>
+              <div className="flex flex-col gap-2.5 w-full">
+                <a
+                  href="/accounting/checkout"
+                  className="px-6 py-2.5 rounded-lg text-sm font-bold transition-opacity hover:opacity-90 shadow-md text-center"
+                  style={{ background: '#C8902A', color: '#fff' }}
+                >
+                  Get Efficient SaaS — from $9/mo
+                </a>
+                <a
+                  href="https://calendly.com/new56money/30min"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-6 py-2.5 rounded-lg text-sm font-semibold transition-opacity hover:opacity-80 text-center"
+                  style={{ background: 'rgba(255,255,255,0.1)', color: 'rgba(255,255,255,0.7)', border: '1px solid rgba(255,255,255,0.2)' }}
+                >
+                  Book Agency Call →
+                </a>
+              </div>
             </div>
           </div>
         </div>

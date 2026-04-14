@@ -11,6 +11,7 @@ const SUBDOMAIN_MAP: Record<string, string> = {
   accounting: '/accounting',
   hub:        '/hub',
   portal:     '/portal',
+  platform:   '/platform',
 }
 
 function getSubdomain(request: NextRequest): string | null {

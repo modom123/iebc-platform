@@ -82,7 +82,7 @@ const PERSONAS: Record<string, string> = {
   'Retail Specialist':     'You are a retail business consultant helping brick-and-mortar and omnichannel retailers with merchandising, inventory, customer experience, and profitability.',
 }
 
-export const ALL_DEPARTMENTS = Object.keys(PERSONAS)
+const ALL_DEPARTMENTS = Object.keys(PERSONAS)
 
 type MessageParam = { role: 'user' | 'assistant'; content: string }
 

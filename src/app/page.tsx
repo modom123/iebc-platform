@@ -1,246 +1,272 @@
 import Link from 'next/link'
+import AgencyLeadForm from '@/components/AgencyLeadForm'
 
-const NAV_LINKS = [
-  { label: 'Services', href: '#services' },
-  { label: 'Infrastructure', href: '/efficient' },
-  { label: 'Automation Hub', href: '/hub' },
-  { label: 'Pricing', href: '#pricing' },
-]
+// Font loaded via Google Fonts in layout.tsx — class defined in globals.css
+const playfair = { className: 'font-playfair', variable: '' }
 
 const SERVICES = [
   {
-    number: '01',
     icon: '🏛️',
     title: 'Business Formation',
-    subtitle: 'Start the right way.',
-    body: 'LLC, S-Corp, and C-Corp setup handled for you. EIN registration, operating agreements, registered agent services, and compliance checklists — your legal foundation built in days, not weeks.',
-    features: ['LLC · S-Corp · C-Corp', 'EIN registration', 'Operating agreements', 'Compliance checklists'],
-    cta: { label: 'Start Formation', href: '/hub/formation' },
-    accent: '#0F4C81',
-    bg: '#EEF4FF',
+    body: 'LLC, S-Corp, C-Corp setup handled for you. EIN registration, operating agreements, registered agent services, and compliance checklists — your legal foundation built right.',
+    detail: 'State filing · EIN · Operating agreement · Compliance checklist',
   },
   {
-    number: '02',
     icon: '🌐',
     title: 'Intelligent Websites',
-    subtitle: 'A web presence that works for you.',
-    body: 'We design and build high-performance websites powered by automation — lead capture, client portals, booking, and AI-driven content. Not just a site, a conversion engine for your business.',
-    features: ['Custom design & build', 'Lead capture & CRM sync', 'Client payment portal', 'AI-powered content'],
-    cta: { label: 'Learn More', href: '#services' },
-    accent: '#7C3AED',
-    bg: '#F5F3FF',
+    body: 'Custom-built websites powered by automation — lead capture, client portals, online booking, and AI-driven content. Not just a site, a conversion engine for your business.',
+    detail: 'Custom design & build · Lead capture & CRM · Client portal · AI content',
   },
   {
-    number: '03',
     icon: '⚡',
     title: 'Automated Business Hubs',
-    subtitle: 'Run your operations on autopilot.',
-    body: 'A unified command center that automates your leads, tasks, team, and operations. Replace five disconnected tools with one hub that runs your business while you focus on growing it.',
-    features: ['Lead pipeline & CRM', 'Task & project automation', 'Team management', 'Document vault'],
-    cta: { label: 'Open the Hub', href: '/hub' },
-    accent: '#C9A02E',
-    bg: '#FFFBEB',
+    body: 'A unified command center that automates your leads, tasks, team, and operations. Replace five disconnected tools with one hub that runs your business while you grow it.',
+    detail: 'CRM & pipeline · Task automation · Team management · Document vault',
   },
   {
-    number: '04',
     icon: '🏗️',
     title: 'Business Infrastructure',
-    subtitle: 'The financial backbone of your business.',
-    body: 'Full-stack accounting, invoicing, payroll, reconciliation, tax center, and real-time cash flow — all automated. The infrastructure layer that keeps your business compliant, funded, and financially clear.',
-    features: ['Invoicing & payroll', 'Bank reconciliation', 'Tax center & 1099s', 'Cash flow forecasting'],
-    cta: { label: 'Explore Infrastructure', href: '/efficient' },
-    accent: '#059669',
-    bg: '#ECFDF5',
+    body: 'Full-stack accounting, invoicing, payroll, reconciliation, tax center, and cash flow — all automated. The financial backbone that keeps your business compliant and funded.',
+    detail: 'Invoicing & payroll · Bank reconciliation · Tax center · Cash forecast',
   },
   {
-    number: '05',
     icon: '🤖',
     title: 'IEBC Consultants',
-    subtitle: '60 AI consultants. On demand.',
-    body: 'A workforce of 60 specialized AI consultants across finance, marketing, operations, legal, HR, technology, and strategy — automatically routed to your business based on what you need, when you need it.',
-    features: ['60 specialist consultants', 'Finance · Legal · Marketing', 'Operations · HR · Tech', 'Always available, no retainer'],
-    cta: { label: 'Meet the Consultants', href: '/hub/consultants' },
-    accent: '#0F4C81',
-    bg: '#EEF4FF',
+    body: 'A workforce of 60 specialized AI consultants across finance, marketing, operations, legal, HR, technology, and strategy — automatically routed to your business, when you need it.',
+    detail: '60 specialists · Finance · Legal · Marketing · Operations · HR · Tech',
   },
 ]
 
-const STATS = [
-  { value: '5', label: 'core services' },
-  { value: '60', label: 'AI consultants on demand' },
-  { value: '25+', label: 'infrastructure modules' },
-  { value: '$9/mo', label: 'to get started' },
+const INDUSTRIES = [
+  { icon: '🚛', label: 'Logistics & Trucking' },
+  { icon: '🔨', label: 'Contractors & 1099' },
+  { icon: '🎨', label: 'Creative & Freelance' },
+  { icon: '🛍️', label: 'Retail & E-commerce' },
+  { icon: '🍽️', label: 'Restaurant & Food' },
+  { icon: '♥️', label: 'Nonprofit' },
+  { icon: '⚽', label: 'Sports & NIL' },
+  { icon: '🏢', label: 'Professional Services' },
 ]
 
 const PLANS = [
   {
-    id: 'silver',
-    label: 'Silver',
-    price: '$9',
-    period: '/mo',
-    desc: 'Business infrastructure for solo founders.',
-    consultants: 0,
-    users: 1,
-    highlight: false,
+    name: 'Starter',
+    setup: '$1,500',
+    monthly: 'from $150/mo',
+    consultants: 8,
+    desc: 'Your business, professionally built and automated.',
     features: [
-      'Business Infrastructure suite',
-      'Invoicing & estimates',
-      'Income & expense tracking',
-      'Client payment portal',
-      'Email support',
+      '8 IEBC AI consultants',
+      'Business Formation assistance',
+      'Custom website (design & build)',
+      'Automated Business Hub setup',
+      'Business Infrastructure basics',
+      'Delivered in 6 weeks',
     ],
-    link: '/accounting/checkout',
-    cta: 'Start with Silver',
+    highlight: false,
+    cta: 'Get Started',
+    ctaHref: 'https://calendly.com/new56money/30min',
   },
   {
-    id: 'gold',
-    label: 'Gold',
-    price: '$22',
-    period: '/mo',
-    desc: 'Infrastructure + automation for growing teams.',
-    consultants: 3,
-    users: 5,
-    highlight: true,
+    name: 'Growth',
+    setup: '$3,500',
+    monthly: 'from $300/mo',
+    consultants: 25,
+    desc: 'Full operations stack for serious businesses.',
     features: [
-      'Everything in Silver',
-      '3 IEBC AI consultants',
-      'Automated Business Hub',
-      'Lead pipeline & CRM',
-      'Bank reconciliation',
-      'Up to 5 users',
-      'Priority support',
-    ],
-    link: '/accounting/checkout',
-    cta: 'Start with Gold',
-  },
-  {
-    id: 'platinum',
-    label: 'Platinum',
-    price: '$42',
-    period: '/mo',
-    desc: 'All 5 services. Full platform access.',
-    consultants: 5,
-    users: 10,
-    highlight: false,
-    features: [
-      'Everything in Gold',
-      '5 IEBC AI consultants',
-      'Business Formation',
-      'Intelligent Website setup',
-      'Full infrastructure suite',
-      'Up to 10 users',
+      '25 IEBC AI consultants',
+      'Full website + portal + booking',
+      'Advanced Hub (CRM, tasks, team)',
+      'Full Infrastructure suite',
+      'Payroll, Tax center, Reconciliation',
+      'Priority build & support',
       'Dedicated account manager',
     ],
-    link: 'https://buy.stripe.com/bJe14h1aVeRj58CfrVgEg01',
-    cta: 'Start with Platinum',
+    highlight: true,
+    cta: 'Schedule a Call',
+    ctaHref: 'https://calendly.com/new56money/30min',
+  },
+  {
+    name: 'Enterprise',
+    setup: 'Custom',
+    monthly: 'custom',
+    consultants: 60,
+    desc: 'Fully custom deployment for established businesses.',
+    features: [
+      'All 60 IEBC consultants',
+      'Multi-location support',
+      'Custom API integrations',
+      'White-label options available',
+      'On-site training & onboarding',
+      'SLA & compliance guarantees',
+    ],
+    highlight: false,
+    cta: 'Contact Us',
+    ctaHref: 'mailto:info@iebusinessconsultants.com',
   },
 ]
 
-const FOOTER_LINKS = {
-  Services: [
-    { label: 'Business Formation', href: '/hub/formation' },
-    { label: 'Intelligent Websites', href: '#services' },
-    { label: 'Automated Business Hubs', href: '/hub' },
-    { label: 'Business Infrastructure', href: '/efficient' },
-    { label: 'IEBC Consultants', href: '/hub/consultants' },
-  ],
-  Company: [
-    { label: 'About IEBC', href: '#' },
-    { label: 'Contact', href: '#' },
-    { label: 'Privacy Policy', href: '#' },
-    { label: 'Terms of Service', href: '#' },
-  ],
-  Account: [
-    { label: 'Sign In', href: '/auth/login' },
-    { label: 'Create Account', href: '/auth/signup' },
-    { label: 'Pricing', href: '#pricing' },
-  ],
-}
+export default function AgencyHomepage() {
+  const year = new Date().getFullYear()
 
-export default function Home() {
   return (
-    <main className="min-h-screen bg-white text-slate-900 font-sans">
+    <div className={`${playfair.variable} min-h-screen`} style={{ fontFamily: 'Inter, system-ui, sans-serif' }}>
 
       {/* ── Navigation ── */}
-      <nav className="sticky top-0 z-50 bg-white border-b border-gray-200 px-6 py-0 shadow-sm">
-        <div className="max-w-7xl mx-auto flex items-center justify-between h-16">
-          <Link href="/" className="flex items-center gap-3">
-            <div className="w-9 h-9 bg-[#0F4C81] rounded-lg flex items-center justify-center shadow-md">
-              <span className="text-white text-base font-extrabold">I</span>
+      <nav
+        className="sticky top-0 z-50"
+        style={{ background: '#0B2140', borderBottom: '1px solid rgba(200,144,42,0.2)' }}
+      >
+        <div className="max-w-7xl mx-auto px-6 flex items-center justify-between h-16">
+          <Link href="/" className="flex items-center gap-3 shrink-0">
+            <div
+              className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 shadow-md"
+              style={{ background: '#C8902A' }}
+            >
+              <span className="text-white font-black text-[10px] tracking-tight">IEBC</span>
             </div>
             <div className="leading-tight">
-              <span className="text-[#0F4C81] font-extrabold text-lg tracking-tight">IEBC</span>
-              <span className="hidden md:block text-[10px] text-gray-400 font-medium tracking-wide -mt-0.5">Integrated Efficiency</span>
+              <p className="text-white font-bold text-sm leading-none">Integrated Efficiency</p>
+              <p className="text-[10px] leading-none mt-0.5" style={{ color: '#C8902A' }}>
+                Business Consultants
+              </p>
             </div>
           </Link>
 
-          <div className="hidden md:flex items-center gap-1">
-            {NAV_LINKS.map(l => (
-              <Link
-                key={l.href}
-                href={l.href}
-                className="px-4 py-2 text-sm font-medium text-gray-600 hover:text-[#0F4C81] hover:bg-blue-50 rounded-lg transition"
+          <div className="hidden md:flex items-center gap-7">
+            {[
+              ['Services', '#services'],
+              ['Industries', '#industries'],
+              ['How It Works', '#how'],
+              ['Pricing', '#pricing'],
+            ].map(([label, href]) => (
+              <a
+                key={href}
+                href={href}
+                className="text-sm font-medium transition-colors hover:text-[#C8902A]"
+                style={{ color: 'rgba(255,255,255,0.75)' }}
               >
-                {l.label}
-              </Link>
+                {label}
+              </a>
             ))}
           </div>
 
-          <div className="flex items-center gap-2">
-            <Link href="/auth/login" className="hidden md:block px-4 py-2 text-sm font-medium text-gray-600 hover:text-[#0F4C81] transition">
+          <div className="flex items-center gap-3">
+            <Link
+              href="/auth/login"
+              className="hidden md:block text-sm font-medium transition-colors hover:text-white"
+              style={{ color: 'rgba(255,255,255,0.5)' }}
+            >
               Sign In
             </Link>
-            <Link href="/accounting/checkout" className="bg-[#C02020] hover:bg-[#A01818] text-white px-5 py-2 rounded-lg text-sm font-bold transition shadow-sm">
-              Get Started
-            </Link>
+            <a
+              href="https://calendly.com/new56money/30min"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-5 py-2 rounded-lg text-sm font-bold transition-opacity hover:opacity-90 shadow-md"
+              style={{ background: '#C8902A', color: '#fff' }}
+            >
+              Book a Call
+            </a>
           </div>
         </div>
       </nav>
 
       {/* ── Hero ── */}
-      <header className="relative bg-gradient-to-br from-[#F0F5FF] via-white to-[#FFF8E8] overflow-hidden border-b border-gray-100">
-        <div className="absolute -top-24 -right-24 w-96 h-96 bg-[#0F4C81] opacity-5 rounded-full pointer-events-none" />
-        <div className="absolute -bottom-16 -left-16 w-72 h-72 bg-[#C9A02E] opacity-5 rounded-full pointer-events-none" />
+      <header className="relative overflow-hidden" style={{ background: '#0B2140' }}>
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            backgroundImage:
+              'radial-gradient(circle at 15% 60%, rgba(200,144,42,0.12) 0%, transparent 50%), radial-gradient(circle at 85% 20%, rgba(228,168,48,0.08) 0%, transparent 45%)',
+          }}
+        />
+        <div
+          className="absolute bottom-0 left-0 right-0 h-px"
+          style={{ background: 'linear-gradient(90deg, transparent, rgba(200,144,42,0.5), transparent)' }}
+        />
 
-        <div className="relative max-w-5xl mx-auto px-6 py-24 text-center">
-          <div className="inline-flex items-center gap-2 bg-[#0F4C81]/10 border border-[#0F4C81]/20 text-[#0F4C81] text-xs font-bold px-4 py-1.5 rounded-full mb-7 tracking-widest uppercase">
-            <span className="w-1.5 h-1.5 bg-green-500 rounded-full" />
-            Integrated Efficiency
+        <div className="relative max-w-5xl mx-auto px-6 py-28 text-center">
+          <div
+            className="inline-flex items-center gap-2 rounded-full px-5 py-1.5 mb-8 text-xs font-bold uppercase tracking-[0.15em]"
+            style={{
+              border: '1px solid rgba(200,144,42,0.35)',
+              color: '#C8902A',
+              background: 'rgba(200,144,42,0.08)',
+            }}
+          >
+            <span className="w-1.5 h-1.5 rounded-full" style={{ background: '#C8902A' }} />
+            Done For You · Delivered in 6 Weeks
           </div>
 
-          <h1 className="text-5xl md:text-6xl font-extrabold leading-tight mb-6 tracking-tight text-gray-900">
-            Everything your business
+          <h1
+            className={`${playfair.className} text-5xl md:text-7xl font-black leading-[1.05] mb-8`}
+            style={{ color: '#fff' }}
+          >
+            Control.{' '}
+            <span style={{ color: '#C8902A' }}>Grow.</span>
             <br />
-            needs to{' '}
-            <span className="text-[#0F4C81]">build</span>,{' '}
-            <span className="text-[#C9A02E]">run</span>, and{' '}
-            <span className="text-[#059669]">grow</span>.
+            Be Efficient.
           </h1>
 
-          <p className="text-lg md:text-xl text-gray-500 max-w-2xl mx-auto mb-10 leading-relaxed">
-            5 integrated services — Formation, Websites, Automation Hubs, Infrastructure, and AI Consultants.
-            <br />
-            <span className="text-gray-800 font-semibold">One company. One platform. Everything working together.</span>
+          <p
+            className="text-lg md:text-xl max-w-2xl mx-auto mb-3 leading-relaxed"
+            style={{ color: 'rgba(255,255,255,0.75)' }}
+          >
+            We build custom automated business systems — websites, operations hubs, and financial
+            infrastructure — that put you back in control and help you grow.
+          </p>
+          <p className="text-base font-semibold mb-10" style={{ color: '#E4A830' }}>
+            Delivered in 6 weeks. Built for your industry.
           </p>
 
-          <div className="flex flex-wrap gap-3 justify-center mb-8">
-            <Link href="/accounting/checkout" className="bg-[#C02020] hover:bg-[#A01818] text-white px-8 py-3.5 rounded-xl font-bold text-base transition shadow-lg shadow-red-200">
-              Get Started Free
-            </Link>
-            <Link href="#services" className="bg-white hover:bg-blue-50 border-2 border-[#0F4C81] text-[#0F4C81] px-8 py-3.5 rounded-xl font-bold text-base transition shadow-sm">
-              Explore Our Services
-            </Link>
+          <div className="flex flex-wrap gap-3 justify-center mb-12">
+            <a
+              href="https://calendly.com/new56money/30min"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="px-9 py-4 rounded-xl font-bold text-base transition-opacity hover:opacity-90 shadow-xl"
+              style={{ background: '#C8902A', color: '#fff' }}
+            >
+              Book a Free Strategy Call
+            </a>
+            <a
+              href="#services"
+              className="px-9 py-4 rounded-xl font-bold text-base border transition-colors hover:bg-white/10"
+              style={{ borderColor: 'rgba(255,255,255,0.3)', color: '#fff' }}
+            >
+              See Our Services
+            </a>
           </div>
 
-          <p className="text-sm text-gray-400">No contracts · Cancel anytime · Starts at $9/mo</p>
+          <Link
+            href="/platform"
+            className="text-sm transition-colors hover:text-white/60"
+            style={{ color: 'rgba(255,255,255,0.35)' }}
+          >
+            Looking for self-service?{' '}
+            <span style={{ color: '#C8902A', textDecoration: 'underline' }}>
+              Try our SaaS platform from $9/mo →
+            </span>
+          </Link>
         </div>
 
-        <div className="bg-[#0F4C81]">
-          <div className="max-w-5xl mx-auto px-6 py-5 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
-            {STATS.map((s, i) => (
+        {/* Stats bar */}
+        <div style={{ background: 'rgba(255,255,255,0.04)', borderTop: '1px solid rgba(200,144,42,0.12)' }}>
+          <div className="max-w-5xl mx-auto px-6 py-6 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+            {[
+              ['6 Weeks', 'average delivery'],
+              ['60', 'AI consultants included'],
+              ['5', 'integrated services'],
+              ['7+', 'industries served'],
+            ].map(([value, label], i) => (
               <div key={i}>
-                <p className="text-2xl font-extrabold text-white">{s.value}</p>
-                <p className="text-xs text-blue-200 mt-0.5">{s.label}</p>
+                <p className={`${playfair.className} text-3xl font-bold`} style={{ color: '#C8902A' }}>
+                  {value}
+                </p>
+                <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.45)' }}>
+                  {label}
+                </p>
               </div>
             ))}
           </div>
@@ -251,179 +277,410 @@ export default function Home() {
       <section id="services" className="py-24 px-6 bg-white">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
-            <p className="text-xs font-bold text-[#C9A02E] uppercase tracking-widest mb-3">What We Do</p>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900">5 services. One integrated platform.</h2>
+            <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: '#C8902A' }}>
+              What We Build
+            </p>
+            <h2
+              className={`${playfair.className} text-3xl md:text-4xl font-bold`}
+              style={{ color: '#0B2140' }}
+            >
+              Five services. One integrated system.
+            </h2>
             <p className="text-gray-500 mt-4 max-w-xl mx-auto">
-              IEBC is not a single product — it's a complete business operating system. Each service is powerful alone, and unstoppable together.
+              Every engagement includes all five services — custom-built for your business, delivered as
+              one integrated system.
             </p>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {SERVICES.map((s) => (
+            {SERVICES.map((s, i) => (
               <div
-                key={s.number}
-                className="rounded-2xl border border-gray-200 overflow-hidden hover:shadow-xl hover:border-transparent transition group flex flex-col"
+                key={i}
+                className="rounded-2xl border border-gray-200 p-7 hover:shadow-xl hover:border-[#C8902A]/30 transition-all group"
+                style={{ borderTop: '3px solid #C8902A' }}
               >
-                <div className="p-1.5" style={{ background: s.bg }}>
-                  <div className="flex items-center gap-2 px-4 py-3">
-                    <span className="text-2xl">{s.icon}</span>
-                    <span className="text-xs font-black tracking-widest uppercase" style={{ color: s.accent }}>{s.number}</span>
-                  </div>
-                </div>
-                <div className="p-6 flex flex-col flex-1">
-                  <h3 className="text-xl font-extrabold text-gray-900 mb-1">{s.title}</h3>
-                  <p className="text-sm font-semibold mb-3" style={{ color: s.accent }}>{s.subtitle}</p>
-                  <p className="text-sm text-gray-500 leading-relaxed mb-5">{s.body}</p>
-                  <ul className="grid grid-cols-2 gap-1.5 mb-6 flex-1">
-                    {s.features.map((f, fi) => (
-                      <li key={fi} className="flex items-center gap-1.5 text-xs text-gray-600">
-                        <span className="font-bold shrink-0" style={{ color: s.accent }}>✓</span>{f}
-                      </li>
-                    ))}
-                  </ul>
-                  <Link
-                    href={s.cta.href}
-                    className="text-center py-2.5 rounded-lg font-bold text-sm transition text-white"
-                    style={{ background: s.accent }}
-                  >
-                    {s.cta.label}
-                  </Link>
-                </div>
+                <div className="text-3xl mb-4">{s.icon}</div>
+                <h3
+                  className={`${playfair.className} text-xl font-bold mb-2`}
+                  style={{ color: '#0B2140' }}
+                >
+                  {s.title}
+                </h3>
+                <p className="text-sm text-gray-600 mb-4 leading-relaxed">{s.body}</p>
+                <p className="text-xs font-semibold" style={{ color: '#C8902A' }}>
+                  {s.detail}
+                </p>
               </div>
             ))}
 
-            {/* Spacer card — "All in one" */}
-            <div className="rounded-2xl border-2 border-dashed border-gray-200 p-6 flex flex-col items-center justify-center text-center bg-gray-50 hover:border-[#0F4C81] transition">
-              <div className="w-12 h-12 bg-[#0F4C81] rounded-xl flex items-center justify-center mb-4 shadow-md">
-                <span className="text-white font-black text-sm">IE</span>
-              </div>
-              <h3 className="text-lg font-extrabold text-gray-900 mb-2">All 5 Services</h3>
-              <p className="text-sm text-gray-500 mb-5">Get every IEBC service bundled in one Platinum plan. Formation to consultants — fully integrated.</p>
-              <Link href="#pricing" className="bg-[#0F4C81] hover:bg-[#082D4F] text-white px-6 py-2.5 rounded-lg font-bold text-sm transition">
-                See Platinum Plan
-              </Link>
+            {/* CTA card */}
+            <div
+              className="rounded-2xl p-7 flex flex-col items-center justify-center text-center"
+              style={{ background: '#0B2140', borderTop: '3px solid #C8902A' }}
+            >
+              <p
+                className={`${playfair.className} text-xl font-bold text-white mb-3`}
+              >
+                All 5 Services.
+                <br />
+                One Engagement.
+              </p>
+              <p className="text-sm mb-6" style={{ color: 'rgba(255,255,255,0.6)' }}>
+                Every client gets the full stack — built, automated, and delivered in 6 weeks.
+              </p>
+              <a
+                href="https://calendly.com/new56money/30min"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-6 py-2.5 rounded-lg text-sm font-bold transition-opacity hover:opacity-90 shadow-md"
+                style={{ background: '#C8902A', color: '#fff' }}
+              >
+                Start Your Build
+              </a>
             </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Industries ── */}
+      <section id="industries" className="py-20 px-6" style={{ background: '#F8F6F1' }}>
+        <div className="max-w-5xl mx-auto">
+          <div className="text-center mb-12">
+            <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: '#C8902A' }}>
+              Industries
+            </p>
+            <h2
+              className={`${playfair.className} text-3xl font-bold`}
+              style={{ color: '#0B2140' }}
+            >
+              Built for your type of business.
+            </h2>
+            <p className="text-gray-500 mt-3 max-w-md mx-auto">
+              Every industry has unique needs. We build systems that fit your specific workflows.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            {INDUSTRIES.map((ind, i) => (
+              <div
+                key={i}
+                className="rounded-xl border border-gray-200 bg-white p-5 text-center hover:shadow-md hover:border-[#C8902A]/40 transition-all"
+              >
+                <div className="text-2xl mb-2">{ind.icon}</div>
+                <p className="text-sm font-semibold" style={{ color: '#0B2140' }}>
+                  {ind.label}
+                </p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── How It Works ── */}
+      <section id="how" className="py-24 px-6 bg-white">
+        <div className="max-w-4xl mx-auto">
+          <div className="text-center mb-16">
+            <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: '#C8902A' }}>
+              Process
+            </p>
+            <h2
+              className={`${playfair.className} text-3xl md:text-4xl font-bold`}
+              style={{ color: '#0B2140' }}
+            >
+              From strategy call to live system in 6 weeks.
+            </h2>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+            {[
+              {
+                step: '01',
+                title: 'Strategy Call',
+                body: 'We learn your business, goals, and current operations. You leave with a clear custom build plan and timeline.',
+              },
+              {
+                step: '02',
+                title: 'Custom Build',
+                body: 'Our team builds your website, automation hub, and financial infrastructure — fully integrated with your brand.',
+              },
+              {
+                step: '03',
+                title: 'Launch & Automate',
+                body: 'We launch your system, onboard your team, and hand off a business that runs on autopilot.',
+              },
+            ].map((s, i) => (
+              <div key={i} className="text-center">
+                <div
+                  className="w-14 h-14 rounded-2xl flex items-center justify-center mx-auto mb-5 shadow-md"
+                  style={{ background: '#0B2140' }}
+                >
+                  <span
+                    className={`${playfair.className} text-2xl font-black`}
+                    style={{ color: '#C8902A' }}
+                  >
+                    {s.step}
+                  </span>
+                </div>
+                <h3
+                  className={`${playfair.className} text-xl font-bold mb-2`}
+                  style={{ color: '#0B2140' }}
+                >
+                  {s.title}
+                </h3>
+                <p className="text-sm text-gray-500 leading-relaxed">{s.body}</p>
+              </div>
+            ))}
+          </div>
+
+          <div className="text-center mt-12">
+            <a
+              href="https://calendly.com/new56money/30min"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-8 py-3.5 rounded-xl font-bold text-sm shadow-lg transition-opacity hover:opacity-90"
+              style={{ background: '#C8902A', color: '#fff' }}
+            >
+              Book Your Strategy Call →
+            </a>
           </div>
         </div>
       </section>
 
       {/* ── Pricing ── */}
-      <section id="pricing" className="py-24 px-6 bg-[#F5F7FA]">
-        <div className="max-w-5xl mx-auto">
+      <section id="pricing" className="py-24 px-6 relative overflow-hidden" style={{ background: '#0B2140' }}>
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            backgroundImage: 'radial-gradient(circle at 80% 80%, rgba(200,144,42,0.1) 0%, transparent 50%)',
+          }}
+        />
+        <div className="relative max-w-5xl mx-auto">
           <div className="text-center mb-14">
-            <p className="text-xs font-bold text-[#C9A02E] uppercase tracking-widest mb-3">Pricing</p>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900">Simple, transparent pricing.</h2>
-            <p className="text-gray-500 mt-4">All 5 services, bundled by plan. No hidden fees, no long-term contracts.</p>
+            <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: '#C8902A' }}>
+              Investment
+            </p>
+            <h2
+              className={`${playfair.className} text-3xl md:text-4xl font-bold text-white`}
+            >
+              Simple, transparent pricing.
+            </h2>
+            <p className="mt-4 max-w-xl mx-auto" style={{ color: 'rgba(255,255,255,0.6)' }}>
+              One-time setup fee plus a monthly retainer. No surprises, no hidden costs,
+              no long-term contracts.
+            </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
-            {PLANS.map(p => (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {PLANS.map((p, i) => (
               <div
-                key={p.id}
-                className={`rounded-2xl border flex flex-col transition relative bg-white ${
-                  p.highlight
-                    ? 'border-[#0F4C81] shadow-2xl shadow-blue-100 ring-2 ring-[#0F4C81]/20'
-                    : 'border-gray-200 hover:border-[#0F4C81] hover:shadow-lg'
-                }`}
+                key={i}
+                className="rounded-2xl p-7 flex flex-col"
+                style={{
+                  background: p.highlight ? '#fff' : 'rgba(255,255,255,0.05)',
+                  border: p.highlight ? '2px solid #C8902A' : '1px solid rgba(255,255,255,0.1)',
+                  color: p.highlight ? '#0B2140' : '#fff',
+                }}
               >
                 {p.highlight && (
-                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-                    <span className="bg-[#C9A02E] text-white text-xs font-bold px-4 py-1 rounded-full uppercase tracking-widest whitespace-nowrap shadow-md">
+                  <div className="text-center mb-4">
+                    <span
+                      className="text-xs font-bold uppercase tracking-widest px-4 py-1 rounded-full"
+                      style={{ background: '#C8902A', color: '#fff' }}
+                    >
                       Most Popular
                     </span>
                   </div>
                 )}
-                <div className="p-7 flex flex-col flex-1">
-                  <div className="mb-5">
-                    <span className={`inline-block px-2.5 py-0.5 rounded-md text-xs font-bold mb-3 ${
-                      p.id === 'silver' ? 'bg-slate-100 text-slate-600' :
-                      p.id === 'gold' ? 'bg-amber-50 text-amber-700 border border-amber-200' :
-                      'bg-blue-50 text-[#0F4C81] border border-blue-200'
-                    }`}>{p.label}</span>
-                    <div className="flex items-baseline gap-1">
-                      <span className="text-4xl font-extrabold text-gray-900">{p.price}</span>
-                      <span className="text-gray-400 text-sm">{p.period}</span>
-                    </div>
-                    <p className="text-sm text-gray-500 mt-1">{p.desc}</p>
-                    <p className="text-xs text-gray-400 mt-1">
-                      {p.consultants > 0 ? `${p.consultants} AI consultants · ` : ''}Up to {p.users} user{p.users > 1 ? 's' : ''}
-                    </p>
-                  </div>
 
-                  <ul className="space-y-2.5 flex-1 mb-7">
-                    {p.features.map((f, i) => (
-                      <li key={i} className="flex items-start gap-2 text-sm text-gray-600">
-                        <span className="text-green-500 font-bold mt-0.5 shrink-0">✓</span>
-                        <span>{f}</span>
-                      </li>
-                    ))}
-                  </ul>
+                <h3 className={`${playfair.className} text-2xl font-bold mb-1`}>{p.name}</h3>
+                <p
+                  className="text-sm mb-4"
+                  style={{ color: p.highlight ? '#666' : 'rgba(255,255,255,0.55)' }}
+                >
+                  {p.desc}
+                </p>
 
-                  <Link
-                    href={p.link}
-                    className={`text-center py-3 rounded-xl font-bold text-sm transition block shadow-sm ${
-                      p.highlight
-                        ? 'bg-[#C02020] hover:bg-[#A01818] text-white shadow-red-200'
-                        : 'bg-[#0F4C81] hover:bg-[#082D4F] text-white'
-                    }`}
+                <div className="mb-1">
+                  <span className={`${playfair.className} text-4xl font-black`}>{p.setup}</span>
+                  <span
+                    className="text-sm ml-1.5"
+                    style={{ color: p.highlight ? '#999' : 'rgba(255,255,255,0.4)' }}
                   >
-                    {p.cta}
-                  </Link>
+                    setup
+                  </span>
                 </div>
+                <p className="text-sm font-semibold mb-2" style={{ color: '#C8902A' }}>
+                  {p.monthly} retainer
+                </p>
+                <p
+                  className="text-xs mb-6"
+                  style={{ color: p.highlight ? '#888' : 'rgba(255,255,255,0.45)' }}
+                >
+                  {p.consultants} IEBC AI consultants included
+                </p>
+
+                <ul className="space-y-2.5 flex-1 mb-8">
+                  {p.features.map((f, fi) => (
+                    <li key={fi} className="flex items-start gap-2 text-sm">
+                      <span className="font-bold shrink-0 mt-0.5" style={{ color: '#C8902A' }}>
+                        ✓
+                      </span>
+                      <span
+                        style={{ color: p.highlight ? '#333' : 'rgba(255,255,255,0.8)' }}
+                      >
+                        {f}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+
+                <a
+                  href={p.ctaHref}
+                  target={p.ctaHref.startsWith('http') ? '_blank' : undefined}
+                  rel={p.ctaHref.startsWith('http') ? 'noopener noreferrer' : undefined}
+                  className="text-center py-3.5 rounded-xl font-bold text-sm transition-opacity hover:opacity-90 block shadow-md"
+                  style={{ background: '#C8902A', color: '#fff' }}
+                >
+                  {p.cta}
+                </a>
               </div>
             ))}
           </div>
 
-          <p className="text-center text-xs text-gray-400 mt-8">
-            All plans billed monthly. Cancel anytime. Secure payments via Stripe.
+          <p className="text-center text-sm mt-8" style={{ color: 'rgba(255,255,255,0.35)' }}>
+            Monthly retainers cover ongoing support, updates, hosting, and your AI consultant access.
+            No long-term contracts.
           </p>
         </div>
       </section>
 
-      {/* ── CTA Banner ── */}
-      <section className="py-20 px-6 bg-[#0F4C81] text-white text-center relative overflow-hidden">
-        <div className="absolute inset-0 opacity-[0.06]" style={{
-          backgroundImage: 'linear-gradient(#fff 1px, transparent 1px), linear-gradient(90deg, #fff 1px, transparent 1px)',
-          backgroundSize: '60px 60px',
-        }} />
-        <div className="absolute -top-16 right-1/4 w-64 h-64 bg-[#C9A02E] opacity-10 rounded-full pointer-events-none" />
-        <div className="relative max-w-2xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-extrabold mb-4">Ready to build a better business?</h2>
-          <p className="text-blue-200 mb-8 text-lg">Formation to consultants — get every IEBC service working for your business from day one.</p>
-          <div className="flex flex-wrap gap-3 justify-center">
-            <Link href="/accounting/checkout" className="bg-[#C02020] hover:bg-[#A01818] text-white px-8 py-3.5 rounded-xl font-bold transition shadow-lg shadow-black/20">
-              Start Today — From $9/mo
-            </Link>
-            <Link href="/auth/login" className="bg-white hover:bg-blue-50 text-[#0F4C81] px-8 py-3.5 rounded-xl font-bold transition shadow-md">
-              Sign In
-            </Link>
+      {/* ── Contact / Lead Form ── */}
+      <section id="contact" className="py-24 px-6 bg-white">
+        <div className="max-w-2xl mx-auto">
+          <div className="text-center mb-12">
+            <p className="text-xs font-bold uppercase tracking-widest mb-3" style={{ color: '#C8902A' }}>
+              Get Started
+            </p>
+            <h2
+              className={`${playfair.className} text-3xl md:text-4xl font-bold mb-3`}
+              style={{ color: '#0B2140' }}
+            >
+              Tell us about your business.
+            </h2>
+            <p className="text-gray-500">
+              We&apos;ll reach out within 24 hours to schedule your free strategy call.
+            </p>
           </div>
+          <AgencyLeadForm />
+        </div>
+      </section>
+
+      {/* ── Platform Callout ── */}
+      <section className="py-16 px-6" style={{ background: '#F8F6F1' }}>
+        <div className="max-w-3xl mx-auto text-center">
+          <p className="text-xs font-bold uppercase tracking-widest mb-3 text-gray-400">
+            Self-Service Option
+          </p>
+          <h3
+            className={`${playfair.className} text-2xl font-bold mb-3`}
+            style={{ color: '#0B2140' }}
+          >
+            Prefer to do it yourself?
+          </h3>
+          <p className="text-gray-500 mb-6 max-w-lg mx-auto">
+            Our self-service SaaS platform gives you access to Business Infrastructure, Automated Hub,
+            and IEBC Consultants — starting at $9/mo. No setup fee, no contract.
+          </p>
+          <Link
+            href="/platform"
+            className="inline-flex items-center gap-2 px-7 py-3 rounded-xl font-bold text-sm border-2 transition-colors hover:bg-[#0B2140] hover:text-white"
+            style={{ borderColor: '#0B2140', color: '#0B2140' }}
+          >
+            View SaaS Platform Pricing →
+          </Link>
         </div>
       </section>
 
       {/* ── Footer ── */}
-      <footer className="bg-gray-50 border-t border-gray-200 px-6 py-14">
+      <footer
+        className="px-6 py-14"
+        style={{ background: '#0B2140', borderTop: '1px solid rgba(200,144,42,0.15)' }}
+      >
         <div className="max-w-6xl mx-auto">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-10">
             <div>
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-8 h-8 bg-[#0F4C81] rounded-lg flex items-center justify-center shadow-sm">
-                  <span className="text-white text-sm font-extrabold">I</span>
+              <div className="flex items-center gap-2 mb-4">
+                <div
+                  className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0 shadow-md"
+                  style={{ background: '#C8902A' }}
+                >
+                  <span className="text-white font-black text-[10px]">IEBC</span>
                 </div>
-                <span className="text-[#0F4C81] font-extrabold text-lg">IEBC</span>
+                <div className="leading-tight">
+                  <p className="text-white font-bold text-sm leading-none">Integrated Efficiency</p>
+                  <p className="text-[10px] mt-0.5" style={{ color: '#C8902A' }}>
+                    Business Consultants
+                  </p>
+                </div>
               </div>
-              <p className="text-xs text-gray-400 leading-relaxed max-w-[200px]">
-                Integrated Efficiency — 5 services to build, run, and grow your business.
+              <p className="text-xs leading-relaxed" style={{ color: 'rgba(255,255,255,0.4)' }}>
+                Control. Grow. Be Efficient. — Custom automated business systems delivered in 6 weeks.
               </p>
             </div>
 
-            {Object.entries(FOOTER_LINKS).map(([group, links]) => (
+            {(
+              [
+                [
+                  'Services',
+                  [
+                    ['Business Formation', '#services'],
+                    ['Intelligent Websites', '#services'],
+                    ['Automated Business Hubs', '#services'],
+                    ['Business Infrastructure', '#services'],
+                    ['IEBC Consultants', '#services'],
+                  ],
+                ],
+                [
+                  'Industries',
+                  [
+                    ['Logistics & Trucking', '#industries'],
+                    ['Contractors & 1099', '#industries'],
+                    ['Retail & Restaurant', '#industries'],
+                    ['Nonprofit', '#industries'],
+                    ['Sports & NIL', '#industries'],
+                  ],
+                ],
+                [
+                  'Company',
+                  [
+                    ['Book a Call', 'https://calendly.com/new56money/30min'],
+                    ['Contact Us', '#contact'],
+                    ['SaaS Platform', '/platform'],
+                    ['Sign In', '/auth/login'],
+                    ['Create Account', '/auth/signup'],
+                  ],
+                ],
+              ] as [string, [string, string][]][]
+            ).map(([group, links]) => (
               <div key={group}>
-                <p className="text-xs font-bold text-gray-800 uppercase tracking-widest mb-4">{group}</p>
+                <p
+                  className="text-xs font-bold uppercase tracking-widest mb-4"
+                  style={{ color: '#C8902A' }}
+                >
+                  {group}
+                </p>
                 <ul className="space-y-2.5">
-                  {links.map(l => (
-                    <li key={l.href}>
-                      <Link href={l.href} className="text-sm text-gray-500 hover:text-[#0F4C81] transition">{l.label}</Link>
+                  {links.map(([label, href]) => (
+                    <li key={label}>
+                      <a
+                        href={href}
+                        target={href.startsWith('http') ? '_blank' : undefined}
+                        rel={href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                        className="text-sm transition-colors hover:text-white"
+                        style={{ color: 'rgba(255,255,255,0.45)' }}
+                      >
+                        {label}
+                      </a>
                     </li>
                   ))}
                 </ul>
@@ -431,13 +688,19 @@ export default function Home() {
             ))}
           </div>
 
-          <div className="border-t border-gray-200 pt-6 flex flex-col md:flex-row justify-between items-center gap-2">
-            <p className="text-xs text-gray-400">© {new Date().getFullYear()} Integrated Efficiency (IEBC). All rights reserved.</p>
-            <p className="text-xs text-gray-400">Secured by Supabase · Payments by Stripe</p>
+          <div
+            className="border-t pt-6 flex flex-col md:flex-row justify-between items-center gap-2"
+            style={{ borderColor: 'rgba(255,255,255,0.08)' }}
+          >
+            <p className="text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>
+              © {year} Integrated Efficiency Business Consultants (IEBC). All rights reserved.
+            </p>
+            <p className="text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>
+              Secured by Supabase · Powered by IEBC Platform
+            </p>
           </div>
         </div>
       </footer>
-
-    </main>
+    </div>
   )
 }

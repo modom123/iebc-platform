@@ -187,6 +187,8 @@ export default async function Hub() {
               <div><p className="font-semibold text-sm">{label}</p><p className="text-xs text-gray-400">{sub}</p></div>
             </Link>
           ))}
+        </div>
+
         {/* ── Operations KPIs ── */}
         <div>
           <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-3">Operations</p>

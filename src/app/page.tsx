@@ -7,34 +7,69 @@ const playfair = { className: 'font-playfair', variable: '' }
 
 const SERVICES = [
   {
+    num: '01',
     icon: '🏛️',
     title: 'Business Formation',
-    body: 'LLC, S-Corp, C-Corp setup handled for you. EIN registration, operating agreements, registered agent services, and compliance checklists — your legal foundation built right.',
-    detail: 'State filing · EIN · Operating agreement · Compliance checklist',
+    subtitle: 'Start legal. Start right.',
+    body: 'LLC, S-Corp, C-Corp, or Nonprofit filed in any U.S. state. EIN registration, operating agreements, registered agent, and compliance checklists — your legal foundation built right, the first time.',
+    features: ['LLC · S-Corp · C-Corp · Nonprofit', 'EIN & operating agreement', 'All 50 states · docs delivered', 'Compliance checklist included'],
+    detail: 'from $150 · one-time · all 50 states',
+    cta: 'Start Formation',
+    href: '/hub/formation',
+    accent: '#0B2140',
+    bg: 'rgba(11,33,64,0.04)',
   },
   {
+    num: '02',
     icon: '🌐',
     title: 'Intelligent Websites',
-    body: 'Custom-built websites powered by automation — lead capture, client portals, online booking, and AI-driven content. Not just a site, a conversion engine for your business.',
-    detail: 'Custom design & build · Lead capture & CRM · Client portal · AI content',
+    subtitle: 'Your 24/7 conversion engine.',
+    body: 'AI-powered, mobile-first website built for your industry. Online booking, payments, and lead capture — all connected to your hub automatically. Smarter than a static site. It works while you sleep.',
+    features: ['Custom pages for your industry', 'Online booking & payment collection', 'Lead capture → flows into hub', 'Domain + hosting included'],
+    detail: '$800 build · then $149/mo hosting & support',
+    cta: 'Book a Strategy Call',
+    href: 'https://calendly.com/new56money/30min',
+    accent: '#1D4ED8',
+    bg: 'rgba(29,78,216,0.04)',
   },
   {
-    icon: '⚡',
+    num: '03',
+    icon: '⚙️',
     title: 'Automated Business Hubs',
-    body: 'A unified command center that automates your leads, tasks, team, and operations. Replace five disconnected tools with one hub that runs your business while you grow it.',
-    detail: 'CRM & pipeline · Task automation · Team management · Document vault',
+    subtitle: 'Your internal command center.',
+    body: 'CRM, invoicing, automated outreach, social media, project tracking, and reporting — built around how your business actually operates. Replace five disconnected tools with one hub that runs itself.',
+    features: ['CRM & lead pipeline', 'Invoice automation & client portal', 'Social media & content scheduling', 'Reporting & analytics dashboard'],
+    detail: '$1,000 build · then $199/mo · or bundle for best value',
+    cta: 'Open the Hub',
+    href: '/hub',
+    accent: '#C8902A',
+    bg: 'rgba(200,144,42,0.05)',
   },
   {
+    num: '04',
+    icon: '🔄',
+    title: 'IEBC Automated Workflow',
+    subtitle: 'Your operations on autopilot.',
+    body: 'We design and deploy automated workflows across every function of your business — invoices sent, follow-ups triggered, reports generated, receipts scanned and logged, tasks assigned. All without you lifting a finger.',
+    features: ['AI receipt scanning & recordkeeping', 'Automated invoicing & follow-up sequences', 'Workflow triggers & task automation', 'QuickBooks & tax export ready'],
+    detail: 'Included in every bundle · standalone from $19/mo',
+    cta: 'Book a Strategy Call',
+    href: 'https://calendly.com/new56money/30min',
+    accent: '#059669',
+    bg: 'rgba(5,150,105,0.04)',
+  },
+  {
+    num: '05',
     icon: '🏗️',
-    title: 'Business Infrastructure',
-    body: 'Full-stack accounting, invoicing, payroll, reconciliation, tax center, and cash flow — all automated. The financial backbone that keeps your business compliant and funded.',
-    detail: 'Invoicing & payroll · Bank reconciliation · Tax center · Cash forecast',
-  },
-  {
-    icon: '🤖',
-    title: 'IEBC Consultants',
-    body: 'A workforce of 60 specialized AI consultants across finance, marketing, operations, legal, HR, technology, and strategy — automatically routed to your business, when you need it.',
-    detail: '60 specialists · Finance · Legal · Marketing · Operations · HR · Tech',
+    title: 'Intelligent Infrastructure',
+    subtitle: 'The foundation your business runs on.',
+    body: 'The technical and operational backbone of your IEBC system — 60 AI consultants embedded in your hub, custom integrations, API connections, and the data architecture that makes everything work together intelligently.',
+    features: ['60 IEBC AI expert consultants', 'Custom API & system integrations', 'Business intelligence & reporting', 'Ongoing infrastructure & support'],
+    detail: 'from $499/mo · consultants assembled within 24hrs',
+    cta: 'Meet Your Team',
+    href: '/hub/consultants',
+    accent: '#7C3AED',
+    bg: 'rgba(124,58,237,0.04)',
   },
 ]
 
@@ -43,15 +78,16 @@ const PLANS = [
   {
     name: 'Starter',
     setup: '$1,500',
-    monthly: 'from $150/mo',
+    monthly: '$299/mo',
     consultants: 8,
-    desc: 'Your business, professionally built and automated.',
+    desc: 'Your business built and automated in 6 weeks.',
     features: [
       '8 IEBC AI consultants',
       'Business Formation assistance',
-      'Custom website (design & build)',
-      'Automated Business Hub setup',
-      'Business Infrastructure basics',
+      'Intelligent Website (5-page)',
+      'Automated Business Hub',
+      'IEBC Automated Workflow setup',
+      'Hosting + domain included',
       'Delivered in 6 weeks',
     ],
     highlight: false,
@@ -61,39 +97,40 @@ const PLANS = [
   {
     name: 'Growth',
     setup: '$3,500',
-    monthly: 'from $300/mo',
+    monthly: '$499/mo',
     consultants: 25,
-    desc: 'Full operations stack for serious businesses.',
+    desc: 'Full stack for serious, scaling businesses.',
     features: [
       '25 IEBC AI consultants',
-      'Full website + portal + booking',
-      'Advanced Hub (CRM, tasks, team)',
-      'Full Infrastructure suite',
-      'Payroll, Tax center, Reconciliation',
-      'Priority build & support',
-      'Dedicated account manager',
+      '10-page website + booking + payments',
+      'Full Hub — CRM, invoicing, outreach',
+      'Complete IEBC Automated Workflows',
+      'Intelligent Infrastructure layer',
+      '52-week roadmap & strategy sessions',
+      'Priority build & dedicated manager',
     ],
     highlight: true,
     cta: 'Schedule a Call',
     ctaHref: 'https://calendly.com/new56money/30min',
   },
   {
-    name: 'Enterprise',
-    setup: 'Custom',
-    monthly: 'custom',
+    name: 'Pro',
+    setup: '$6,500',
+    monthly: '$799/mo',
     consultants: 60,
-    desc: 'Fully custom deployment for established businesses.',
+    desc: 'Full enterprise deployment. No limits.',
     features: [
-      'All 60 IEBC consultants',
-      'Multi-location support',
-      'Custom API integrations',
-      'White-label options available',
-      'On-site training & onboarding',
-      'SLA & compliance guarantees',
+      'All 60 IEBC AI consultants',
+      'Unlimited pages + client login portal',
+      'Every hub module — no limits',
+      'Custom automations + API integrations',
+      'Full Intelligent Infrastructure build',
+      'Quarterly executive review',
+      'SLA guarantee + priority support',
     ],
     highlight: false,
-    cta: 'Contact Us',
-    ctaHref: 'mailto:info@iebusinessconsultants.com',
+    cta: 'Book a Call',
+    ctaHref: 'https://calendly.com/new56money/30min',
   },
 ]
 
@@ -284,23 +321,60 @@ export default function AgencyHomepage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {SERVICES.map((s, i) => (
+            {SERVICES.map((s) => (
               <div
-                key={i}
-                className="rounded-2xl border border-gray-200 p-7 hover:shadow-xl hover:border-[#C8902A]/30 transition-all group"
-                style={{ borderTop: '3px solid #C8902A' }}
+                key={s.num}
+                className="rounded-2xl border border-gray-200 overflow-hidden hover:shadow-xl hover:border-transparent transition-all flex flex-col"
+                style={{ borderTop: `3px solid ${s.accent}` }}
               >
-                <div className="text-3xl mb-4">{s.icon}</div>
-                <h3
-                  className={`${playfair.className} text-xl font-bold mb-2`}
-                  style={{ color: '#0B2140' }}
-                >
-                  {s.title}
-                </h3>
-                <p className="text-sm text-gray-600 mb-4 leading-relaxed">{s.body}</p>
-                <p className="text-xs font-semibold" style={{ color: '#C8902A' }}>
-                  {s.detail}
-                </p>
+                {/* Card top bar */}
+                <div className="px-6 pt-6 pb-4" style={{ background: s.bg }}>
+                  <div className="flex items-center gap-3">
+                    <span className="text-2xl">{s.icon}</span>
+                    <span
+                      className="text-xs font-black tracking-widest uppercase"
+                      style={{ color: s.accent }}
+                    >
+                      {s.num}
+                    </span>
+                  </div>
+                </div>
+
+                {/* Card body */}
+                <div className="p-6 flex flex-col flex-1 bg-white">
+                  <h3
+                    className={`${playfair.className} text-xl font-bold mb-0.5`}
+                    style={{ color: '#0B2140' }}
+                  >
+                    {s.title}
+                  </h3>
+                  <p className="text-xs font-semibold mb-3" style={{ color: s.accent }}>
+                    {s.subtitle}
+                  </p>
+                  <p className="text-sm text-gray-600 leading-relaxed mb-4">{s.body}</p>
+
+                  <ul className="grid grid-cols-2 gap-1.5 mb-5 flex-1">
+                    {s.features.map((f, fi) => (
+                      <li key={fi} className="flex items-start gap-1.5 text-xs text-gray-600">
+                        <span className="font-bold shrink-0 mt-0.5" style={{ color: s.accent }}>✓</span>
+                        <span>{f}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <div className="border-t border-gray-100 pt-4 flex items-center justify-between gap-3">
+                    <p className="text-[11px] text-gray-400 leading-tight">{s.detail}</p>
+                    <a
+                      href={s.href}
+                      target={s.href.startsWith('http') ? '_blank' : undefined}
+                      rel={s.href.startsWith('http') ? 'noopener noreferrer' : undefined}
+                      className="shrink-0 text-xs font-bold px-3.5 py-2 rounded-lg transition-opacity hover:opacity-80 whitespace-nowrap"
+                      style={{ background: s.accent, color: '#fff' }}
+                    >
+                      {s.cta}
+                    </a>
+                  </div>
+                </div>
               </div>
             ))}
 
@@ -309,9 +383,7 @@ export default function AgencyHomepage() {
               className="rounded-2xl p-7 flex flex-col items-center justify-center text-center"
               style={{ background: '#0B2140', borderTop: '3px solid #C8902A' }}
             >
-              <p
-                className={`${playfair.className} text-xl font-bold text-white mb-3`}
-              >
+              <p className={`${playfair.className} text-xl font-bold text-white mb-3`}>
                 All 5 Services.
                 <br />
                 One Engagement.
@@ -596,8 +668,8 @@ export default function AgencyHomepage() {
                     ['Business Formation', '#services'],
                     ['Intelligent Websites', '#services'],
                     ['Automated Business Hubs', '#services'],
-                    ['Business Infrastructure', '#services'],
-                    ['IEBC Consultants', '#services'],
+                    ['IEBC Automated Workflow', '#services'],
+                    ['Intelligent Infrastructure', '#services'],
                   ],
                 ],
                 [

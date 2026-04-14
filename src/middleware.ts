@@ -39,13 +39,25 @@ export async function middleware(request: NextRequest) {
   }
 
   // ── Subdomain routing ──────────────────────────────────────────────
+  // Known top-level section prefixes — don't blindly prepend the subdomain
+  // prefix when the path already belongs to a different section (e.g. links
+  // from app.iebconsultants.com to /hub/... should render as /hub/..., not
+  // /accounting/hub/...).
+  const SECTION_PREFIXES = [
+    '/accounting', '/hub', '/portal', '/platform', '/efficient',
+    '/checkout', '/auth', '/settings', '/admin', '/api',
+  ]
+
   const subdomain = getSubdomain(request)
   if (subdomain && SUBDOMAIN_MAP[subdomain]) {
     const prefix = SUBDOMAIN_MAP[subdomain]
     const pathname = request.nextUrl.pathname
 
-    // Already routed (path starts with the prefix) — don't double-rewrite
-    if (!pathname.startsWith(prefix)) {
+    // Already routed to this section — don't double-rewrite
+    // Also skip rewrite when the path belongs to a different known section
+    const isOtherSection = SECTION_PREFIXES.some(p => pathname.startsWith(p))
+
+    if (!pathname.startsWith(prefix) && !isOtherSection) {
       const rewriteUrl = request.nextUrl.clone()
       rewriteUrl.pathname = prefix + (pathname === '/' ? '' : pathname)
       response = NextResponse.rewrite(rewriteUrl)

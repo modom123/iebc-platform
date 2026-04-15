@@ -147,11 +147,11 @@ const PLANS = [
 
 const FOOTER_LINKS = {
   Services: [
-    { label: 'Business Formation', href: '/hub/formation' },
-    { label: 'Intelligent Websites', href: '#services' },
-    { label: 'Automated Business Hubs', href: '/hub' },
+    { label: 'Business Formation', href: '/checkout/formation' },
+    { label: 'Intelligent Websites', href: '/checkout/website' },
+    { label: 'Automated Business Hubs', href: '/checkout/hub' },
     { label: 'Business Infrastructure', href: '/efficient' },
-    { label: 'IEBC Consultants', href: '/hub/consultants' },
+    { label: 'IEBC Consultants', href: 'https://calendly.com/new56money/30min' },
   ],
   Company: [
     { label: 'Agency Services', href: '/' },

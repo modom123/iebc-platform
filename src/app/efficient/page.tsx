@@ -49,7 +49,7 @@ const PLANS = [
     price: '$22',
     period: '/mo',
     badgeCls: 'bg-amber-50 text-amber-700 border border-amber-200',
-    features: ['Everything in Silver', 'Bank reconciliation', 'Reports & dashboards', 'Cash flow forecast', 'AI receipt scanner', 'Recurring transactions', 'Budgets & rules', 'Priority support'],
+    features: ['Everything in Silver', 'CRM & lead generation', 'Bank reconciliation', 'Reports & dashboards', 'Cash flow forecast', 'AI receipt scanner', 'Recurring transactions', 'Budgets & rules', 'Priority support'],
     cta: 'Start with Gold',
     href: '/accounting/checkout',
     highlight: true,

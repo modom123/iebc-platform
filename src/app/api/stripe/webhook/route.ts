@@ -53,15 +53,18 @@ export async function POST(req: Request) {
       return NextResponse.json({ received: true })
     }
 
-    // Check if user already exists (e.g. repeat purchase)
-    const { data: existingUsers } = await supabase.auth.admin.listUsers()
-    const existingUser = existingUsers?.users?.find(u => u.email === email)
+    // Check if user already exists by querying profiles (avoids paginated listUsers)
+    const { data: existingProfile } = await supabase
+      .from('profiles')
+      .select('id')
+      .eq('email', email)
+      .maybeSingle()
 
     let userId: string
 
-    if (existingUser) {
-      userId = existingUser.id
-      // Update their plan
+    if (existingProfile?.id) {
+      userId = existingProfile.id
+      // Existing user — update their plan info
       await supabase.from('profiles').update({
         plan,
         stripe_customer_id: stripeCustomerId,
@@ -69,7 +72,7 @@ export async function POST(req: Request) {
         billing_address: JSON.stringify(billingAddress),
       }).eq('id', userId)
     } else {
-      // Create new user — sends an invite email so they can set their password
+      // New user — send invite email so they can set their password
       const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://iebusinessconsultants.com'
       const { data: invited, error: inviteErr } = await supabase.auth.admin.inviteUserByEmail(email, {
         data: {

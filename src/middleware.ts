@@ -100,10 +100,8 @@ export async function middleware(request: NextRequest) {
 
     const { data: { session } } = await supabase.auth.getSession()
 
-    const protectedPaths = ['/accounting', '/hub', '/settings', '/admin']
-    // These paths under /accounting are public — no login required
-    const publicAccountingPaths = ['/accounting/checkout']
-    const isPublicPath = publicAccountingPaths.some(p => request.nextUrl.pathname.startsWith(p))
+    const protectedPaths = ['/hub', '/settings', '/admin']
+    const isPublicPath = false // reserved for future use
 
     if (protectedPaths.some(p => request.nextUrl.pathname.startsWith(p)) && !session && !isPublicPath) {
       // Redirect to login, preserving the original URL as ?next=

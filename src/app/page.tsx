@@ -26,7 +26,7 @@ const SERVICES = [
     subtitle: 'Your 24/7 conversion engine.',
     body: 'AI-powered, mobile-first website built for your industry. Online booking, payments, and lead capture — all connected to your hub automatically. Smarter than a static site. It works while you sleep.',
     features: ['Custom pages for your industry', 'Online booking & payment collection', 'Lead capture → flows into hub', 'Domain + hosting included'],
-    detail: '$800 build · then $149/mo hosting & support',
+    detail: '$500 (1–5 pages) · $1,000 (6–10 pages) · then $149/mo hosting & support',
     cta: 'Book a Strategy Call',
     href: 'https://calendly.com/new56money/30min',
     accent: '#1D4ED8',

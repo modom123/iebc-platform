@@ -39,15 +39,30 @@ export async function middleware(request: NextRequest) {
   }
 
   // ── Subdomain routing ──────────────────────────────────────────────
+  // Known top-level sections — never prepend a subdomain prefix to these paths
+  // (e.g. app.iebconsultants.com/auth/login must NOT become /accounting/auth/login)
+  const KNOWN_SECTIONS = [
+    '/accounting', '/hub', '/portal', '/platform', '/efficient',
+    '/checkout', '/auth', '/settings', '/admin', '/api', '/formation',
+  ]
+
+  // Track the path that will actually be served (may differ from the request path
+  // when subdomain routing rewrites it — used for auth guard checks below)
+  let effectivePathname = request.nextUrl.pathname
+
   const subdomain = getSubdomain(request)
   if (subdomain && SUBDOMAIN_MAP[subdomain]) {
     const prefix = SUBDOMAIN_MAP[subdomain]
     const pathname = request.nextUrl.pathname
 
-    // Already routed (path starts with the prefix) — don't double-rewrite
-    if (!pathname.startsWith(prefix)) {
+    // Skip rewrite if the path already starts with the target prefix OR belongs
+    // to another known section (prevents /auth/login → /accounting/auth/login)
+    const isKnownSection = KNOWN_SECTIONS.some(p => pathname.startsWith(p))
+
+    if (!pathname.startsWith(prefix) && !isKnownSection) {
       const rewriteUrl = request.nextUrl.clone()
       rewriteUrl.pathname = prefix + (pathname === '/' ? '' : pathname)
+      effectivePathname = rewriteUrl.pathname
       response = NextResponse.rewrite(rewriteUrl)
       // Re-apply security headers after rewrite
       response.headers.set('X-Frame-Options', 'DENY')
@@ -61,7 +76,7 @@ export async function middleware(request: NextRequest) {
   }
 
   // ── Portal is fully public — skip auth ────────────────────────────
-  if (request.nextUrl.pathname.startsWith('/portal')) {
+  if (effectivePathname.startsWith('/portal')) {
     return response
   }
 
@@ -92,20 +107,20 @@ export async function middleware(request: NextRequest) {
     const publicWithinProtected = [
       '/accounting/checkout',  // purchase flow — must be accessible before login
     ]
-    if (publicWithinProtected.some(p => request.nextUrl.pathname.startsWith(p))) {
+    if (publicWithinProtected.some(p => effectivePathname.startsWith(p))) {
       return response
     }
 
     const protectedPaths = ['/accounting', '/hub', '/settings', '/admin']
-    if (protectedPaths.some(p => request.nextUrl.pathname.startsWith(p)) && !session) {
-      // Redirect to login, preserving the original URL as ?next=
+    if (protectedPaths.some(p => effectivePathname.startsWith(p)) && !session) {
+      // Redirect to login, preserving the effective destination as ?next=
       const loginUrl = new URL('/auth/login', request.url)
-      loginUrl.searchParams.set('next', request.nextUrl.pathname)
+      loginUrl.searchParams.set('next', effectivePathname)
       return NextResponse.redirect(loginUrl)
     }
 
     // Admin-only guard
-    if (request.nextUrl.pathname.startsWith('/admin') && session) {
+    if (effectivePathname.startsWith('/admin') && session) {
       try {
         const { data: profile } = await supabase
           .from('profiles')

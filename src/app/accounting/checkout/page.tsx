@@ -15,6 +15,7 @@ const PLANS = [
     badge: '',
     highlight: false,
     features: [
+      '1 IEBC AI Consultant',
       '1 user account',
       'AI receipt scanning',
       'Income & expense tracking',
@@ -36,6 +37,7 @@ const PLANS = [
     badge: 'Most Popular',
     highlight: true,
     features: [
+      '3 IEBC AI Consultants',
       'Up to 3 users',
       'Everything in Silver',
       'Bank reconciliation',
@@ -57,6 +59,7 @@ const PLANS = [
     badge: '',
     highlight: false,
     features: [
+      '5 IEBC AI Consultants',
       'Up to 10 users',
       'Everything in Gold',
       'Full 22-module accounting suite',

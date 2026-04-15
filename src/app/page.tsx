@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import AgencyLeadForm from '@/components/AgencyLeadForm'
 import IndustriesSection from '@/components/IndustriesSection'
+import HomeMobileNav from '@/components/HomeMobileNav'
 
 // Font loaded via Google Fonts in layout.tsx — class defined in globals.css
 const playfair = { className: 'font-playfair', variable: '' }
@@ -198,11 +199,12 @@ export default function AgencyHomepage() {
               href="https://calendly.com/new56money/30min"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-5 py-2 rounded-lg text-sm font-bold transition-opacity hover:opacity-90 shadow-md"
+              className="hidden md:inline-block px-5 py-2 rounded-lg text-sm font-bold transition-opacity hover:opacity-90 shadow-md"
               style={{ background: '#C8902A', color: '#fff' }}
             >
               Book a Call
             </a>
+            <HomeMobileNav />
           </div>
         </div>
       </nav>

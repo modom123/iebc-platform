@@ -82,7 +82,7 @@ export default async function Accounting() {
 
   return (
     <div className="text-slate-900">
-      <div className="max-w-7xl mx-auto p-6 space-y-6">
+      <div className="max-w-7xl mx-auto p-3 sm:p-6 space-y-6">
 
         {/* Alerts */}
         {(billsOverdue.length > 0 || taxesOverdue.length > 0 || overdueCount > 0) && (
@@ -118,7 +118,7 @@ export default async function Accounting() {
           ].map((card, i) => (
             <div key={i} className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
               <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">{card.label}</p>
-              <p className={`text-2xl font-bold mt-1 ${card.color}`}>{card.value}</p>
+              <p className={`text-xl sm:text-2xl font-bold mt-1 ${card.color}`}>{card.value}</p>
               <p className="text-xs text-gray-400 mt-1">{card.sub}</p>
             </div>
           ))}
@@ -171,25 +171,9 @@ export default async function Accounting() {
             { href: '/accounting/vendors', icon: '🏢', label: 'Vendors / 1099' },
             { href: '/accounting/purchaseorders', icon: '📦', label: 'Purchase Orders' },
             { href: '/accounting/inventory', icon: '🗃️', label: 'Inventory' },
-            { href: '/accounting/tracker', icon: '🚗', label: 'Mileage & Time' },
-            { href: '/accounting/payroll', icon: '👔', label: 'Payroll' },
-            { href: '/accounting/vendors', icon: '🏢', label: 'Vendors' },
-            { href: '/accounting/recurring', icon: '🔁', label: 'Recurring' },
-            { href: '/accounting/projects', icon: '🏗️', label: 'Projects' },
-            { href: '/accounting/reconcile', icon: '✅', label: 'Reconcile' },
-            { href: '/accounting/budgets', icon: '🎯', label: 'Budgets' },
-            { href: '/accounting/forecast', icon: '📈', label: 'Cash Forecast' },
-            { href: '/accounting/reports', icon: '📊', label: 'Reports' },
-            { href: '/accounting/aged-receivables', icon: '⏱️', label: 'Aged AR' },
-            { href: '/accounting/coa', icon: '📒', label: 'Chart of Accounts' },
-            { href: '/accounting/journal', icon: '📝', label: 'Journal' },
-            { href: '/accounting/tax', icon: '💸', label: 'Tax Center' },
-            { href: '/accounting/rules', icon: '⚡', label: 'Auto Rules' },
-            { href: '/accounting/customers', icon: '👥', label: 'Customers' },
             { href: '/accounting/connect', icon: '🏦', label: 'Connect Bank' },
             { href: '/accounting/clients', icon: '🔗', label: 'Client Portals' },
-            { href: '/accounting/audit', icon: '🔒', label: 'Audit Trail' },
-            { href: '/api/export?type=transactions', icon: '⬇️', label: 'Export CSV' },
+            { href: '/accounting/reports', icon: '📊', label: 'Reports' },
           ].map(({ href, icon, label }) => (
             <Link key={href} href={href}
               className="bg-white border border-gray-200 rounded-xl p-3 flex items-center gap-2 hover:border-[#0F4C81] hover:shadow-sm transition text-sm">
@@ -207,26 +191,28 @@ export default async function Accounting() {
               <Link href="/accounting/transactions" className="text-sm text-[#0F4C81] hover:underline">View all</Link>
             </div>
             {recentTx && recentTx.length > 0 ? (
-              <table className="w-full text-sm">
-                <thead><tr className="bg-gray-50 text-gray-500 text-xs uppercase">
-                  <th className="p-3 text-left">Date</th>
-                  <th className="p-3 text-left">Description</th>
-                  <th className="p-3 text-left">Category</th>
-                  <th className="p-3 text-right">Amount</th>
-                </tr></thead>
-                <tbody className="divide-y divide-gray-50">
-                  {recentTx.map(t => (
-                    <tr key={t.id} className="hover:bg-gray-50">
-                      <td className="p-3 text-gray-500">{t.date}</td>
-                      <td className="p-3 font-medium">{t.description}</td>
-                      <td className="p-3"><span className="px-2 py-0.5 bg-gray-100 rounded text-xs">{t.category || 'Uncategorized'}</span></td>
-                      <td className={`p-3 text-right font-mono font-semibold ${t.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
-                        {t.type === 'income' ? '+' : '-'}{fmt(Number(t.amount))}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+              <div className="overflow-x-auto -mx-0">
+                <table className="w-full text-sm">
+                  <thead><tr className="bg-gray-50 text-gray-500 text-xs uppercase">
+                    <th className="p-2 sm:p-3 text-left">Date</th>
+                    <th className="p-2 sm:p-3 text-left">Description</th>
+                    <th className="p-2 sm:p-3 text-left hidden sm:table-cell">Category</th>
+                    <th className="p-2 sm:p-3 text-right">Amount</th>
+                  </tr></thead>
+                  <tbody className="divide-y divide-gray-50">
+                    {recentTx.map(t => (
+                      <tr key={t.id} className="hover:bg-gray-50">
+                        <td className="p-2 sm:p-3 text-gray-500">{t.date}</td>
+                        <td className="p-2 sm:p-3 font-medium">{t.description}</td>
+                        <td className="p-2 sm:p-3 hidden sm:table-cell"><span className="px-2 py-0.5 bg-gray-100 rounded text-xs">{t.category || 'Uncategorized'}</span></td>
+                        <td className={`p-2 sm:p-3 text-right font-mono font-semibold ${t.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
+                          {t.type === 'income' ? '+' : '-'}{fmt(Number(t.amount))}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             ) : (
               <div className="p-8 text-center">
                 <p className="text-gray-400 text-sm mb-3">No transactions yet</p>

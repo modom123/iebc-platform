@@ -216,7 +216,7 @@ export default function AppShell({ user, children }: { user?: User; children: Re
           </Link>
           <Link
             href="/accounting/checkout"
-            className="text-[13px] bg-[#C9A02E] hover:bg-yellow-600 text-white px-3 py-1.5 rounded-lg font-semibold transition shadow-sm"
+            className="text-xs sm:text-[13px] bg-[#C9A02E] hover:bg-yellow-600 text-white px-3 py-1.5 rounded-lg font-semibold transition shadow-sm"
           >
             ★ Upgrade
           </Link>

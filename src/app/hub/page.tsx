@@ -105,7 +105,7 @@ export default async function Hub() {
 
   return (
     <div className="text-slate-900">
-      <div className="max-w-7xl mx-auto p-6 space-y-6">
+      <div className="max-w-7xl mx-auto p-3 sm:p-6 space-y-6">
 
         {/* ── Header ── */}
         <div className="flex items-start justify-between gap-4">
@@ -299,30 +299,32 @@ export default async function Hub() {
               <Link href="/accounting/transactions" className="text-sm text-[#0F4C81] hover:underline">View all</Link>
             </div>
             {recentTx && recentTx.length > 0 ? (
-              <table className="w-full text-sm">
-                <thead>
-                  <tr className="bg-gray-50 text-gray-400 text-xs uppercase">
-                    <th className="p-3 text-left font-medium">Date</th>
-                    <th className="p-3 text-left font-medium">Description</th>
-                    <th className="p-3 text-left font-medium hidden md:table-cell">Category</th>
-                    <th className="p-3 text-right font-medium">Amount</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-50">
-                  {recentTx.map(t => (
-                    <tr key={t.id} className="hover:bg-gray-50">
-                      <td className="p-3 text-gray-400 text-xs">{t.date}</td>
-                      <td className="p-3 font-medium text-gray-800 truncate max-w-[160px]">{t.description}</td>
-                      <td className="p-3 hidden md:table-cell">
-                        <span className="px-2 py-0.5 bg-gray-100 rounded text-xs text-gray-500">{t.category || 'Uncategorized'}</span>
-                      </td>
-                      <td className={`p-3 text-right font-mono font-semibold text-sm ${t.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
-                        {t.type === 'income' ? '+' : '-'}{fmt(Number(t.amount))}
-                      </td>
+              <div className="overflow-x-auto -mx-0">
+                <table className="w-full text-sm">
+                  <thead>
+                    <tr className="bg-gray-50 text-gray-400 text-xs uppercase">
+                      <th className="p-2 sm:p-3 text-left font-medium">Date</th>
+                      <th className="p-2 sm:p-3 text-left font-medium">Description</th>
+                      <th className="p-2 sm:p-3 text-left font-medium hidden sm:table-cell">Category</th>
+                      <th className="p-2 sm:p-3 text-right font-medium">Amount</th>
                     </tr>
-                  ))}
-                </tbody>
-              </table>
+                  </thead>
+                  <tbody className="divide-y divide-gray-50">
+                    {recentTx.map(t => (
+                      <tr key={t.id} className="hover:bg-gray-50">
+                        <td className="p-2 sm:p-3 text-gray-400 text-xs">{t.date}</td>
+                        <td className="p-2 sm:p-3 font-medium text-gray-800 truncate max-w-[160px]">{t.description}</td>
+                        <td className="p-2 sm:p-3 hidden sm:table-cell">
+                          <span className="px-2 py-0.5 bg-gray-100 rounded text-xs text-gray-500">{t.category || 'Uncategorized'}</span>
+                        </td>
+                        <td className={`p-2 sm:p-3 text-right font-mono font-semibold text-sm ${t.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
+                          {t.type === 'income' ? '+' : '-'}{fmt(Number(t.amount))}
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
             ) : (
               <div className="p-8 text-center">
                 <p className="text-gray-400 text-sm mb-3">No transactions yet</p>

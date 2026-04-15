@@ -92,8 +92,16 @@ export async function POST(req: Request) {
       },
       billing_address_collection: 'required',
       phone_number_collection: { enabled: true },
-      success_url: `${appUrl}/checkout/industry/${industryId}/success?session_id={CHECKOUT_SESSION_ID}`,
-      cancel_url: `${appUrl}/checkout/industry/${industryId}?canceled=true`,
+      success_url: industryId === 'business_hub'
+        ? `${appUrl}/checkout/hub/success?session_id={CHECKOUT_SESSION_ID}`
+        : industryId.startsWith('website_')
+          ? `${appUrl}/checkout/website/success?session_id={CHECKOUT_SESSION_ID}`
+          : `${appUrl}/checkout/industry/${industryId}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: industryId === 'business_hub'
+        ? `${appUrl}/checkout/hub?canceled=true`
+        : industryId.startsWith('website_')
+          ? `${appUrl}/checkout/website?canceled=true`
+          : `${appUrl}/checkout/industry/${industryId}?canceled=true`,
     })
 
     return NextResponse.json({ url: checkoutSession.url })

@@ -40,6 +40,7 @@ const PLANS = [
       '3 IEBC AI Consultants',
       'Up to 3 users',
       'Everything in Silver',
+      'CRM & lead generation',
       'Bank reconciliation',
       'Reports & dashboards',
       'Cash flow forecast',

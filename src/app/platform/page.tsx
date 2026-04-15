@@ -3,7 +3,7 @@ import Link from 'next/link'
 const NAV_LINKS = [
   { label: 'Services', href: '#services' },
   { label: 'Infrastructure', href: '/efficient' },
-  { label: 'Automation Hub', href: '/hub' },
+  { label: 'Automation Hub', href: '/checkout/hub' },
   { label: 'Pricing', href: '#pricing' },
 ]
 
@@ -109,6 +109,7 @@ const PLANS = [
       '3 IEBC AI Consultants',
       'Up to 3 users',
       'Everything in Silver',
+      'CRM & lead generation',
       'Bank reconciliation',
       'Reports & dashboards',
       'Cash flow forecast',

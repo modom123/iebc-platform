@@ -1,7 +1,6 @@
 'use client'
 import { useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 
 const PLANS = [
   {
@@ -80,7 +79,6 @@ const US_STATES = [
 ]
 
 export default function CheckoutPage() {
-  const router = useRouter()
   const [step, setStep] = useState<1 | 2>(1)
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)

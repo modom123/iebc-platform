@@ -182,7 +182,7 @@ export default function AgencyHomepage() {
 
           <div className="flex items-center gap-2">
             <Link
-              href="/accounting/checkout"
+              href="/accounting/checkout?plan=silver"
               className="hidden md:block text-sm font-semibold px-4 py-2 rounded-lg transition-colors hover:bg-white/10"
               style={{ color: 'rgba(255,255,255,0.6)' }}
             >
@@ -278,7 +278,7 @@ export default function AgencyHomepage() {
 
           <div className="flex flex-wrap gap-4 justify-center">
             <Link
-              href="/accounting/checkout"
+              href="/accounting/checkout?plan=silver"
               className="text-sm transition-colors hover:text-white/80"
               style={{ color: 'rgba(255,255,255,0.45)' }}
             >
@@ -411,7 +411,7 @@ export default function AgencyHomepage() {
               </p>
               <div className="flex flex-col gap-2.5 w-full">
                 <a
-                  href="/accounting/checkout"
+                  href="/accounting/checkout?plan=silver"
                   className="px-6 py-2.5 rounded-lg text-sm font-bold transition-opacity hover:opacity-90 shadow-md text-center"
                   style={{ background: '#C8902A', color: '#fff' }}
                 >
@@ -651,11 +651,11 @@ export default function AgencyHomepage() {
             and IEBC Consultants — starting at $9/mo. No setup fee, no contract.
           </p>
           <Link
-            href="/platform"
+            href="/accounting/checkout"
             className="inline-flex items-center gap-2 px-7 py-3 rounded-xl font-bold text-sm border-2 transition-colors hover:bg-[#0B2140] hover:text-white"
             style={{ borderColor: '#0B2140', color: '#0B2140' }}
           >
-            View SaaS Platform Pricing →
+            View SaaS Plans &amp; Pricing →
           </Link>
         </div>
       </section>

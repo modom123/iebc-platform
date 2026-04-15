@@ -93,8 +93,8 @@ const PLANS = [
       'Monthly financial reports',
       'Email support',
     ],
-    link: '/accounting/checkout',
-    cta: 'Start Free Trial',
+    link: '/accounting/checkout?plan=silver',
+    cta: 'Start Free Trial — $9/mo',
   },
   {
     id: 'gold',
@@ -116,8 +116,8 @@ const PLANS = [
       'Project tracking',
       'Priority support',
     ],
-    link: '/accounting/checkout',
-    cta: 'Start Free Trial',
+    link: '/accounting/checkout?plan=gold',
+    cta: 'Start Free Trial — $22/mo',
   },
   {
     id: 'platinum',
@@ -139,8 +139,8 @@ const PLANS = [
       'Business Formation support',
       'Dedicated account manager',
     ],
-    link: '/accounting/checkout',
-    cta: 'Start Free Trial',
+    link: '/accounting/checkout?plan=platinum',
+    cta: 'Start Free Trial — $42/mo',
   },
 ]
 
@@ -204,8 +204,8 @@ export default function PlatformPage() {
             <Link href="/auth/login" className="hidden md:block px-4 py-2 text-sm font-medium text-gray-600 hover:text-[#0F4C81] transition">
               Sign In
             </Link>
-            <Link href="/accounting/checkout" className="bg-[#0F4C81] hover:bg-[#082D4F] text-white px-5 py-2 rounded-lg text-sm font-bold transition shadow-sm">
-              Get Started
+            <Link href="/accounting/checkout?plan=silver" className="bg-[#0F4C81] hover:bg-[#082D4F] text-white px-5 py-2 rounded-lg text-sm font-bold transition shadow-sm">
+              Get Started — $9/mo
             </Link>
           </div>
         </div>
@@ -238,7 +238,7 @@ export default function PlatformPage() {
           </p>
 
           <div className="flex flex-wrap gap-3 justify-center mb-8">
-            <Link href="/accounting/checkout" className="bg-[#0F4C81] hover:bg-[#082D4F] text-white px-8 py-3.5 rounded-xl font-bold text-base transition shadow-lg">
+            <Link href="/accounting/checkout?plan=silver" className="bg-[#0F4C81] hover:bg-[#082D4F] text-white px-8 py-3.5 rounded-xl font-bold text-base transition shadow-lg">
               Start Free — From $9/mo
             </Link>
             <Link href="#services" className="bg-white hover:bg-blue-50 border-2 border-[#0F4C81] text-[#0F4C81] px-8 py-3.5 rounded-xl font-bold text-base transition shadow-sm">

@@ -82,7 +82,7 @@ export default function HomeMobileNav() {
 
             <div className="pt-8 space-y-3">
               <Link
-                href="/accounting/checkout"
+                href="/accounting/checkout?plan=silver"
                 onClick={close}
                 className="block w-full text-center py-3 rounded-xl font-bold text-base transition-opacity hover:opacity-90"
                 style={{ background: '#C8902A', color: '#fff' }}

@@ -1,5 +1,6 @@
 'use client'
-import { useState } from 'react'
+import { useState, useEffect, Suspense } from 'react'
+import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 
 const PLANS = [
@@ -78,14 +79,13 @@ const US_STATES = [
   'VA','WA','WV','WI','WY','DC',
 ]
 
-export default function CheckoutPage() {
+function CheckoutContent() {
+  const searchParams = useSearchParams()
   const [step, setStep] = useState<1 | 2>(1)
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const [canceled, setCanceled] = useState(
-    typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('canceled') === 'true'
-  )
+  const [canceled, setCanceled] = useState(false)
 
   const [form, setForm] = useState({
     name: '',
@@ -96,6 +96,18 @@ export default function CheckoutPage() {
     state: '',
     zip: '',
   })
+
+  // Pre-select plan from URL ?plan=silver / ?plan=gold / ?plan=platinum
+  useEffect(() => {
+    const planParam = searchParams.get('plan')
+    if (planParam && ['silver', 'gold', 'platinum'].includes(planParam)) {
+      setSelectedPlan(planParam)
+      setStep(2)
+    }
+    if (searchParams.get('canceled') === 'true') {
+      setCanceled(true)
+    }
+  }, [searchParams])
 
   const plan = PLANS.find(p => p.id === selectedPlan)
 
@@ -135,6 +147,8 @@ export default function CheckoutPage() {
       setLoading(false)
     }
   }
+
+  const isStripeError = error.toLowerCase().includes('not yet configured') || error.toLowerCase().includes('not configured')
 
   return (
     <main className="min-h-screen bg-gray-50">
@@ -360,10 +374,27 @@ export default function CheckoutPage() {
                 </div>
               </div>
 
+              {/* Error display */}
               {error && (
-                <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg">
-                  {error}
-                </div>
+                isStripeError ? (
+                  <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-4 space-y-2">
+                    <p className="font-semibold text-amber-800 text-sm">Payment setup in progress</p>
+                    <p className="text-amber-700 text-sm">Our payment system is being finalized. Book a quick call and we&apos;ll get your {plan.label} plan activated right away — no wait.</p>
+                    <a
+                      href="https://calendly.com/new56money/30min"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block text-center py-2.5 rounded-lg font-bold text-sm transition-opacity hover:opacity-90 mt-1"
+                      style={{ background: '#C9A02E', color: '#fff' }}
+                    >
+                      Book a Call to Subscribe — {plan.price}/mo →
+                    </a>
+                  </div>
+                ) : (
+                  <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg">
+                    {error}
+                  </div>
+                )
               )}
 
               <div className="pt-2">
@@ -375,7 +406,7 @@ export default function CheckoutPage() {
                   {loading ? 'Redirecting to payment...' : `Start 7-Day Free Trial — ${plan.price}/mo after`}
                 </button>
                 <p className="text-center text-xs text-gray-400 mt-3">
-                  Secure checkout via Stripe · Your card is saved but not charged for 7 days · Cancel anytime
+                  Secure checkout via Stripe · No charge for 7 days · Cancel anytime
                 </p>
               </div>
             </form>
@@ -396,5 +427,13 @@ export default function CheckoutPage() {
         </div>
       </div>
     </main>
+  )
+}
+
+export default function CheckoutPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-50 flex items-center justify-center"><div className="text-gray-400 text-sm">Loading...</div></div>}>
+      <CheckoutContent />
+    </Suspense>
   )
 }

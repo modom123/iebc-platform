@@ -14,8 +14,8 @@ const SERVICES = [
     body: 'LLC, S-Corp, C-Corp, or Nonprofit filed in any U.S. state. EIN registration, operating agreements, registered agent, and compliance checklists — your legal foundation built right, the first time.',
     features: ['LLC · S-Corp · C-Corp · Nonprofit', 'EIN & operating agreement', 'All 50 states · docs delivered', 'Compliance checklist included'],
     detail: 'from $150 · one-time · all 50 states',
-    cta: 'Start Formation',
-    href: '/hub/formation',
+    cta: 'View Formation Services',
+    href: '/formation',
     accent: '#0B2140',
     bg: 'rgba(11,33,64,0.04)',
   },
@@ -179,13 +179,20 @@ export default function AgencyHomepage() {
             ))}
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
+            <Link
+              href="/accounting/checkout"
+              className="hidden md:block text-sm font-semibold px-4 py-2 rounded-lg transition-colors hover:bg-white/10"
+              style={{ color: 'rgba(255,255,255,0.6)' }}
+            >
+              Get SaaS — $9/mo
+            </Link>
             <Link
               href="/auth/login"
-              className="hidden md:block text-sm font-medium transition-colors hover:text-white"
-              style={{ color: 'rgba(255,255,255,0.5)' }}
+              className="hidden md:block text-sm font-semibold px-4 py-2 rounded-lg border transition-colors hover:bg-white/10"
+              style={{ borderColor: 'rgba(200,144,42,0.5)', color: '#C8902A' }}
             >
-              Sign In
+              Portal Login
             </Link>
             <a
               href="https://calendly.com/new56money/30min"
@@ -267,16 +274,25 @@ export default function AgencyHomepage() {
             </a>
           </div>
 
-          <Link
-            href="/platform"
-            className="text-sm transition-colors hover:text-white/60"
-            style={{ color: 'rgba(255,255,255,0.35)' }}
-          >
-            Looking for self-service?{' '}
-            <span style={{ color: '#C8902A', textDecoration: 'underline' }}>
-              Try our SaaS platform from $9/mo →
-            </span>
-          </Link>
+          <div className="flex flex-wrap gap-4 justify-center">
+            <Link
+              href="/accounting/checkout"
+              className="text-sm transition-colors hover:text-white/80"
+              style={{ color: 'rgba(255,255,255,0.45)' }}
+            >
+              Self-service SaaS from{' '}
+              <span style={{ color: '#C8902A', textDecoration: 'underline' }}>$9/mo →</span>
+            </Link>
+            <span style={{ color: 'rgba(255,255,255,0.2)' }}>·</span>
+            <Link
+              href="/auth/login"
+              className="text-sm transition-colors hover:text-white/80"
+              style={{ color: 'rgba(255,255,255,0.45)' }}
+            >
+              Already a client?{' '}
+              <span style={{ color: '#C8902A', textDecoration: 'underline' }}>Log into portal →</span>
+            </Link>
+          </div>
         </div>
 
         {/* Stats bar */}

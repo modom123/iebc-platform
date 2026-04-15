@@ -32,11 +32,22 @@ export default function Signup() {
   if (done) {
     return (
       <main className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
-        <div className="bg-white p-8 rounded-xl border border-gray-200 w-full max-w-md text-center shadow-sm">
-          <div className="text-4xl mb-4">✅</div>
-          <h2 className="text-xl font-bold text-[#0F4C81] mb-2">Check your email</h2>
-          <p className="text-gray-500 text-sm">We sent a confirmation link to <strong>{email}</strong>. Click it to activate your account, then sign in.</p>
-          <Link href="/auth/login" className="btn-primary mt-6 inline-block">Go to Sign In</Link>
+        <div className="bg-white p-8 rounded-2xl border border-gray-200 w-full max-w-md text-center shadow-sm">
+          <div className="w-14 h-14 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-7 h-7 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <h2 className="text-xl font-bold text-[#0B2140] mb-2">Check your email</h2>
+          <p className="text-gray-500 text-sm mb-2">
+            We sent a confirmation link to <strong>{email}</strong>.
+          </p>
+          <p className="text-gray-400 text-xs mb-6">
+            Click the link in that email to activate your account. Check your spam folder if you don&apos;t see it within 2 minutes.
+          </p>
+          <Link href="/auth/login" className="block w-full py-3 rounded-xl font-bold text-sm text-white bg-[#0B2140] hover:opacity-90 transition">
+            Go to Sign In
+          </Link>
         </div>
       </main>
     )

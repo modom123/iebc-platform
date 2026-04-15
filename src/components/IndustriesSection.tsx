@@ -20,6 +20,7 @@ const INDUSTRIES = [
     ],
     plan: 'Growth',
     setup: '$3,500',
+    setupAmount: 3500,
     monthly: 'from $300/mo',
     highlight: 'Best for carriers with 2+ trucks or owner-operators.',
   },
@@ -40,6 +41,7 @@ const INDUSTRIES = [
     ],
     plan: 'Starter',
     setup: '$1,500',
+    setupAmount: 1500,
     monthly: 'from $150/mo',
     highlight: 'Best for solo contractors and small crews (1–10 employees).',
   },
@@ -60,6 +62,7 @@ const INDUSTRIES = [
     ],
     plan: 'Starter',
     setup: '$1,500',
+    setupAmount: 1500,
     monthly: 'from $150/mo',
     highlight: 'Best for freelancers and studios doing $50K+ annually.',
   },
@@ -80,6 +83,7 @@ const INDUSTRIES = [
     ],
     plan: 'Starter',
     setup: '$1,500',
+    setupAmount: 1500,
     monthly: 'from $150/mo',
     highlight: 'Best for retail stores and online sellers with $200K+ in annual volume.',
   },
@@ -100,6 +104,7 @@ const INDUSTRIES = [
     ],
     plan: 'Starter',
     setup: '$1,500',
+    setupAmount: 1500,
     monthly: 'from $150/mo',
     highlight: 'Best for independent restaurants, food trucks, and catering businesses.',
   },
@@ -120,6 +125,7 @@ const INDUSTRIES = [
     ],
     plan: 'Starter',
     setup: '$1,500',
+    setupAmount: 1500,
     monthly: 'from $150/mo',
     highlight: '3 dedicated IEBC nonprofit specialist consultants included.',
   },
@@ -140,6 +146,7 @@ const INDUSTRIES = [
     ],
     plan: 'Starter',
     setup: '$1,500',
+    setupAmount: 1500,
     monthly: 'from $150/mo',
     highlight: 'Best for agencies, collectives, and advisors managing 5+ athletes.',
   },
@@ -160,6 +167,7 @@ const INDUSTRIES = [
     ],
     plan: 'Growth',
     setup: '$3,500',
+    setupAmount: 3500,
     monthly: 'from $300/mo',
     highlight: 'Separate IR platform pricing available for 50+ LP relationships.',
   },
@@ -180,6 +188,7 @@ const INDUSTRIES = [
     ],
     plan: 'Growth',
     setup: 'from $5,000',
+    setupAmount: null, // enterprise — custom quote
     monthly: 'from $2,500/mo',
     highlight: 'Boutique ($5K setup, $2,500/mo) · Growth ($8.5K, $4,500/mo) · Institutional ($15K, $7,500/mo)',
     premium: true,
@@ -201,15 +210,69 @@ const INDUSTRIES = [
     ],
     plan: 'Growth',
     setup: '$3,500',
+    setupAmount: 3500,
     monthly: 'from $300/mo',
     highlight: 'Best for advisors managing 25+ clients or $5M+ AUM.',
   },
 ]
 
+function fmt(n: number) {
+  return '$' + n.toLocaleString()
+}
+
+type BuyForm = { name: string; email: string; phone: string; company: string }
+
 export default function IndustriesSection() {
   const [selected, setSelected] = useState<string | null>(null)
+  const [showBuy, setShowBuy] = useState(false)
+  const [buyForm, setBuyForm] = useState<BuyForm>({ name: '', email: '', phone: '', company: '' })
+  const [buyLoading, setBuyLoading] = useState(false)
+  const [buyError, setBuyError] = useState('')
 
   const active = INDUSTRIES.find(i => i.id === selected)
+
+  function selectIndustry(id: string) {
+    if (selected === id) {
+      setSelected(null)
+    } else {
+      setSelected(id)
+    }
+    setShowBuy(false)
+    setBuyError('')
+  }
+
+  async function handleDeposit(e: React.FormEvent) {
+    e.preventDefault()
+    if (!active || !active.setupAmount) return
+    setBuyLoading(true)
+    setBuyError('')
+
+    try {
+      const depositAmount = Math.round(active.setupAmount * 0.25)
+      const res = await fetch('/api/stripe/project-checkout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          industry: active.id,
+          industryLabel: active.label,
+          plan: active.plan,
+          setupAmount: active.setupAmount,
+          depositAmount,
+          name: buyForm.name,
+          email: buyForm.email,
+          phone: buyForm.phone,
+          company: buyForm.company,
+        }),
+      })
+
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error || 'Checkout failed')
+      window.location.href = data.url
+    } catch (err: unknown) {
+      setBuyError(err instanceof Error ? err.message : 'Something went wrong. Please try again.')
+      setBuyLoading(false)
+    }
+  }
 
   return (
     <section id="industries" className="py-20 px-6" style={{ background: '#F8F6F1' }}>
@@ -237,7 +300,7 @@ export default function IndustriesSection() {
             return (
               <button
                 key={ind.id}
-                onClick={() => setSelected(isActive ? null : ind.id)}
+                onClick={() => selectIndustry(ind.id)}
                 className="rounded-xl border p-4 text-center transition-all cursor-pointer group"
                 style={{
                   background: isActive ? '#0B2140' : '#fff',
@@ -325,16 +388,16 @@ export default function IndustriesSection() {
                 </div>
 
                 {/* Pricing + CTA */}
-                <div className="flex flex-col justify-between">
+                <div className="flex flex-col gap-4">
                   <div>
                     <p
-                      className="text-xs font-bold uppercase tracking-widest mb-4"
+                      className="text-xs font-bold uppercase tracking-widest mb-3"
                       style={{ color: '#C8902A' }}
                     >
                       Pricing
                     </p>
                     <div
-                      className="rounded-xl p-5 mb-4 border"
+                      className="rounded-xl p-5 border"
                       style={{ background: '#F8F6F1', borderColor: '#e5e7eb' }}
                     >
                       <div className="flex items-baseline gap-2 mb-1">
@@ -343,31 +406,153 @@ export default function IndustriesSection() {
                         </span>
                         <span className="text-sm text-gray-400">one-time setup</span>
                       </div>
-                      <p className="text-sm font-semibold mb-3" style={{ color: '#C8902A' }}>
+                      <p className="text-sm font-semibold mb-2" style={{ color: '#C8902A' }}>
                         {active.monthly} retainer
                       </p>
                       <p className="text-xs text-gray-500 leading-relaxed">{active.highlight}</p>
                     </div>
                   </div>
 
-                  <div className="flex flex-col sm:flex-row gap-3">
-                    <a
-                      href="https://calendly.com/new56money/30min"
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="flex-1 text-center py-3.5 rounded-xl font-bold text-sm transition-opacity hover:opacity-90 shadow-lg"
-                      style={{ background: '#C8902A', color: '#fff' }}
-                    >
-                      Book a Strategy Call
-                    </a>
-                    <a
-                      href="#contact"
-                      className="flex-1 text-center py-3.5 rounded-xl font-bold text-sm border-2 transition-colors hover:bg-[#0B2140] hover:text-white hover:border-[#0B2140]"
-                      style={{ borderColor: '#0B2140', color: '#0B2140' }}
-                    >
-                      Get Started →
-                    </a>
-                  </div>
+                  {/* Payment milestones — shown if setup amount is known */}
+                  {active.setupAmount && (
+                    <div className="rounded-xl border border-[#0B2140]/20 overflow-hidden">
+                      <div className="px-4 py-2.5 text-xs font-bold uppercase tracking-widest" style={{ background: '#0B2140', color: '#C8902A' }}>
+                        Payment Schedule
+                      </div>
+                      <div className="divide-y divide-gray-100">
+                        {[
+                          { label: 'Deposit — due today', pct: '25%', amount: Math.round(active.setupAmount * 0.25), note: 'Kickoff & discovery begin' },
+                          { label: 'Deployment — due at launch', pct: '50%', amount: Math.round(active.setupAmount * 0.50), note: 'Build complete, testing begins' },
+                          { label: 'Final delivery', pct: '25%', amount: Math.round(active.setupAmount * 0.25), note: 'Go-live & handoff' },
+                        ].map((m) => (
+                          <div key={m.label} className="flex items-center justify-between px-4 py-3 bg-white">
+                            <div>
+                              <p className="text-xs font-semibold text-gray-800">{m.label}</p>
+                              <p className="text-[11px] text-gray-400">{m.note}</p>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-sm font-extrabold" style={{ color: '#0B2140' }}>{fmt(m.amount)}</p>
+                              <p className="text-[10px] text-gray-400">{m.pct}</p>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* CTAs */}
+                  {!showBuy ? (
+                    <div className="flex flex-col gap-2.5">
+                      {active.setupAmount ? (
+                        <button
+                          onClick={() => setShowBuy(true)}
+                          className="w-full text-center py-3.5 rounded-xl font-bold text-sm transition-opacity hover:opacity-90 shadow-lg"
+                          style={{ background: '#C8902A', color: '#fff' }}
+                        >
+                          Start Project — Pay {fmt(Math.round(active.setupAmount * 0.25))} Deposit
+                        </button>
+                      ) : (
+                        <a
+                          href="https://calendly.com/new56money/30min"
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="w-full text-center py-3.5 rounded-xl font-bold text-sm transition-opacity hover:opacity-90 shadow-lg"
+                          style={{ background: '#C8902A', color: '#fff' }}
+                        >
+                          Get Custom Quote →
+                        </a>
+                      )}
+                      <a
+                        href="https://calendly.com/new56money/30min"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="w-full text-center py-3 rounded-xl font-semibold text-sm border-2 transition-colors hover:bg-[#0B2140] hover:text-white hover:border-[#0B2140]"
+                        style={{ borderColor: '#0B2140', color: '#0B2140' }}
+                      >
+                        Book a Strategy Call
+                      </a>
+                    </div>
+                  ) : (
+                    /* Buy form — inline */
+                    <div className="rounded-xl border border-[#C8902A]/40 overflow-hidden">
+                      <div className="px-4 py-3 flex items-center justify-between" style={{ background: '#C8902A' }}>
+                        <p className="text-sm font-bold text-white">
+                          Pay {fmt(Math.round(active.setupAmount! * 0.25))} Deposit to Begin
+                        </p>
+                        <button
+                          onClick={() => { setShowBuy(false); setBuyError('') }}
+                          className="text-white/60 hover:text-white text-lg leading-none"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                      <form onSubmit={handleDeposit} className="bg-white p-4 space-y-3">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                          <div>
+                            <label className="block text-xs font-semibold text-gray-600 mb-1">Full Name <span className="text-red-500">*</span></label>
+                            <input
+                              type="text"
+                              required
+                              value={buyForm.name}
+                              onChange={e => setBuyForm(p => ({ ...p, name: e.target.value }))}
+                              placeholder="Jane Smith"
+                              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C8902A]"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-semibold text-gray-600 mb-1">Email <span className="text-red-500">*</span></label>
+                            <input
+                              type="email"
+                              required
+                              value={buyForm.email}
+                              onChange={e => setBuyForm(p => ({ ...p, email: e.target.value }))}
+                              placeholder="jane@company.com"
+                              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C8902A]"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-semibold text-gray-600 mb-1">Phone</label>
+                            <input
+                              type="tel"
+                              value={buyForm.phone}
+                              onChange={e => setBuyForm(p => ({ ...p, phone: e.target.value }))}
+                              placeholder="(555) 000-0000"
+                              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C8902A]"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-xs font-semibold text-gray-600 mb-1">Business Name</label>
+                            <input
+                              type="text"
+                              value={buyForm.company}
+                              onChange={e => setBuyForm(p => ({ ...p, company: e.target.value }))}
+                              placeholder="Acme Inc."
+                              className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#C8902A]"
+                            />
+                          </div>
+                        </div>
+
+                        {buyError && (
+                          <p className="text-xs text-red-600 bg-red-50 border border-red-200 rounded px-3 py-2">{buyError}</p>
+                        )}
+
+                        <button
+                          type="submit"
+                          disabled={buyLoading}
+                          className="w-full py-3 rounded-xl font-bold text-sm transition-opacity hover:opacity-90 disabled:opacity-60 disabled:cursor-not-allowed"
+                          style={{ background: '#0B2140', color: '#fff' }}
+                        >
+                          {buyLoading
+                            ? 'Redirecting to payment...'
+                            : `Pay ${fmt(Math.round(active.setupAmount! * 0.25))} Deposit → Stripe`
+                          }
+                        </button>
+                        <p className="text-[10px] text-center text-gray-400">
+                          Secure payment via Stripe · Remaining balance invoiced per milestone
+                        </p>
+                      </form>
+                    </div>
+                  )}
                 </div>
               </div>
             </div>

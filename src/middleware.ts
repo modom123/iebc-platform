@@ -88,6 +88,14 @@ export async function middleware(request: NextRequest) {
 
     const { data: { session } } = await supabase.auth.getSession()
 
+    // Public paths that live inside a normally-protected prefix
+    const publicWithinProtected = [
+      '/accounting/checkout',  // purchase flow — must be accessible before login
+    ]
+    if (publicWithinProtected.some(p => request.nextUrl.pathname.startsWith(p))) {
+      return response
+    }
+
     const protectedPaths = ['/accounting', '/hub', '/settings', '/admin']
     if (protectedPaths.some(p => request.nextUrl.pathname.startsWith(p)) && !session) {
       // Redirect to login, preserving the original URL as ?next=

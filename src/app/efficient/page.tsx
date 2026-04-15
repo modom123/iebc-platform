@@ -61,8 +61,8 @@ const PLANS = [
     period: '/mo',
     badgeCls: 'bg-blue-50 text-[#0F4C81] border border-blue-200',
     features: ['Everything in Gold', 'Full 22-module suite', 'Payroll', 'Inventory & POs', 'Tax center & 1099s', 'Mileage & time tracker', 'Projects & job costing', 'Audit trail'],
-    cta: 'Start with Platinum',
-    href: 'https://buy.stripe.com/bJe14h1aVeRj58CfrVgEg01',
+    cta: 'Efficient Accounting',
+    href: '/accounting/checkout',
     highlight: false,
   },
 ]

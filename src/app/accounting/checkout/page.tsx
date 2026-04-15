@@ -1,7 +1,6 @@
 'use client'
 import { useState } from 'react'
 import Link from 'next/link'
-import { useRouter } from 'next/navigation'
 
 const PLANS = [
   {
@@ -39,12 +38,12 @@ const PLANS = [
     features: [
       '3 IEBC AI Consultants',
       'Up to 3 users',
-      'AI receipt scanning',
       'Everything in Silver',
-      'Automated Business Hub',
-      'Lead pipeline & CRM',
       'Bank reconciliation',
-      'Project tracking',
+      'Reports & dashboards',
+      'Cash flow forecast',
+      'Recurring transactions',
+      'Budgets & automation rules',
       'Priority support',
     ],
   },
@@ -55,18 +54,18 @@ const PLANS = [
     period: '/mo',
     consultants: 5,
     users: 10,
-    desc: 'All features. Full platform access.',
+    desc: 'Full accounting suite. Every module.',
     badge: '',
     highlight: false,
     features: [
       '5 IEBC AI Consultants',
       'Up to 10 users',
-      'AI receipt scanning',
       'Everything in Gold',
-      'Full accounting suite',
+      'Full 22-module accounting suite',
       'Payroll management',
       'Tax center & 1099s',
-      'Business Formation support',
+      'Inventory & purchase orders',
+      'Mileage & time tracker',
       'Dedicated account manager',
     ],
   },
@@ -80,7 +79,6 @@ const US_STATES = [
 ]
 
 export default function CheckoutPage() {
-  const router = useRouter()
   const [step, setStep] = useState<1 | 2>(1)
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)

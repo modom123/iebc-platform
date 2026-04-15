@@ -24,6 +24,13 @@ const PLAN_NAMES: Record<string, string> = {
 }
 
 export async function POST(req: Request) {
+  if (!process.env.STRIPE_SECRET_KEY) {
+    return NextResponse.json(
+      { error: 'Payment system is not yet configured. Please contact support at info@iebconsultants.com.' },
+      { status: 503 }
+    )
+  }
+
   try {
     const body = await req.json()
     const { plan, name, email, phone, billing_address } = body as {

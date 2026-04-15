@@ -182,18 +182,18 @@ export default function AgencyHomepage() {
 
           <div className="flex items-center gap-2">
             <Link
-              href="/accounting/checkout?plan=silver"
-              className="hidden md:block text-sm font-semibold px-4 py-2 rounded-lg transition-colors hover:bg-white/10"
-              style={{ color: 'rgba(255,255,255,0.6)' }}
-            >
-              Get SaaS — $9/mo
-            </Link>
-            <Link
               href="/auth/login"
               className="hidden md:block text-sm font-semibold px-4 py-2 rounded-lg border transition-colors hover:bg-white/10"
               style={{ borderColor: 'rgba(200,144,42,0.5)', color: '#C8902A' }}
             >
-              Portal Login
+              Client Portal
+            </Link>
+            <Link
+              href="/auth/login?next=/hub/consultants"
+              className="hidden md:block text-sm font-semibold px-4 py-2 rounded-lg border transition-colors hover:bg-white/10"
+              style={{ borderColor: 'rgba(255,255,255,0.25)', color: 'rgba(255,255,255,0.7)' }}
+            >
+              IEBC Consultants
             </Link>
             <a
               href="https://calendly.com/new56money/30min"
@@ -715,7 +715,8 @@ export default function AgencyHomepage() {
                     ['Book a Call', 'https://calendly.com/new56money/30min'],
                     ['Contact Us', '#contact'],
                     ['SaaS Platform', '/platform'],
-                    ['Sign In', '/auth/login'],
+                    ['Client Portal', '/auth/login'],
+                    ['IEBC Consultants', '/auth/login?next=/hub/consultants'],
                     ['Create Account', '/auth/signup'],
                   ],
                 ],

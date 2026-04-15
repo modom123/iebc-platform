@@ -159,7 +159,8 @@ const FOOTER_LINKS = {
     { label: 'Terms of Service', href: '#' },
   ],
   Account: [
-    { label: 'Sign In', href: '/auth/login' },
+    { label: 'Client Portal', href: '/auth/login' },
+    { label: 'IEBC Consultants', href: '/auth/login?next=/hub/consultants' },
     { label: 'Create Account', href: '/auth/signup' },
     { label: 'Pricing', href: '#pricing' },
   ],
@@ -201,8 +202,17 @@ export default function PlatformPage() {
             >
               Agency Site
             </Link>
-            <Link href="/auth/login" className="hidden md:block px-4 py-2 text-sm font-medium text-gray-600 hover:text-[#0F4C81] transition">
-              Sign In
+            <Link
+              href="/auth/login"
+              className="hidden md:block px-3 py-2 text-sm font-semibold text-[#0F4C81] border border-[#0F4C81]/30 rounded-lg hover:bg-blue-50 transition"
+            >
+              Client Portal
+            </Link>
+            <Link
+              href="/auth/login?next=/hub/consultants"
+              className="hidden md:block px-3 py-2 text-sm font-semibold text-gray-600 border border-gray-300 rounded-lg hover:bg-gray-50 transition"
+            >
+              Consultants
             </Link>
             <Link href="/accounting/checkout?plan=silver" className="bg-[#0F4C81] hover:bg-[#082D4F] text-white px-5 py-2 rounded-lg text-sm font-bold transition shadow-sm">
               Get Started — $9/mo

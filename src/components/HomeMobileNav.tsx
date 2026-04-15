@@ -89,14 +89,29 @@ export default function HomeMobileNav() {
               >
                 Get SaaS — $9/mo
               </Link>
-              <Link
-                href="/auth/login"
-                onClick={close}
-                className="block w-full text-center py-3 rounded-xl font-semibold text-base transition-colors hover:bg-white/10 border"
-                style={{ borderColor: 'rgba(200,144,42,0.5)', color: '#C8902A' }}
-              >
-                Portal Login
-              </Link>
+
+              <div className="pt-1">
+                <p className="text-xs font-bold uppercase tracking-widest mb-2 px-1" style={{ color: 'rgba(255,255,255,0.35)' }}>
+                  Sign In
+                </p>
+                <Link
+                  href="/auth/login"
+                  onClick={close}
+                  className="block w-full text-center py-3 rounded-xl font-semibold text-base transition-colors hover:bg-white/10 border mb-2"
+                  style={{ borderColor: 'rgba(200,144,42,0.5)', color: '#C8902A' }}
+                >
+                  Client Portal
+                </Link>
+                <Link
+                  href="/auth/login?next=/hub/consultants"
+                  onClick={close}
+                  className="block w-full text-center py-3 rounded-xl font-semibold text-base transition-colors hover:bg-white/10 border"
+                  style={{ borderColor: 'rgba(255,255,255,0.25)', color: 'rgba(255,255,255,0.75)' }}
+                >
+                  IEBC Consultants
+                </Link>
+              </div>
+
               <a
                 href="https://calendly.com/new56money/30min"
                 target="_blank"

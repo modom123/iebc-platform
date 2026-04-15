@@ -13,6 +13,7 @@ function LoginForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const next = searchParams.get('next') || '/accounting'
+  const isConsultant = next.includes('/hub/consultants') || next.includes('consultant')
   const supabase = createClient()
 
   const handleLogin = async (e: React.FormEvent) => {
@@ -38,9 +39,18 @@ function LoginForm() {
             <div className="w-9 h-9 bg-[#0B2140] rounded-lg flex items-center justify-center">
               <span className="text-white font-black text-[10px] tracking-tight">IEBC</span>
             </div>
-            <span className="font-extrabold text-[#0B2140] text-lg">Efficient</span>
+            <span className="font-extrabold text-[#0B2140] text-lg">
+              {isConsultant ? 'Consultants' : 'Client Portal'}
+            </span>
           </Link>
-          <p className="text-gray-500 text-sm">Sign in to your portal</p>
+          <p className="text-gray-500 text-sm">
+            {isConsultant ? 'Sign in to the IEBC Consultant Hub' : 'Sign in to your client portal'}
+          </p>
+          {isConsultant && (
+            <div className="mt-3 inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-blue-50 text-[#0B2140] border border-blue-200">
+              <span>🤖</span> IEBC Consultant Access
+            </div>
+          )}
         </div>
 
         <form onSubmit={handleLogin} className="space-y-4">
@@ -93,18 +103,29 @@ function LoginForm() {
         </form>
 
         <div className="mt-6 pt-5 border-t border-gray-100 space-y-3 text-center">
-          <p className="text-sm text-gray-500">
-            New subscriber?{' '}
-            <Link href="/auth/signup" className="text-[#0B2140] font-semibold hover:underline">
-              Create your account
-            </Link>
-          </p>
-          <p className="text-xs text-gray-400">
-            Don&apos;t have a subscription yet?{' '}
-            <Link href="/accounting/checkout" className="text-[#C8902A] hover:underline font-medium">
-              Get started from $9/mo →
-            </Link>
-          </p>
+          {isConsultant ? (
+            <p className="text-sm text-gray-500">
+              Looking for the client portal?{' '}
+              <Link href="/auth/login" className="text-[#0B2140] font-semibold hover:underline">
+                Sign in here
+              </Link>
+            </p>
+          ) : (
+            <>
+              <p className="text-sm text-gray-500">
+                New subscriber?{' '}
+                <Link href="/auth/signup" className="text-[#0B2140] font-semibold hover:underline">
+                  Create your account
+                </Link>
+              </p>
+              <p className="text-xs text-gray-400">
+                Don&apos;t have a subscription yet?{' '}
+                <Link href="/accounting/checkout?plan=silver" className="text-[#C8902A] hover:underline font-medium">
+                  Get started from $9/mo →
+                </Link>
+              </p>
+            </>
+          )}
         </div>
 
         <div className="text-center mt-4">

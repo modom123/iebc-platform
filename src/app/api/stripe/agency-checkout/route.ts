@@ -103,12 +103,16 @@ export async function POST(req: Request) {
         ? `${appUrl}/checkout/hub/success?session_id={CHECKOUT_SESSION_ID}`
         : industryId.startsWith('website_')
           ? `${appUrl}/checkout/website/success?session_id={CHECKOUT_SESSION_ID}`
-          : `${appUrl}/checkout/industry/${industryId}/success?session_id={CHECKOUT_SESSION_ID}`,
+          : industryId.startsWith('bundle_')
+            ? `${appUrl}/checkout/bundle/success?session_id={CHECKOUT_SESSION_ID}&bundle=${encodeURIComponent(industryLabel)}`
+            : `${appUrl}/checkout/industry/${industryId}/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: industryId === 'business_hub'
         ? `${appUrl}/checkout/hub?canceled=true`
         : industryId.startsWith('website_')
           ? `${appUrl}/checkout/website?canceled=true`
-          : `${appUrl}/checkout/industry/${industryId}?canceled=true`,
+          : industryId.startsWith('bundle_')
+            ? `${appUrl}/checkout/bundle?canceled=true`
+            : `${appUrl}/checkout/industry/${industryId}?canceled=true`,
     })
 
     return NextResponse.json({ url: checkoutSession.url })

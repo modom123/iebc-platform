@@ -4,7 +4,7 @@ import { stripe } from '@/lib/stripe'
 export async function POST(req: Request) {
   if (!process.env.STRIPE_SECRET_KEY) {
     return NextResponse.json(
-      { error: 'Payment system is not yet configured. Please contact support at info@iebconsultants.com.' },
+      { error: 'Payment system is not yet configured. Please contact support at info@iebusinessconsultants.com.' },
       { status: 503 }
     )
   }

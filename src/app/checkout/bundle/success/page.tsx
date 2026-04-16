@@ -105,8 +105,8 @@ export default function BundleSuccessPage() {
 
         <p className="text-xs text-gray-400 mt-6">
           Questions? Email us at{' '}
-          <a href="mailto:info@iebconsultants.com" className="underline" style={{ color: '#0B2140' }}>
-            info@iebconsultants.com
+          <a href="mailto:info@iebusinessconsultants.com" className="underline" style={{ color: '#0B2140' }}>
+            info@iebusinessconsultants.com
           </a>
         </p>
       </div>

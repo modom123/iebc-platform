@@ -3,9 +3,9 @@ import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
 
 // Subdomain → path prefix mapping
-// e.g. app.iebconsultants.com  → rewrite to /accounting
-// e.g. hub.iebconsultants.com  → rewrite to /hub
-// e.g. portal.iebconsultants.com → rewrite to /portal
+// e.g. app.iebusinessconsultants.com  → rewrite to /accounting
+// e.g. hub.iebusinessconsultants.com  → rewrite to /hub
+// e.g. portal.iebusinessconsultants.com → rewrite to /portal
 const SUBDOMAIN_MAP: Record<string, string> = {
   app:        '/accounting',
   accounting: '/accounting',
@@ -18,7 +18,7 @@ function getSubdomain(request: NextRequest): string | null {
   const host = request.headers.get('host') || ''
   // Strip port if present (localhost:3000)
   const hostname = host.split(':')[0]
-  // e.g. "app.iebconsultants.com" → "app"
+  // e.g. "app.iebusinessconsultants.com" → "app"
   const parts = hostname.split('.')
   if (parts.length >= 3) return parts[0]
   // Handle Vercel preview URLs like "app-iebconsultants.vercel.app"
@@ -40,7 +40,7 @@ export async function middleware(request: NextRequest) {
 
   // ── Subdomain routing ──────────────────────────────────────────────
   // Known top-level sections — never prepend a subdomain prefix to these paths
-  // (e.g. app.iebconsultants.com/auth/login must NOT become /accounting/auth/login)
+  // (e.g. app.iebusinessconsultants.com/auth/login must NOT become /accounting/auth/login)
   const KNOWN_SECTIONS = [
     '/accounting', '/hub', '/portal', '/platform', '/efficient',
     '/checkout', '/auth', '/settings', '/admin', '/api', '/formation',

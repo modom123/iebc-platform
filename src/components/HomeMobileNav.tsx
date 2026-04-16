@@ -112,16 +112,14 @@ export default function HomeMobileNav() {
                 </Link>
               </div>
 
-              <a
-                href="https://calendly.com/new56money/30min"
-                target="_blank"
-                rel="noopener noreferrer"
+              <Link
+                href="/efficient"
                 onClick={close}
-                className="block w-full text-center py-3 rounded-xl font-bold text-base transition-colors hover:bg-white/10 border"
-                style={{ borderColor: 'rgba(255,255,255,0.3)', color: '#fff' }}
+                className="block w-full text-center py-3 rounded-xl font-bold text-base transition-opacity hover:opacity-90"
+                style={{ background: '#C8902A', color: '#fff' }}
               >
-                Book a Call
-              </a>
+                Get Efficient Accounting
+              </Link>
             </div>
           </nav>
         </div>

@@ -195,15 +195,13 @@ export default function AgencyHomepage() {
             >
               IEBC Consultants
             </Link>
-            <a
-              href="https://calendly.com/new56money/30min"
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              href="/efficient"
               className="hidden md:inline-block px-5 py-2 rounded-lg text-sm font-bold transition-opacity hover:opacity-90 shadow-md"
               style={{ background: '#C8902A', color: '#fff' }}
             >
-              Book a Call
-            </a>
+              Get Efficient Accounting
+            </Link>
             <HomeMobileNav />
           </div>
         </div>

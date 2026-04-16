@@ -110,7 +110,7 @@ export default async function Hub() {
         {/* ── Header ── */}
         <div className="flex items-start justify-between gap-4">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">
+            <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
               {profile?.full_name ? `Welcome back, ${profile.full_name.split(' ')[0]}` : 'Master Hub'}
             </h1>
             <p className="text-gray-400 text-sm mt-0.5">{session.user.email}</p>
@@ -161,10 +161,10 @@ export default async function Hub() {
               { label: 'Net Profit',          value: fmtShort(netProfit),     sub: netProfit >= 0 ? 'Profitable' : 'Net loss',   color: netProfit >= 0 ? 'text-green-700' : 'text-red-600', href: '/accounting/reports' },
               { label: 'Outstanding AR',      value: fmtShort(outstanding),   sub: overdueInvoices > 0 ? `${overdueInvoices} overdue` : 'No overdue', color: outstanding > 0 ? 'text-orange-600' : 'text-gray-500', href: '/accounting/invoices' },
             ].map((c, i) => (
-              <Link key={i} href={c.href} className="bg-white p-5 rounded-xl border border-gray-200 hover:border-[#0F4C81] hover:shadow-sm transition">
-                <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">{c.label}</p>
-                <p className={`text-2xl font-bold mt-1 ${c.color}`}>{c.value}</p>
-                <p className="text-xs text-gray-400 mt-1">{c.sub}</p>
+              <Link key={i} href={c.href} className="bg-white p-3 sm:p-5 rounded-xl border border-gray-200 hover:border-[#0F4C81] hover:shadow-sm transition">
+                <p className="text-[10px] sm:text-xs text-gray-500 font-medium uppercase tracking-wide truncate">{c.label}</p>
+                <p className={`text-xl sm:text-2xl font-bold mt-1 ${c.color}`}>{c.value}</p>
+                <p className="text-[10px] sm:text-xs text-gray-400 mt-1 truncate">{c.sub}</p>
               </Link>
             ))}
           </div>
@@ -182,9 +182,9 @@ export default async function Hub() {
             { href: '/hub/documents', icon: '📁', label: 'Documents', sub: 'Vault & file storage' },
             { href: '/accounting/payroll', icon: '👔', label: 'Payroll', sub: 'Run employee payroll' },
           ].map(({ href, icon, label, sub }) => (
-            <Link key={href} href={href} className="bg-white border border-gray-200 rounded-xl p-4 flex items-center gap-3 hover:border-[#0F4C81] hover:shadow-sm transition">
-              <span className="text-2xl">{icon}</span>
-              <div><p className="font-semibold text-sm">{label}</p><p className="text-xs text-gray-400">{sub}</p></div>
+            <Link key={href} href={href} className="bg-white border border-gray-200 rounded-xl p-3 sm:p-4 flex items-center gap-2 sm:gap-3 hover:border-[#0F4C81] hover:shadow-sm transition">
+              <span className="text-xl sm:text-2xl shrink-0">{icon}</span>
+              <div className="min-w-0"><p className="font-semibold text-xs sm:text-sm truncate">{label}</p><p className="text-xs text-gray-400 truncate hidden sm:block">{sub}</p></div>
             </Link>
           ))}
         </div>
@@ -199,9 +199,9 @@ export default async function Hub() {
               { label: 'Tasks Overdue',  value: String(overdueTasks),         color: overdueTasks > 0 ? 'text-red-600' : 'text-gray-400', href: '/hub/tasks' },
               { label: 'Pipeline Value', value: fmtShort(pipelineValue),      color: 'text-green-700', href: '/hub/leads' },
             ].map((c, i) => (
-              <Link key={i} href={c.href} className="bg-white p-5 rounded-xl border border-gray-200 hover:border-[#0F4C81] hover:shadow-sm transition">
-                <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">{c.label}</p>
-                <p className={`text-2xl font-bold mt-1 ${c.color}`}>{c.value}</p>
+              <Link key={i} href={c.href} className="bg-white p-3 sm:p-5 rounded-xl border border-gray-200 hover:border-[#0F4C81] hover:shadow-sm transition">
+                <p className="text-[10px] sm:text-xs text-gray-500 font-medium uppercase tracking-wide truncate">{c.label}</p>
+                <p className={`text-xl sm:text-2xl font-bold mt-1 ${c.color}`}>{c.value}</p>
               </Link>
             ))}
           </div>
@@ -313,7 +313,7 @@ export default async function Hub() {
                     {recentTx.map(t => (
                       <tr key={t.id} className="hover:bg-gray-50">
                         <td className="p-2 sm:p-3 text-gray-400 text-xs">{t.date}</td>
-                        <td className="p-2 sm:p-3 font-medium text-gray-800 truncate max-w-[160px]">{t.description}</td>
+                        <td className="p-2 sm:p-3 font-medium text-gray-800 truncate max-w-[80px] sm:max-w-[160px]">{t.description}</td>
                         <td className="p-2 sm:p-3 hidden sm:table-cell">
                           <span className="px-2 py-0.5 bg-gray-100 rounded text-xs text-gray-500">{t.category || 'Uncategorized'}</span>
                         </td>

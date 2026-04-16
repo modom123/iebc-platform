@@ -65,7 +65,6 @@ export async function POST(req: Request) {
 
     if (existingProfile?.id) {
       userId = existingProfile.id
-      // Existing user — update their plan info
       await supabase.from('profiles').update({
         plan,
         stripe_customer_id: stripeCustomerId,
@@ -73,25 +72,22 @@ export async function POST(req: Request) {
         billing_address: JSON.stringify(billingAddress),
       }).eq('id', userId)
     } else {
-      // New user — send invite email so they can set their password
-      const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://iebusinessconsultants.com'
-      const { data: invited, error: inviteErr } = await supabase.auth.admin.inviteUserByEmail(email, {
-        data: {
-          full_name: name,
-          plan,
-          stripe_customer_id: stripeCustomerId,
-        },
-        redirectTo: `${appUrl}/auth/callback?next=/accounting`,
+      // New user — create with the password they set during checkout (from metadata)
+      const password = session.metadata?.account_password
+      const { data: created, error: createErr } = await supabase.auth.admin.createUser({
+        email,
+        password: password || undefined,
+        email_confirm: true,
+        user_metadata: { full_name: name, plan, stripe_customer_id: stripeCustomerId },
       })
 
-      if (inviteErr || !invited?.user) {
-        console.error('Failed to invite user:', inviteErr)
+      if (createErr || !created?.user) {
+        console.error('Failed to create user:', createErr)
         return NextResponse.json({ received: true })
       }
 
-      userId = invited.user.id
+      userId = created.user.id
 
-      // Save profile record
       await supabase.from('profiles').upsert({
         id: userId,
         email,

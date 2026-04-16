@@ -1,20 +1,16 @@
 import { NextResponse } from 'next/server'
 import { stripe } from '@/lib/stripe'
 
-// Stripe Price IDs — create these in your Stripe Dashboard:
-//   Products → Add product → add monthly recurring price
-// Then set env vars: STRIPE_PRICE_SILVER, STRIPE_PRICE_GOLD, STRIPE_PRICE_PLATINUM
 const PRICE_IDS: Record<string, string> = {
   silver:   process.env.STRIPE_PRICE_SILVER   || '',
   gold:     process.env.STRIPE_PRICE_GOLD     || '',
   platinum: process.env.STRIPE_PRICE_PLATINUM || '',
 }
 
-// Fallback amounts in cents if price IDs not yet configured
 const PLAN_AMOUNTS: Record<string, number> = {
-  silver:   900,   // $9/mo
-  gold:     2200,  // $22/mo
-  platinum: 4200,  // $42/mo
+  silver:   900,
+  gold:     2200,
+  platinum: 4200,
 }
 
 const PLAN_NAMES: Record<string, string> = {
@@ -33,11 +29,12 @@ export async function POST(req: Request) {
 
   try {
     const body = await req.json()
-    const { plan, name, email, phone, billing_address } = body as {
+    const { plan, name, email, phone, password, billing_address } = body as {
       plan: string
       name: string
       email: string
       phone?: string
+      password?: string
       billing_address?: { street: string; city: string; state: string; zip: string }
     }
 
@@ -49,7 +46,6 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Invalid plan' }, { status: 400 })
     }
 
-    // Create or find Stripe customer
     const customer = await stripe.customers.create({
       name,
       email,
@@ -67,7 +63,6 @@ export async function POST(req: Request) {
     const priceId = PRICE_IDS[plan]
     const hasPrice = priceId && priceId.trim() !== ''
 
-    // Build line items — use configured Price ID if available, otherwise inline price
     const lineItems = hasPrice
       ? [{ price: priceId, quantity: 1 }]
       : [{
@@ -91,15 +86,15 @@ export async function POST(req: Request) {
         trial_period_days: 7,
         metadata: { plan },
       },
-      // Collect billing address on Stripe's side too
       billing_address_collection: 'required',
-      // Collect phone
       phone_number_collection: { enabled: true },
       metadata: {
         plan,
         customer_name: name,
         customer_email: email,
         customer_phone: phone || '',
+        // password stored in metadata so success page can create account immediately
+        account_password: password || '',
         billing_street: billing_address?.street || '',
         billing_city: billing_address?.city || '',
         billing_state: billing_address?.state || '',

@@ -68,6 +68,7 @@ const NAV_SECTIONS = [
       { href: '/hub/team', icon: '◉', label: 'Team Members' },
       { href: '/hub/formation', icon: '⌂', label: 'Business Formation' },
       { href: '/hub/documents', icon: '⊞', label: 'Document Vault' },
+      { href: '/hub/social', icon: '📱', label: 'Social Optimize' },
     ],
   },
 ]

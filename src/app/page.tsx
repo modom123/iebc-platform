@@ -72,6 +72,19 @@ const SERVICES = [
     accent: '#7C3AED',
     bg: 'rgba(124,58,237,0.04)',
   },
+  {
+    num: '06',
+    icon: '📱',
+    title: 'Social Optimize',
+    subtitle: 'Find, grow, and engage your audience.',
+    body: 'We run your social media across YouTube, Facebook, LinkedIn, TikTok, and Instagram — content creation, posting, engagement, and analytics. Your brand grows while you focus on your business.',
+    features: ['YouTube · Facebook · LinkedIn · TikTok · Instagram', 'Content creation, scheduling & publishing', 'Comment & DM engagement management', 'Monthly analytics reports & AI recommendations'],
+    detail: 'from $299/mo · up to all 5 platforms',
+    cta: 'Get Social Optimize',
+    href: '/checkout/social-optimize',
+    accent: '#D946EF',
+    bg: 'rgba(217,70,239,0.04)',
+  },
 ]
 
 
@@ -328,10 +341,10 @@ export default function AgencyHomepage() {
               className={`${playfair.className} text-2xl sm:text-3xl md:text-4xl font-bold`}
               style={{ color: '#0B2140' }}
             >
-              Five services. One integrated system.
+              Six services. One integrated system.
             </h2>
             <p className="text-gray-500 mt-4 max-w-xl mx-auto">
-              Every engagement includes all five services — custom-built for your business, delivered as
+              Every engagement includes all six services — custom-built for your business, delivered as
               one integrated system.
             </p>
           </div>
@@ -695,6 +708,7 @@ export default function AgencyHomepage() {
                     ['Automated Business Hubs', '#services'],
                     ['IEBC Automated Workflow', '#services'],
                     ['Intelligent Infrastructure', '#services'],
+                    ['Social Optimize', '/checkout/social-optimize'],
                   ],
                 ],
                 [

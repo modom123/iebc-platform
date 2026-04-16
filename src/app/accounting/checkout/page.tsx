@@ -79,6 +79,12 @@ const US_STATES = [
   'VA','WA','WV','WI','WY','DC',
 ]
 
+const STRIPE_LINKS: Record<string, string> = {
+  silver:   process.env.NEXT_PUBLIC_STRIPE_LINK_SILVER   || '',
+  gold:     process.env.NEXT_PUBLIC_STRIPE_LINK_GOLD     || '',
+  platinum: process.env.NEXT_PUBLIC_STRIPE_LINK_PLATINUM || '',
+}
+
 function CheckoutContent() {
   const searchParams = useSearchParams()
   const [step, setStep] = useState<1 | 2>(1)
@@ -121,15 +127,7 @@ function CheckoutContent() {
     setLoading(true)
     setError('')
 
-    // Direct Stripe payment links — no server API key needed.
-    // Set NEXT_PUBLIC_STRIPE_LINK_SILVER / _GOLD / _PLATINUM in Vercel env vars.
-    const PLAN_LINKS: Record<string, string> = {
-      silver:   process.env.NEXT_PUBLIC_STRIPE_LINK_SILVER   || '',
-      gold:     process.env.NEXT_PUBLIC_STRIPE_LINK_GOLD     || '',
-      platinum: process.env.NEXT_PUBLIC_STRIPE_LINK_PLATINUM || '',
-    }
-
-    const directLink = PLAN_LINKS[selectedPlan]
+    const directLink = STRIPE_LINKS[selectedPlan]
     if (directLink) {
       try {
         const url = new URL(directLink)
@@ -309,6 +307,24 @@ function CheckoutContent() {
                 <button onClick={() => setStep(1)} className="text-xs text-[#0F4C81] hover:underline">Change</button>
               </div>
             </div>
+
+            {!STRIPE_LINKS[plan.id] && !error && (
+              <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-4 space-y-2 mb-2">
+                <p className="font-semibold text-amber-800 text-sm">Payment setup in progress</p>
+                <p className="text-amber-700 text-sm">
+                  Book a quick call and we&apos;ll activate your {plan.label} plan right away — no wait.
+                </p>
+                <a
+                  href="https://calendly.com/new56money/30min"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="block text-center py-2.5 rounded-lg font-bold text-sm transition-opacity hover:opacity-90"
+                  style={{ background: '#C9A02E', color: '#fff' }}
+                >
+                  Book a Call to Subscribe — {plan.price}/mo →
+                </a>
+              </div>
+            )}
 
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Name */}

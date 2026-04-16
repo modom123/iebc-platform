@@ -5,7 +5,15 @@ import Link from 'next/link'
 const fmt = (n: number) => '$' + Number(n).toLocaleString('en-US', { minimumFractionDigits: 2 })
 
 export default async function AdminPage() {
-  const supabase = createServerSupabaseClient()
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    redirect('/auth/login')
+  }
+  let supabase: ReturnType<typeof createServerSupabaseClient>
+  try {
+    supabase = createServerSupabaseClient()
+  } catch {
+    redirect('/auth/login')
+  }
   const { data: { session } } = await supabase.auth.getSession()
   if (!session) redirect('/auth/login')
 

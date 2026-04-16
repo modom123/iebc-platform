@@ -3,7 +3,15 @@ import { createServerSupabaseClient } from '@/lib/supabase/server'
 
 // Public payment endpoint — no session required
 export async function POST(req: NextRequest) {
-  const supabase = createServerSupabaseClient()
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    return NextResponse.json({ error: 'Service unavailable' }, { status: 503 })
+  }
+  let supabase: ReturnType<typeof createServerSupabaseClient>
+  try {
+    supabase = createServerSupabaseClient()
+  } catch {
+    return NextResponse.json({ error: 'Service unavailable' }, { status: 503 })
+  }
 
   const { token, invoice_id, method, amount } = await req.json()
 

@@ -6,7 +6,15 @@ import { MonthlyBarChart, DonutChart } from '@/components/Charts'
 const DONUT_COLORS = ['#0F4C81','#2563eb','#7c3aed','#db2777','#ea580c','#16a34a']
 
 export default async function Accounting() {
-  const supabase = createServerSupabaseClient()
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    redirect('/auth/login')
+  }
+  let supabase: ReturnType<typeof createServerSupabaseClient>
+  try {
+    supabase = createServerSupabaseClient()
+  } catch {
+    redirect('/auth/login')
+  }
   const { data: { session } } = await supabase.auth.getSession()
   if (!session) redirect('/auth/login')
 

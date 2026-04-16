@@ -80,7 +80,7 @@ const SERVICES = [
     body: 'We run your social media across YouTube, Facebook, LinkedIn, TikTok, and Instagram — content creation, posting, engagement, and analytics. Your brand grows while you focus on your business.',
     features: ['YouTube · Facebook · LinkedIn · TikTok · Instagram', 'Content creation, scheduling & publishing', 'Comment & DM engagement management', 'Monthly analytics reports & AI recommendations'],
     detail: 'from $299/mo · up to all 5 platforms',
-    cta: 'Get Social Optimize',
+    cta: 'Social Optimize',
     href: '/checkout/social-optimize',
     accent: '#D946EF',
     bg: 'rgba(217,70,239,0.04)',
@@ -413,7 +413,7 @@ export default function AgencyHomepage() {
               style={{ background: '#0B2140', borderTop: '3px solid #C8902A' }}
             >
               <p className={`${playfair.className} text-xl font-bold text-white mb-3`}>
-                All 5 Services.
+                All 6 Services.
                 <br />
                 One Engagement.
               </p>

@@ -65,14 +65,14 @@ export default function ClientPortalView({ invoice, token }: { invoice: Invoice;
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#0F4C81] via-blue-700 to-blue-800 flex items-start justify-center py-10 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-[#0F4C81] via-blue-700 to-blue-800 flex items-start justify-center py-6 sm:py-10 px-4">
       <div className="w-full max-w-2xl space-y-4">
 
         {/* Header Bar */}
         <div className="flex items-center justify-between">
           <div className="text-white">
             <p className="text-xs text-blue-200 uppercase tracking-wider font-medium">Secure Payment Portal</p>
-            <h1 className="text-2xl font-bold">Invoice {invoice.invoice_number}</h1>
+            <h1 className="text-lg sm:text-2xl font-bold">Invoice {invoice.invoice_number}</h1>
           </div>
           <div className="bg-white/10 rounded-lg px-3 py-1.5 text-white text-xs font-medium backdrop-blur-sm">
             🔒 SSL Secured
@@ -98,7 +98,7 @@ export default function ClientPortalView({ invoice, token }: { invoice: Invoice;
           )}
 
           {/* Invoice Details */}
-          <div className="p-6 md:p-8 space-y-6">
+          <div className="p-4 sm:p-6 md:p-8 space-y-6">
 
             {/* Bill To */}
             <div>
@@ -112,19 +112,19 @@ export default function ClientPortalView({ invoice, token }: { invoice: Invoice;
               <table className="w-full text-sm">
                 <thead>
                   <tr className="bg-gray-50 text-gray-400 text-xs uppercase">
-                    <th className="px-4 py-3 text-left">Description</th>
-                    <th className="px-4 py-3 text-right">Qty</th>
-                    <th className="px-4 py-3 text-right">Unit Price</th>
-                    <th className="px-4 py-3 text-right">Amount</th>
+                    <th className="px-2 sm:px-4 py-2 sm:py-3 text-left">Description</th>
+                    <th className="px-2 sm:px-4 py-2 sm:py-3 text-right">Qty</th>
+                    <th className="px-2 sm:px-4 py-2 sm:py-3 text-right hidden sm:table-cell">Unit Price</th>
+                    <th className="px-2 sm:px-4 py-2 sm:py-3 text-right">Amount</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-50">
                   {(invoice.invoice_line_items || []).map((line, i) => (
                     <tr key={line.id || i}>
-                      <td className="px-4 py-3 text-gray-700">{line.description}</td>
-                      <td className="px-4 py-3 text-right text-gray-500">{line.quantity}</td>
-                      <td className="px-4 py-3 text-right text-gray-500 font-mono">{fmt(line.unit_price)}</td>
-                      <td className="px-4 py-3 text-right font-mono font-medium">{fmt(line.quantity * line.unit_price)}</td>
+                      <td className="px-2 sm:px-4 py-2 sm:py-3 text-gray-700 text-sm">{line.description}</td>
+                      <td className="px-2 sm:px-4 py-2 sm:py-3 text-right text-gray-500 text-sm">{line.quantity}</td>
+                      <td className="px-2 sm:px-4 py-2 sm:py-3 text-right text-gray-500 font-mono text-sm hidden sm:table-cell">{fmt(line.unit_price)}</td>
+                      <td className="px-2 sm:px-4 py-2 sm:py-3 text-right font-mono font-medium text-sm">{fmt(line.quantity * line.unit_price)}</td>
                     </tr>
                   ))}
                 </tbody>
@@ -139,7 +139,7 @@ export default function ClientPortalView({ invoice, token }: { invoice: Invoice;
                     <span className="font-mono">{fmt(invoice.tax_amount)}</span>
                   </div>
                 )}
-                <div className="flex justify-between font-bold text-lg text-gray-900 pt-1 border-t border-gray-200 mt-1">
+                <div className="flex justify-between font-bold text-base sm:text-lg text-gray-900 pt-1 border-t border-gray-200 mt-1">
                   <span>Total Due</span>
                   <span className="font-mono text-[#0F4C81]">{fmt(invoice.total)}</span>
                 </div>
@@ -165,18 +165,18 @@ export default function ClientPortalView({ invoice, token }: { invoice: Invoice;
               <div className="space-y-4">
                 <p className="font-semibold text-gray-800 text-sm">Select Payment Method</p>
 
-                <div className="grid grid-cols-2 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                   <button
                     onClick={() => setPayMethod(payMethod === 'card' ? null : 'card')}
-                    className={`border-2 rounded-xl p-4 text-center transition ${payMethod === 'card' ? 'border-[#0F4C81] bg-blue-50' : 'border-gray-200 hover:border-blue-300'}`}>
-                    <div className="text-2xl mb-1">💳</div>
+                    className={`border-2 rounded-xl p-3 sm:p-4 text-center transition ${payMethod === 'card' ? 'border-[#0F4C81] bg-blue-50' : 'border-gray-200 hover:border-blue-300'}`}>
+                    <div className="text-xl sm:text-2xl mb-1">💳</div>
                     <div className="text-sm font-semibold text-gray-700">Credit / Debit Card</div>
                     <div className="text-xs text-gray-400">Visa, MC, Amex</div>
                   </button>
                   <button
                     onClick={() => setPayMethod(payMethod === 'ach' ? null : 'ach')}
-                    className={`border-2 rounded-xl p-4 text-center transition ${payMethod === 'ach' ? 'border-[#0F4C81] bg-blue-50' : 'border-gray-200 hover:border-blue-300'}`}>
-                    <div className="text-2xl mb-1">🏦</div>
+                    className={`border-2 rounded-xl p-3 sm:p-4 text-center transition ${payMethod === 'ach' ? 'border-[#0F4C81] bg-blue-50' : 'border-gray-200 hover:border-blue-300'}`}>
+                    <div className="text-xl sm:text-2xl mb-1">🏦</div>
                     <div className="text-sm font-semibold text-gray-700">Bank Transfer (ACH)</div>
                     <div className="text-xs text-gray-400">Free · 1-3 business days</div>
                   </button>

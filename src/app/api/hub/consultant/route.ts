@@ -87,6 +87,10 @@ const ALL_DEPARTMENTS = Object.keys(PERSONAS)
 type MessageParam = { role: 'user' | 'assistant'; content: string }
 
 export async function POST(req: NextRequest) {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    return NextResponse.json({ error: 'Service unavailable' }, { status: 503 })
+  }
+
   const supabase = createServerSupabaseClient()
   const { data: { session } } = await supabase.auth.getSession()
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

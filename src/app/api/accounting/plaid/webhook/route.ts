@@ -9,6 +9,10 @@ export async function POST(req: NextRequest) {
     const { webhook_type, webhook_code, item_id } = body
 
     if (webhook_type === 'TRANSACTIONS') {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    return NextResponse.json({ error: 'Service unavailable' }, { status: 503 })
+  }
+
       const supabase = createServerSupabaseClient()
 
       // Find which user owns this item

@@ -7,8 +7,15 @@ export async function GET(request: Request) {
   const next = searchParams.get('next') ?? '/accounting'
 
   if (code) {
-    const supabase = createServerSupabaseClient()
-    await supabase.auth.exchangeCodeForSession(code)
+    try {
+      const supabase = createServerSupabaseClient()
+      const { error } = await supabase.auth.exchangeCodeForSession(code)
+      if (error) {
+        return NextResponse.redirect(`${origin}/auth/login?error=callback_failed`)
+      }
+    } catch {
+      return NextResponse.redirect(`${origin}/auth/login?error=callback_failed`)
+    }
   }
 
   return NextResponse.redirect(`${origin}${next}`)

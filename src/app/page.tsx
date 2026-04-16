@@ -195,15 +195,13 @@ export default function AgencyHomepage() {
             >
               IEBC Consultants
             </Link>
-            <a
-              href="https://calendly.com/new56money/30min"
-              target="_blank"
-              rel="noopener noreferrer"
+            <Link
+              href="/efficient"
               className="hidden md:inline-block px-5 py-2 rounded-lg text-sm font-bold transition-opacity hover:opacity-90 shadow-md"
               style={{ background: '#C8902A', color: '#fff' }}
             >
-              Book a Call
-            </a>
+              Get Efficient Accounting
+            </Link>
             <HomeMobileNav />
           </div>
         </div>
@@ -237,7 +235,7 @@ export default function AgencyHomepage() {
           </div>
 
           <h1
-            className={`${playfair.className} text-5xl md:text-7xl font-black leading-[1.05] mb-8`}
+            className={`${playfair.className} text-4xl sm:text-5xl md:text-7xl font-black leading-[1.05] mb-8`}
             style={{ color: '#fff' }}
           >
             Control.{' '}
@@ -247,7 +245,7 @@ export default function AgencyHomepage() {
           </h1>
 
           <p
-            className="text-lg md:text-xl max-w-2xl mx-auto mb-3 leading-relaxed"
+            className="text-base sm:text-lg md:text-xl max-w-2xl mx-auto mb-3 leading-relaxed"
             style={{ color: 'rgba(255,255,255,0.75)' }}
           >
             We build custom automated business systems — websites, operations hubs, and financial
@@ -257,19 +255,19 @@ export default function AgencyHomepage() {
             Delivered in 6 weeks. Built for your industry.
           </p>
 
-          <div className="flex flex-wrap gap-3 justify-center mb-12">
+          <div className="flex flex-col sm:flex-row flex-wrap gap-3 justify-center mb-12">
             <a
               href="https://calendly.com/new56money/30min"
               target="_blank"
               rel="noopener noreferrer"
-              className="px-9 py-4 rounded-xl font-bold text-base transition-opacity hover:opacity-90 shadow-xl"
+              className="px-7 sm:px-9 py-3.5 sm:py-4 rounded-xl font-bold text-base transition-opacity hover:opacity-90 shadow-xl text-center"
               style={{ background: '#C8902A', color: '#fff' }}
             >
               Book a Free Strategy Call
             </a>
             <a
               href="#services"
-              className="px-9 py-4 rounded-xl font-bold text-base border transition-colors hover:bg-white/10"
+              className="px-7 sm:px-9 py-3.5 sm:py-4 rounded-xl font-bold text-base border transition-colors hover:bg-white/10 text-center"
               style={{ borderColor: 'rgba(255,255,255,0.3)', color: '#fff' }}
             >
               See Our Services
@@ -307,7 +305,7 @@ export default function AgencyHomepage() {
               ['7+', 'industries served'],
             ].map(([value, label], i) => (
               <div key={i}>
-                <p className={`${playfair.className} text-3xl font-bold`} style={{ color: '#C8902A' }}>
+                <p className={`${playfair.className} text-2xl sm:text-3xl font-bold`} style={{ color: '#C8902A' }}>
                   {value}
                 </p>
                 <p className="text-xs mt-1" style={{ color: 'rgba(255,255,255,0.45)' }}>
@@ -327,7 +325,7 @@ export default function AgencyHomepage() {
               What We Build
             </p>
             <h2
-              className={`${playfair.className} text-3xl md:text-4xl font-bold`}
+              className={`${playfair.className} text-2xl sm:text-3xl md:text-4xl font-bold`}
               style={{ color: '#0B2140' }}
             >
               Five services. One integrated system.
@@ -443,7 +441,7 @@ export default function AgencyHomepage() {
               Process
             </p>
             <h2
-              className={`${playfair.className} text-3xl md:text-4xl font-bold`}
+              className={`${playfair.className} text-2xl sm:text-3xl md:text-4xl font-bold`}
               style={{ color: '#0B2140' }}
             >
               From strategy call to live system in 6 weeks.
@@ -519,7 +517,7 @@ export default function AgencyHomepage() {
               Investment
             </p>
             <h2
-              className={`${playfair.className} text-3xl md:text-4xl font-bold text-white`}
+              className={`${playfair.className} text-2xl sm:text-3xl md:text-4xl font-bold text-white`}
             >
               Simple, transparent pricing.
             </h2>
@@ -560,7 +558,7 @@ export default function AgencyHomepage() {
                 </p>
 
                 <div className="mb-1">
-                  <span className={`${playfair.className} text-4xl font-black`}>{p.setup}</span>
+                  <span className={`${playfair.className} text-3xl sm:text-4xl font-black`}>{p.setup}</span>
                   <span
                     className="text-sm ml-1.5"
                     style={{ color: p.highlight ? '#999' : 'rgba(255,255,255,0.4)' }}
@@ -621,7 +619,7 @@ export default function AgencyHomepage() {
               Get Started
             </p>
             <h2
-              className={`${playfair.className} text-3xl md:text-4xl font-bold mb-3`}
+              className={`${playfair.className} text-2xl sm:text-3xl md:text-4xl font-bold mb-3`}
               style={{ color: '#0B2140' }}
             >
               Tell us about your business.
@@ -666,7 +664,7 @@ export default function AgencyHomepage() {
         style={{ background: '#0B2140', borderTop: '1px solid rgba(200,144,42,0.15)' }}
       >
         <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-10">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-10 mb-10">
             <div>
               <div className="flex items-center gap-2 mb-4">
                 <div

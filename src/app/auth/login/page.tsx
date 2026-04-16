@@ -14,19 +14,24 @@ function LoginForm() {
   const searchParams = useSearchParams()
   const next = searchParams.get('next') || '/accounting'
   const isConsultant = next.includes('/hub/consultants') || next.includes('consultant')
-  const supabase = createClient()
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError('')
-    const { error } = await supabase.auth.signInWithPassword({ email, password })
-    if (error) {
-      setError(error.message)
+    try {
+      const supabase = createClient()
+      const { error } = await supabase.auth.signInWithPassword({ email, password })
+      if (error) {
+        setError(error.message)
+      } else {
+        router.push(next)
+        router.refresh()
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Authentication service unavailable. Please try again.')
+    } finally {
       setLoading(false)
-    } else {
-      router.push(next)
-      router.refresh()
     }
   }
 

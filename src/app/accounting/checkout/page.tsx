@@ -122,11 +122,11 @@ function CheckoutContent() {
     setError('')
 
     // Direct Stripe payment links — no server API key needed.
-    // Set NEXT_PUBLIC_STRIPE_LINK_SILVER / _GOLD / _PLATINUM in Vercel env vars.
+    // Env vars override the hardcoded fallbacks if set in Vercel.
     const PLAN_LINKS: Record<string, string> = {
-      silver:   process.env.NEXT_PUBLIC_STRIPE_LINK_SILVER   || '',
-      gold:     process.env.NEXT_PUBLIC_STRIPE_LINK_GOLD     || '',
-      platinum: process.env.NEXT_PUBLIC_STRIPE_LINK_PLATINUM || '',
+      silver:   process.env.NEXT_PUBLIC_STRIPE_LINK_SILVER   || 'https://buy.stripe.com/dRm7sF9Hr6kNbx0frVgEg03',
+      gold:     process.env.NEXT_PUBLIC_STRIPE_LINK_GOLD     || 'https://buy.stripe.com/4gM8wJ8Dn10teJc6VpgEg02',
+      platinum: process.env.NEXT_PUBLIC_STRIPE_LINK_PLATINUM || 'https://buy.stripe.com/bJe14h1aVeRj58CfrVgEg01',
     }
 
     const directLink = PLAN_LINKS[selectedPlan]

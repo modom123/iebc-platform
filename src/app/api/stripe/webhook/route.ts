@@ -37,7 +37,8 @@ export async function POST(req: Request) {
     const email = session.customer_details?.email ?? session.metadata?.customer_email ?? ''
     const name = session.customer_details?.name ?? session.metadata?.customer_name ?? ''
     const phone = session.customer_details?.phone ?? session.metadata?.customer_phone ?? ''
-    const plan = session.metadata?.plan ?? ''
+    // client_reference_id carries the plan when using direct Stripe payment links
+    const plan = session.metadata?.plan ?? session.client_reference_id ?? ''
     const stripeCustomerId = typeof session.customer === 'string' ? session.customer : ''
     const stripeSubId = typeof session.subscription === 'string' ? session.subscription : ''
 

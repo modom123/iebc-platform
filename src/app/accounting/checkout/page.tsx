@@ -121,6 +121,29 @@ function CheckoutContent() {
     setLoading(true)
     setError('')
 
+    // Direct Stripe payment links — no server API key needed.
+    // Set NEXT_PUBLIC_STRIPE_LINK_SILVER / _GOLD / _PLATINUM in Vercel env vars.
+    const PLAN_LINKS: Record<string, string> = {
+      silver:   process.env.NEXT_PUBLIC_STRIPE_LINK_SILVER   || '',
+      gold:     process.env.NEXT_PUBLIC_STRIPE_LINK_GOLD     || '',
+      platinum: process.env.NEXT_PUBLIC_STRIPE_LINK_PLATINUM || '',
+    }
+
+    const directLink = PLAN_LINKS[selectedPlan]
+    if (directLink) {
+      try {
+        const url = new URL(directLink)
+        if (form.email) url.searchParams.set('prefilled_email', form.email)
+        // Pass plan so the webhook can identify which subscription was purchased
+        url.searchParams.set('client_reference_id', selectedPlan)
+        window.location.href = url.toString()
+        return
+      } catch {
+        // Invalid URL — fall through to API checkout
+      }
+    }
+
+    // Fallback: API-based checkout (requires STRIPE_SECRET_KEY in Vercel)
     try {
       const res = await fetch('/api/stripe/checkout', {
         method: 'POST',

@@ -113,6 +113,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ url: checkoutSession.url })
   } catch (error) {
     console.error('Stripe Checkout Error:', error)
-    return NextResponse.json({ error: 'Checkout failed. Please try again.' }, { status: 500 })
+    const message = error instanceof Error ? error.message : 'Checkout failed. Please try again.'
+    return NextResponse.json({ error: message }, { status: 500 })
   }
 }

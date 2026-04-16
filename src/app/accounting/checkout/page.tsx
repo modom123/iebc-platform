@@ -185,12 +185,15 @@ function CheckoutContent() {
             <span className="font-extrabold text-[#0F4C81] text-lg">IEBC</span>
             <span className="text-gray-400 text-sm">/ Efficient SaaS</span>
           </Link>
-          <div className="flex items-center gap-2 text-xs text-gray-400">
+          <div className="hidden sm:flex items-center gap-2 text-xs text-gray-400">
             <span className={`font-semibold ${step === 1 ? 'text-[#0F4C81]' : 'text-gray-400'}`}>1. Choose Plan</span>
             <span className="mx-1">→</span>
             <span className={`font-semibold ${step === 2 ? 'text-[#0F4C81]' : 'text-gray-400'}`}>2. Your Info</span>
             <span className="mx-1">→</span>
             <span className="text-gray-300 font-semibold">3. Payment</span>
+          </div>
+          <div className="sm:hidden text-xs font-semibold text-[#0F4C81]">
+            Step {step} of 3
           </div>
         </div>
       </div>
@@ -207,7 +210,7 @@ function CheckoutContent() {
           <>
             <div className="text-center mb-10">
               <p className="text-xs font-bold text-[#C9A02E] uppercase tracking-widest mb-2">Step 1 of 3</p>
-              <h1 className="text-3xl font-extrabold text-gray-900 mb-2">Choose your plan</h1>
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-2">Choose your plan</h1>
               <p className="text-gray-500">All plans include a <span className="font-semibold text-gray-700">7-day free trial</span>. No charge until day 8.</p>
             </div>
 
@@ -244,7 +247,7 @@ function CheckoutContent() {
                           'bg-blue-50 text-[#0F4C81] border border-blue-200'
                         }`}>{p.label}</span>
                         <div className="flex items-baseline gap-1">
-                          <span className="text-4xl font-extrabold text-gray-900">{p.price}</span>
+                          <span className="text-3xl sm:text-4xl font-extrabold text-gray-900">{p.price}</span>
                           <span className="text-gray-400 text-sm">{p.period}</span>
                         </div>
                         <p className="text-sm text-gray-500 mt-1">{p.desc}</p>
@@ -287,12 +290,12 @@ function CheckoutContent() {
           <div className="max-w-xl mx-auto">
             <div className="text-center mb-8">
               <p className="text-xs font-bold text-[#C9A02E] uppercase tracking-widest mb-2">Step 2 of 3</p>
-              <h1 className="text-3xl font-extrabold text-gray-900 mb-2">Your information</h1>
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-gray-900 mb-2">Your information</h1>
               <p className="text-gray-500">We&apos;ll use this to set up your account after payment.</p>
             </div>
 
             {/* Plan summary */}
-            <div className="bg-white rounded-xl border border-gray-200 p-4 mb-6 flex items-center justify-between">
+            <div className="bg-white rounded-xl border border-gray-200 p-4 mb-6 flex flex-wrap items-center justify-between gap-2">
               <div>
                 <span className={`inline-block px-2.5 py-0.5 rounded-md text-xs font-bold mr-2 ${
                   plan.id === 'silver' ? 'bg-slate-100 text-slate-600' :
@@ -363,7 +366,7 @@ function CheckoutContent() {
                     placeholder="Street address"
                     className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F4C81] focus:border-transparent"
                   />
-                  <div className="grid grid-cols-2 gap-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <input
                       name="city"
                       type="text"

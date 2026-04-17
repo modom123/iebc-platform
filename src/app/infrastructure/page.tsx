@@ -137,9 +137,9 @@ const DEPARTMENTS: Department[] = [
 
 const DURATION_OPTIONS = [
   { months: 1, label: '1 Month', discount: 0 },
-  { months: 3, label: '3 Months', discount: 5 },
-  { months: 6, label: '6 Months', discount: 10 },
-  { months: 12, label: '12 Months', discount: 15 },
+  { months: 3, label: '3 Months', discount: 10 },
+  { months: 6, label: '6 Months', discount: 20 },
+  { months: 12, label: '12 Months', discount: 30 },
 ]
 
 export default function InfrastructurePage() {

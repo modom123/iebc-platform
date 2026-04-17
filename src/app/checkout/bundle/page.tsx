@@ -13,6 +13,13 @@ const PLAN_CONFIG = {
   pro:     { name: 'Pro Bundle',     setup: 6500, monthly: 799, maxAdvisors: 20 },
 }
 
+const DURATION_OPTIONS = [
+  { months: 1,  label: '1 Month',   discount: 0  },
+  { months: 3,  label: '3 Months',  discount: 10 },
+  { months: 6,  label: '6 Months',  discount: 20 },
+  { months: 12, label: '12 Months', discount: 30 },
+]
+
 type Advisor = { id: string; name: string; title: string; deptName: string }
 
 const DEPARTMENTS = [
@@ -83,6 +90,7 @@ function BundleContent() {
   const [planId, setPlanId] = useState<keyof typeof PLAN_CONFIG>('growth')
   const [deptId, setDeptId] = useState(DEPARTMENTS[0].id)
   const [selected, setSelected] = useState<(Advisor & { deptName: string })[]>([])
+  const [duration, setDuration] = useState(1)
   const [form, setForm] = useState({ name: '', email: '', phone: '', company: '', notes: '' })
   const [submitting, setSubmitting] = useState(false)
   const [submitted, setSubmitted] = useState(false)
@@ -95,6 +103,10 @@ function BundleContent() {
   const plan = PLAN_CONFIG[planId]
   const dept = DEPARTMENTS.find(d => d.id === deptId)!
   const atLimit = selected.length >= plan.maxAdvisors
+  const durationOpt = DURATION_OPTIONS.find(d => d.months === duration)!
+  const subtotal = plan.monthly * duration
+  const discountAmt = Math.round(subtotal * durationOpt.discount / 100)
+  const total = subtotal - discountAmt
 
   function toggleAdvisor(adv: { id: string; name: string; title: string }, deptName: string) {
     setSelected(prev => {
@@ -112,7 +124,7 @@ function BundleContent() {
       await fetch('/api/infrastructure/order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type: 'bundle', plan: planId, advisors: selected, ...form }),
+        body: JSON.stringify({ type: 'bundle', plan: planId, advisors: selected, duration, total, ...form }),
       })
     } catch { /* non-blocking */ }
     setSubmitting(false)
@@ -354,6 +366,23 @@ function BundleContent() {
                     <textarea value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} rows={3} className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2140] focus:border-transparent resize-none" placeholder="Industry, current challenges, goals…" />
                   </div>
 
+                  {/* Duration selector */}
+                  <div>
+                    <label className="block text-xs font-bold text-gray-600 mb-2 uppercase tracking-wide">Contract Duration</label>
+                    <div className="grid grid-cols-4 gap-2">
+                      {DURATION_OPTIONS.map(opt => (
+                        <button key={opt.months} type="button" onClick={() => setDuration(opt.months)}
+                          className={`py-2.5 rounded-xl text-xs font-semibold transition text-center ${duration === opt.months ? 'bg-[#0B2140] text-white shadow-sm' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}`}
+                        >
+                          {opt.label}
+                          {opt.discount > 0 && (
+                            <span className={`block text-[9px] mt-0.5 ${duration === opt.months ? 'text-blue-300' : 'text-green-600'}`}>Save {opt.discount}%</span>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
                   {/* Milestones */}
                   <div className="rounded-xl p-4 border border-gray-100" style={{ background: '#F8F8F8' }}>
                     <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-3">Setup Payment Milestones</p>
@@ -390,7 +419,7 @@ function BundleContent() {
               <div className="sticky top-6 bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
                 <div className="px-5 py-4" style={{ background: DARK }}>
                   <p className="text-white font-bold text-sm">{plan.name}</p>
-                  <p className="text-blue-300 text-xs">{selected.length} AI Advisors selected</p>
+                  <p className="text-blue-300 text-xs">{selected.length} AI Advisors · {duration}-month contract{durationOpt.discount > 0 ? ` · ${durationOpt.discount}% off` : ''}</p>
                 </div>
                 <div className="p-4 space-y-3">
                   {selected.length > 0 && (
@@ -409,7 +438,18 @@ function BundleContent() {
                   )}
                   <div className="border-t border-gray-100 pt-3 space-y-1.5">
                     <div className="flex justify-between text-sm"><span className="text-gray-500">Setup fee</span><span className="font-bold text-gray-900">${plan.setup.toLocaleString()}</span></div>
-                    <div className="flex justify-between text-sm"><span className="text-gray-500">Monthly retainer</span><span className="font-bold" style={{ color: GOLD }}>${plan.monthly}/mo</span></div>
+                    <div className="flex justify-between text-sm"><span className="text-gray-500">{plan.monthly}/mo × {duration} mo</span><span className="font-bold text-gray-700">${subtotal.toLocaleString()}</span></div>
+                    {durationOpt.discount > 0 && (
+                      <div className="flex justify-between text-xs text-green-600 font-medium">
+                        <span>Multi-month discount ({durationOpt.discount}%)</span>
+                        <span>−${discountAmt.toLocaleString()}</span>
+                      </div>
+                    )}
+                    <div className="flex justify-between font-bold text-sm pt-1.5 border-t border-gray-100" style={{ color: DARK }}>
+                      <span>Total (excl. setup)</span>
+                      <span>${total.toLocaleString()}</span>
+                    </div>
+                    <p className="text-[10px] text-gray-400">${Math.round(total / duration).toLocaleString()}/mo · {duration}-month contract</p>
                   </div>
                 </div>
               </div>

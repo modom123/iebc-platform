@@ -29,35 +29,25 @@ export async function POST(req: Request) {
 
   try {
     const body = await req.json()
-    const { plan, name, email, phone, password, billing_address } = body as {
+    const { plan, email, password, businessName } = body as {
       plan: string
-      name: string
       email: string
-      phone?: string
       password?: string
-      billing_address?: { street: string; city: string; state: string; zip: string }
+      businessName?: string
     }
 
-    if (!plan || !name || !email) {
-      return NextResponse.json({ error: 'Missing required fields: plan, name, email' }, { status: 400 })
+    if (!plan || !email) {
+      return NextResponse.json({ error: 'Missing required fields: plan, email' }, { status: 400 })
     }
 
     if (!['silver', 'gold', 'platinum'].includes(plan)) {
       return NextResponse.json({ error: 'Invalid plan' }, { status: 400 })
     }
 
+    // Create minimal customer — Stripe will fill in name/phone/address on checkout
     const customer = await stripe.customers.create({
-      name,
       email,
-      phone: phone || undefined,
-      address: billing_address ? {
-        line1: billing_address.street,
-        city: billing_address.city,
-        state: billing_address.state,
-        postal_code: billing_address.zip,
-        country: 'US',
-      } : undefined,
-      metadata: { plan, source: 'iebc_checkout' },
+      metadata: { plan, source: 'iebc_checkout', business_name: businessName || '' },
     })
 
     const priceId = PRICE_IDS[plan]
@@ -86,19 +76,17 @@ export async function POST(req: Request) {
         trial_period_days: 7,
         metadata: { plan },
       },
+      // Stripe collects name, billing address, phone — no duplicate entry
       billing_address_collection: 'required',
       phone_number_collection: { enabled: true },
+      // Write what the customer enters back onto the Stripe customer record
+      customer_update: { name: 'auto', address: 'auto', shipping: 'auto' },
       metadata: {
         plan,
-        customer_name: name,
         customer_email: email,
-        customer_phone: phone || '',
-        // password stored in metadata so success page can create account immediately
+        business_name: businessName || '',
+        // password in metadata so webhook/success page can create Supabase account
         account_password: password || '',
-        billing_street: billing_address?.street || '',
-        billing_city: billing_address?.city || '',
-        billing_state: billing_address?.state || '',
-        billing_zip: billing_address?.zip || '',
       },
       success_url: `${appUrl}/accounting/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${appUrl}/accounting/checkout?canceled=true`,

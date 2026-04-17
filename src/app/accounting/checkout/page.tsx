@@ -69,12 +69,6 @@ const PLANS = [
   },
 ]
 
-const US_STATES = [
-  'AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA','HI','ID','IL','IN','IA',
-  'KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ',
-  'NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT',
-  'VA','WA','WV','WI','WY','DC',
-]
 
 function CheckoutContent() {
   const searchParams = useSearchParams()
@@ -85,15 +79,10 @@ function CheckoutContent() {
   const [canceled, setCanceled] = useState(false)
 
   const [form, setForm] = useState({
-    name: '',
     email: '',
-    phone: '',
-    street: '',
-    city: '',
-    state: '',
-    zip: '',
     password: '',
     confirmPassword: '',
+    businessName: '',
   })
 
   useEffect(() => {
@@ -133,26 +122,18 @@ function CheckoutContent() {
     sessionStorage.setItem('iebc_pending', JSON.stringify({
       email: form.email,
       password: form.password,
-      name: form.name,
     }))
 
-    // API checkout — creates session with credentials in metadata, returns Stripe URL
+    // API checkout — Stripe collects name/phone/address on their page
     try {
       const res = await fetch('/api/stripe/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           plan: selectedPlan,
-          name: form.name,
           email: form.email,
-          phone: form.phone,
           password: form.password,
-          billing_address: {
-            street: form.street,
-            city: form.city,
-            state: form.state,
-            zip: form.zip,
-          },
+          businessName: form.businessName,
         }),
       })
 
@@ -317,15 +298,15 @@ function CheckoutContent() {
               </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Name */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1.5">Full Name <span className="text-red-500">*</span></label>
-                <input name="name" type="text" required value={form.name} onChange={handleField}
-                  placeholder="Jane Smith"
-                  className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F4C81] focus:border-transparent" />
-              </div>
+            {/* What Stripe collects callout */}
+            <div className="bg-blue-50 border border-blue-100 rounded-xl px-4 py-3 mb-2 flex items-start gap-2.5">
+              <span className="text-blue-400 mt-0.5 shrink-0">ℹ</span>
+              <p className="text-xs text-blue-700 leading-relaxed">
+                Your name, phone, and billing address are collected securely on the next screen by Stripe — no need to enter them twice.
+              </p>
+            </div>
 
+            <form onSubmit={handleSubmit} className="space-y-4">
               {/* Email */}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">Email Address <span className="text-red-500">*</span></label>
@@ -351,35 +332,12 @@ function CheckoutContent() {
                   className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F4C81] focus:border-transparent" />
               </div>
 
-              {/* Phone */}
+              {/* Business name — not collected by Stripe */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1.5">Phone Number</label>
-                <input name="phone" type="tel" value={form.phone} onChange={handleField}
-                  placeholder="(555) 000-0000"
+                <label className="block text-sm font-semibold text-gray-700 mb-1.5">Business Name <span className="text-gray-400 font-normal">(optional)</span></label>
+                <input name="businessName" type="text" value={form.businessName} onChange={handleField}
+                  placeholder="Acme Corp"
                   className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F4C81] focus:border-transparent" />
-              </div>
-
-              {/* Billing Address */}
-              <div className="pt-2">
-                <p className="text-sm font-semibold text-gray-700 mb-3">Billing Address</p>
-                <div className="space-y-3">
-                  <input name="street" type="text" required value={form.street} onChange={handleField}
-                    placeholder="Street address"
-                    className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F4C81] focus:border-transparent" />
-                  <div className="grid grid-cols-2 gap-3">
-                    <input name="city" type="text" required value={form.city} onChange={handleField}
-                      placeholder="City"
-                      className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F4C81] focus:border-transparent" />
-                    <select name="state" required value={form.state} onChange={handleField}
-                      className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F4C81] focus:border-transparent bg-white">
-                      <option value="">State</option>
-                      {US_STATES.map(s => <option key={s} value={s}>{s}</option>)}
-                    </select>
-                  </div>
-                  <input name="zip" type="text" required value={form.zip} onChange={handleField}
-                    placeholder="ZIP code" maxLength={10}
-                    className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F4C81] focus:border-transparent" />
-                </div>
               </div>
 
               {/* Error */}

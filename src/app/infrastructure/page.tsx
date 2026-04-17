@@ -13,6 +13,7 @@ type Contractor = {
   badge?: string
   bio: string
   skills: string[]
+  avatarBg?: string
 }
 
 type Department = {
@@ -175,10 +176,10 @@ export default function InfrastructurePage() {
       <div className="bg-[#0B2140]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10">
           <Link href="/" className="text-blue-300 text-sm hover:text-white mb-4 inline-block transition">← Back to IEBC</Link>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-white mb-3">Build Your Expert Team</h1>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-white mb-3">Build Your IEBC AI Advisor Team</h1>
           <p className="text-blue-200 text-base max-w-2xl leading-relaxed">
-            Contract specialized experts by the month — no hiring, no benefits, no long-term commitments.
-            Browse departments, choose your people, set your timeline, and get to work.
+            Contract senior IEBC AI Advisors by the month — no hiring, no benefits, no long-term commitments.
+            Browse departments, choose your advisors, set your timeline, and get to work.
           </p>
           <div className="flex flex-wrap items-center gap-x-6 gap-y-2 mt-5 text-sm text-blue-300">
             <span>✓ Assembled within 24 hours</span>
@@ -235,7 +236,7 @@ export default function InfrastructurePage() {
             </div>
           </div>
 
-          {/* Contractor grid */}
+          {/* IEBC AI Advisor grid */}
           <main className="flex-1 min-w-0">
             <div className="flex items-center gap-3 mb-5">
               <span className="text-2xl">{currentDept.icon}</span>
@@ -256,12 +257,11 @@ export default function InfrastructurePage() {
                     }`}
                   >
                     <div className="flex items-start gap-4">
-                      <div
-                        className="w-12 h-12 rounded-full flex items-center justify-center shrink-0 text-white font-black text-sm"
-                        style={{ background: currentDept.color }}
-                      >
-                        {contractor.name.split(' ').map(n => n[0]).join('')}
-                      </div>
+                      <img
+                        src={`https://api.dicebear.com/7.x/personas/svg?seed=${encodeURIComponent(contractor.name)}&backgroundColor=0B2140`}
+                        alt={contractor.name}
+                        className="w-14 h-14 rounded-full shrink-0 border-2 border-gray-100 bg-gray-50"
+                      />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-start justify-between gap-2 mb-1">
                           <div>
@@ -299,7 +299,7 @@ export default function InfrastructurePage() {
                             : 'bg-gray-100 text-gray-700 hover:bg-[#0B2140] hover:text-white'
                         }`}
                       >
-                        {inCart ? '✓ Added' : '+ Add to Team'}
+                        {inCart ? '✓ Added' : '+ Add Advisor'}
                       </button>
                     </div>
                   </div>
@@ -312,7 +312,7 @@ export default function InfrastructurePage() {
           <aside className="hidden lg:block w-72 shrink-0">
             <div className="sticky top-6 bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
               <div className="bg-[#0B2140] px-5 py-4 flex items-center justify-between">
-                <p className="text-white font-bold text-sm">Your Team</p>
+                <p className="text-white font-bold text-sm">Your AI Advisors</p>
                 <span className="bg-white/20 text-white text-xs font-bold px-2 py-0.5 rounded-full">
                   {cart.length} selected
                 </span>
@@ -323,16 +323,18 @@ export default function InfrastructurePage() {
                   <div className="text-center py-6">
                     <p className="text-3xl mb-2">👥</p>
                     <p className="text-xs text-gray-400 leading-relaxed">
-                      No team members yet.<br />Browse departments and add experts.
+                      No advisors selected yet.<br />Browse departments and add IEBC AI Advisors.
                     </p>
                   </div>
                 ) : (
                   <div className="space-y-2.5 max-h-60 overflow-y-auto pr-1">
                     {cart.map(c => (
                       <div key={c.id} className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-full bg-[#0B2140] flex items-center justify-center text-white text-[10px] font-black shrink-0">
-                          {c.name.split(' ').map(n => n[0]).join('')}
-                        </div>
+                        <img
+                          src={`https://api.dicebear.com/7.x/personas/svg?seed=${encodeURIComponent(c.name)}&backgroundColor=0B2140`}
+                          alt={c.name}
+                          className="w-8 h-8 rounded-full shrink-0 border border-gray-100"
+                        />
                         <div className="flex-1 min-w-0">
                           <p className="text-xs font-semibold text-gray-800 truncate">{c.name}</p>
                           <p className="text-[10px] text-gray-400 truncate">{c.title}</p>
@@ -417,7 +419,7 @@ export default function InfrastructurePage() {
           <div className="lg:hidden fixed bottom-4 left-4 right-4 z-40">
             <div className="bg-[#0B2140] rounded-2xl p-4 shadow-2xl flex items-center gap-4">
               <div className="flex-1">
-                <p className="text-white font-bold text-sm">{cart.length} expert{cart.length > 1 ? 's' : ''} selected</p>
+                <p className="text-white font-bold text-sm">{cart.length} AI Advisor{cart.length > 1 ? 's' : ''} selected</p>
                 <p className="text-blue-300 text-xs">${monthlyTotal.toLocaleString()}/mo · {duration} mo contract</p>
               </div>
               <button

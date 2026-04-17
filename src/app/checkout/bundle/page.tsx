@@ -179,7 +179,7 @@ function BundleContent() {
         <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
           <Link href="/#pricing" className="text-blue-300 text-sm hover:text-white mb-3 inline-block">← Back to Pricing</Link>
           <h1 className="text-2xl sm:text-3xl font-extrabold text-white mb-1">Bundle Order</h1>
-          <p className="text-blue-200 text-sm">Website · Hub · Accounting · AI Advisor Workforce — all six services, fully integrated.</p>
+          <p className="text-blue-200 text-sm">Website · Hub · Accounting · Fractional AI Advisor Workforce — all services, fully integrated.</p>
           {/* Step indicator */}
           <div className="flex items-center gap-2 mt-5 text-xs">
             {[['1','Choose Plan'],['2','Select Advisors'],['3','Your Info']].map(([n, label], i) => (
@@ -211,7 +211,7 @@ function BundleContent() {
                       </div>
                       <div>
                         <p className="font-bold text-gray-900">{p.name}</p>
-                        <p className="text-sm text-gray-500 mt-0.5">Includes <span className="font-semibold text-[#0B2140]">{p.maxAdvisors} AI Advisors</span> — you pick your team</p>
+                        <p className="text-sm text-gray-500 mt-0.5">Includes <span className="font-semibold text-[#0B2140]">{p.maxAdvisors} Fractional AI Advisors</span> — advisory hours, you pick your team</p>
                       </div>
                     </div>
                     <div className="text-right shrink-0">
@@ -236,7 +236,7 @@ function BundleContent() {
             <div className="flex items-center justify-between mb-5">
               <div>
                 <h2 className="text-xl font-bold text-gray-900">Select your AI Advisor team</h2>
-                <p className="text-sm text-gray-500 mt-0.5">Choose up to <strong>{plan.maxAdvisors}</strong> advisors for your {plan.name}</p>
+                <p className="text-sm text-gray-500 mt-0.5">Choose up to <strong>{plan.maxAdvisors}</strong> fractional advisors — advisory hours included in your bundle</p>
               </div>
               <div className="flex items-center gap-3 shrink-0">
                 <div className={`px-3 py-1.5 rounded-full text-xs font-bold ${atLimit ? 'bg-green-100 text-green-700' : 'bg-blue-50 text-[#0B2140]'}`}>
@@ -244,6 +244,11 @@ function BundleContent() {
                 </div>
                 <button onClick={() => setStep(1)} className="text-xs text-gray-400 hover:text-gray-600">← Back</button>
               </div>
+            </div>
+
+            <div className="mb-4 bg-blue-50 border border-blue-100 rounded-xl px-4 py-3 text-xs text-blue-700 flex items-start gap-2">
+              <span className="shrink-0 mt-0.5">💡</span>
+              <span><strong>Fractional advisors</strong> work part-time across multiple clients — ideal for strategy, guidance, and oversight. Need a fully dedicated advisor? <a href="/infrastructure" className="underline font-semibold">Hire dedicated</a> and negotiate salary directly.</span>
             </div>
 
             {atLimit && (

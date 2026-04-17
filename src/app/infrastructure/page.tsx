@@ -144,24 +144,38 @@ const DURATION_OPTIONS = [
 
 export default function InfrastructurePage() {
   const [selectedDept, setSelectedDept] = useState(DEPARTMENTS[0].id)
-  const [cart, setCart] = useState<(Contractor & { deptName: string })[]>([])
+  const [cart, setCart] = useState<(Contractor & { deptName: string; negotiatedRate?: number })[]>([])
   const [duration, setDuration] = useState(1)
+  const [offerMode, setOfferMode] = useState<string | null>(null)
+  const [offerValues, setOfferValues] = useState<Record<string, string>>({})
   const router = useRouter()
 
   const currentDept = DEPARTMENTS.find(d => d.id === selectedDept)!
   const durationOpt = DURATION_OPTIONS.find(d => d.months === duration)!
-  const monthlyTotal = cart.reduce((s, c) => s + c.rate, 0)
+  const monthlyTotal = cart.reduce((s, c) => s + (c.negotiatedRate ?? c.rate), 0)
   const subtotal = monthlyTotal * duration
   const discountAmt = Math.round(subtotal * durationOpt.discount / 100)
   const total = subtotal - discountAmt
 
-  function toggleCart(contractor: Contractor) {
+  function toggleCart(contractor: Contractor, negotiatedRate?: number) {
     const deptName = DEPARTMENTS.find(d => d.contractors.some(c => c.id === contractor.id))?.name ?? ''
     setCart(prev =>
       prev.some(c => c.id === contractor.id)
         ? prev.filter(c => c.id !== contractor.id)
-        : [...prev, { ...contractor, deptName }]
+        : [...prev, { ...contractor, deptName, negotiatedRate }]
     )
+    setOfferMode(null)
+  }
+
+  function openOffer(contractor: Contractor) {
+    setOfferValues(v => ({ ...v, [contractor.id]: String(contractor.rate) }))
+    setOfferMode(contractor.id)
+  }
+
+  function addWithOffer(contractor: Contractor) {
+    const offered = parseInt(offerValues[contractor.id] ?? String(contractor.rate), 10)
+    const rate = isNaN(offered) || offered <= 0 ? contractor.rate : offered
+    toggleCart(contractor, rate !== contractor.rate ? rate : undefined)
   }
 
   function checkout() {
@@ -178,14 +192,18 @@ export default function InfrastructurePage() {
           <Link href="/" className="text-blue-300 text-sm hover:text-white mb-4 inline-block transition">← Back to IEBC</Link>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-white mb-3">Build Your IEBC AI Advisor Team</h1>
           <p className="text-blue-200 text-base max-w-2xl leading-relaxed">
-            Contract senior IEBC AI Advisors by the month — no hiring, no benefits, no long-term commitments.
-            Browse departments, choose your advisors, set your timeline, and get to work.
+            Contract <strong className="text-white">dedicated</strong> IEBC AI Advisors — exclusively focused on your business, full engagement.
+            Browse departments, choose your advisors, negotiate your rate, and get to work.
           </p>
           <div className="flex flex-wrap items-center gap-x-6 gap-y-2 mt-5 text-sm text-blue-300">
-            <span>✓ Assembled within 24 hours</span>
-            <span>✓ Month-to-month flexibility</span>
+            <span>✓ Dedicated to your business only</span>
+            <span>✓ Negotiate salary directly</span>
             <span>✓ Senior-level expertise</span>
-            <span>✓ Cancel anytime</span>
+            <span>✓ Cancel with 30-day notice</span>
+          </div>
+          <div className="mt-4 inline-flex items-center gap-2 bg-white/10 rounded-xl px-4 py-2 text-xs text-blue-200">
+            <span>💡</span>
+            <span>Need fractional advisors at a lower cost? See our <a href="/#pricing" className="text-white font-semibold underline">Bundle plans</a> — fractional advisory hours included.</span>
           </div>
         </div>
       </div>
@@ -286,21 +304,57 @@ export default function InfrastructurePage() {
                       </div>
                     </div>
 
-                    <div className="flex items-center justify-between mt-4 pt-4 border-t border-gray-100">
-                      <div>
-                        <span className="text-xl font-extrabold text-gray-900">${contractor.rate.toLocaleString()}</span>
-                        <span className="text-xs text-gray-400">/mo</span>
-                      </div>
-                      <button
-                        onClick={() => toggleCart(contractor)}
-                        className={`px-4 py-2 rounded-xl text-sm font-bold transition ${
-                          inCart
-                            ? 'bg-[#0B2140] text-white'
-                            : 'bg-gray-100 text-gray-700 hover:bg-[#0B2140] hover:text-white'
-                        }`}
-                      >
-                        {inCart ? '✓ Added' : '+ Add Advisor'}
-                      </button>
+                    <div className="mt-4 pt-4 border-t border-gray-100">
+                      {offerMode === contractor.id ? (
+                        <div className="space-y-2">
+                          <label className="block text-xs font-bold text-gray-600 uppercase tracking-wide">Your offer ($/mo)</label>
+                          <input
+                            type="number"
+                            value={offerValues[contractor.id] ?? contractor.rate}
+                            onChange={e => setOfferValues(v => ({ ...v, [contractor.id]: e.target.value }))}
+                            className="w-full border border-gray-300 rounded-xl px-3 py-2 text-sm font-bold focus:outline-none focus:ring-2 focus:ring-[#C9A02E] focus:border-transparent"
+                            min={1}
+                          />
+                          <p className="text-[10px] text-gray-400">Listed rate: ${contractor.rate.toLocaleString()}/mo · IEBC will respond to your offer within 2 hrs</p>
+                          <div className="flex gap-2">
+                            <button
+                              onClick={() => addWithOffer(contractor)}
+                              className="flex-1 py-2 rounded-xl text-sm font-bold text-white transition" style={{ background: '#C9A02E' }}
+                            >
+                              Add at ${parseInt(offerValues[contractor.id] ?? String(contractor.rate)).toLocaleString() || '—'}/mo
+                            </button>
+                            <button onClick={() => setOfferMode(null)} className="px-3 py-2 rounded-xl text-sm text-gray-500 hover:text-gray-800 border border-gray-200">✕</button>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="flex items-end justify-between gap-3">
+                          <div>
+                            <div className="flex items-baseline gap-1">
+                              <span className="text-xl font-extrabold text-gray-900">${(cart.find(c => c.id === contractor.id)?.negotiatedRate ?? contractor.rate).toLocaleString()}</span>
+                              <span className="text-xs text-gray-400">/mo</span>
+                            </div>
+                            {cart.find(c => c.id === contractor.id)?.negotiatedRate && (
+                              <p className="text-[10px] text-amber-600 font-semibold">Offered · listed ${contractor.rate.toLocaleString()}/mo</p>
+                            )}
+                            <p className="text-[10px] text-gray-400">Dedicated engagement</p>
+                          </div>
+                          <div className="flex flex-col gap-1.5 items-end shrink-0">
+                            <button
+                              onClick={() => toggleCart(contractor)}
+                              className={`px-4 py-2 rounded-xl text-sm font-bold transition ${
+                                inCart ? 'bg-[#0B2140] text-white' : 'bg-gray-100 text-gray-700 hover:bg-[#0B2140] hover:text-white'
+                              }`}
+                            >
+                              {inCart ? '✓ Added' : '+ Add Advisor'}
+                            </button>
+                            {!inCart && (
+                              <button onClick={() => openOffer(contractor)} className="text-xs font-semibold underline" style={{ color: '#C9A02E' }}>
+                                Make an Offer
+                              </button>
+                            )}
+                          </div>
+                        </div>
+                      )}
                     </div>
                   </div>
                 )
@@ -340,7 +394,8 @@ export default function InfrastructurePage() {
                           <p className="text-[10px] text-gray-400 truncate">{c.title}</p>
                         </div>
                         <div className="text-right shrink-0">
-                          <p className="text-xs font-bold text-gray-800">${c.rate.toLocaleString()}/mo</p>
+                          <p className="text-xs font-bold text-gray-800">${(c.negotiatedRate ?? c.rate).toLocaleString()}/mo</p>
+                          {c.negotiatedRate && <p className="text-[9px] text-amber-600">Offered</p>}
                           <button onClick={() => toggleCart(c)} className="text-[10px] text-red-400 hover:text-red-600 transition">
                             Remove
                           </button>

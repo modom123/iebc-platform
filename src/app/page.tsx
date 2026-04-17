@@ -68,7 +68,7 @@ const SERVICES = [
     features: ['60 IEBC AI expert consultants', 'Custom API & system integrations', 'Business intelligence & reporting', 'Ongoing infrastructure & support'],
     detail: 'from $499/mo · consultants assembled within 24hrs',
     cta: 'Meet Your Team',
-    href: '/hub/consultants',
+    href: '/infrastructure',
     accent: '#7C3AED',
     bg: 'rgba(124,58,237,0.04)',
   },

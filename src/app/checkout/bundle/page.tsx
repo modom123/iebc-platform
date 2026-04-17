@@ -8,9 +8,9 @@ const DARK = '#0B2140'
 const GOLD = '#C9A02E'
 
 const PLAN_CONFIG = {
-  starter: { name: 'Starter Bundle', setup: 1500, monthly: 299, maxAdvisors: 5 },
-  growth:  { name: 'Growth Bundle',  setup: 3500, monthly: 499, maxAdvisors: 10 },
-  pro:     { name: 'Pro Bundle',     setup: 6500, monthly: 799, maxAdvisors: 20 },
+  starter: { name: 'Starter Bundle', setup: 1500, monthly: 299, maxAdvisors: 5,  hoursPerAdvisor: 20 },
+  growth:  { name: 'Growth Bundle',  setup: 3500, monthly: 499, maxAdvisors: 10, hoursPerAdvisor: 40 },
+  pro:     { name: 'Pro Bundle',     setup: 6500, monthly: 799, maxAdvisors: 20, hoursPerAdvisor: 60 },
 }
 
 const DURATION_OPTIONS = [
@@ -144,7 +144,7 @@ function BundleContent() {
           <p className="text-xs font-black uppercase tracking-widest mb-3" style={{ color: GOLD }}>Order Received</p>
           <h1 className="text-3xl font-extrabold mb-4" style={{ color: DARK }}>You&apos;re in!</h1>
           <p className="text-gray-600 leading-relaxed mb-6">
-            Your <strong>{plan.name}</strong> with {selected.length} AI Advisor{selected.length !== 1 ? 's' : ''} is confirmed.
+            Your <strong>{plan.name}</strong> with {selected.length} fractional AI Advisor{selected.length !== 1 ? 's' : ''} ({plan.hoursPerAdvisor} hrs/advisor/mo) is confirmed.
             We&apos;ll reach out to <strong>{form.email}</strong> within 2 business hours.
           </p>
           {selected.length > 0 && (
@@ -211,7 +211,11 @@ function BundleContent() {
                       </div>
                       <div>
                         <p className="font-bold text-gray-900">{p.name}</p>
-                        <p className="text-sm text-gray-500 mt-0.5">Includes <span className="font-semibold text-[#0B2140]">{p.maxAdvisors} Fractional AI Advisors</span> — advisory hours, you pick your team</p>
+                        <p className="text-sm text-gray-500 mt-0.5">
+                          <span className="font-semibold text-[#0B2140]">{p.maxAdvisors} Fractional AI Advisors</span>
+                          {' · '}<span className="text-green-700 font-semibold">{p.hoursPerAdvisor} hrs/advisor/mo</span>
+                          {' · '}you pick your team
+                        </p>
                       </div>
                     </div>
                     <div className="text-right shrink-0">
@@ -236,7 +240,7 @@ function BundleContent() {
             <div className="flex items-center justify-between mb-5">
               <div>
                 <h2 className="text-xl font-bold text-gray-900">Select your AI Advisor team</h2>
-                <p className="text-sm text-gray-500 mt-0.5">Choose up to <strong>{plan.maxAdvisors}</strong> fractional advisors — advisory hours included in your bundle</p>
+                <p className="text-sm text-gray-500 mt-0.5">Choose up to <strong>{plan.maxAdvisors}</strong> fractional advisors — <span className="text-green-700 font-semibold">{plan.hoursPerAdvisor} hrs/advisor/mo</span> included</p>
               </div>
               <div className="flex items-center gap-3 shrink-0">
                 <div className={`px-3 py-1.5 rounded-full text-xs font-bold ${atLimit ? 'bg-green-100 text-green-700' : 'bg-blue-50 text-[#0B2140]'}`}>

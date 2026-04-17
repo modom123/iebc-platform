@@ -78,7 +78,7 @@ const SERVICES = [
     title: 'Social Optimize',
     subtitle: 'Find, grow, and engage your audience.',
     body: 'We run your social media across YouTube, Facebook, LinkedIn, TikTok, and Instagram — content creation, posting, engagement, and analytics. Your brand grows while you focus on your business.',
-    features: ['Lead generation across YouTube, Facebook, LinkedIn, TikTok & Instagram', 'Marketing automation — workflows, drip campaigns & retargeting', 'Auto posting with AI-optimized scheduling across all platforms', 'Content creation — graphics, captions, short-form video & copy'],
+    features: ['Lead generation across multiple platforms', 'Automated engagement — comments, DMs & audience interaction', 'Auto posting with AI-optimized scheduling across all platforms', 'Content creation — graphics, captions, short-form video & copy'],
     detail: 'from $299/mo · up to all 5 platforms',
     cta: 'Social Optimize',
     href: '/checkout/social-optimize',

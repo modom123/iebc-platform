@@ -27,9 +27,9 @@ const SERVICES = [
     subtitle: 'Your 24/7 conversion engine.',
     body: 'AI-powered, mobile-first website built for your industry. Online booking, payments, and lead capture — all connected to your hub automatically. Smarter than a static site. It works while you sleep.',
     features: ['Custom pages for your industry', 'Online booking & payment collection', 'Lead capture → flows into hub', 'Domain + hosting included'],
-    detail: '$800 build · then $149/mo hosting & support',
-    cta: 'Book a Strategy Call',
-    href: 'https://calendly.com/new56money/30min',
+    detail: 'from $500 build · then $149/mo hosting',
+    cta: 'View Plans & Buy',
+    href: '/checkout/website',
     accent: '#1D4ED8',
     bg: 'rgba(29,78,216,0.04)',
   },
@@ -90,61 +90,67 @@ const SERVICES = [
 
 const PLANS = [
   {
-    name: 'Starter',
+    name: 'Starter Bundle',
     setup: '$1,500',
     monthly: '$299/mo',
     consultants: 8,
-    desc: 'Your business built and automated in 6 weeks.',
+    desc: 'Everything you need to launch — website, hub, accounting & advisors.',
+    badge: '',
     features: [
-      '8 IEBC AI consultants',
-      'Business Formation assistance',
-      'Intelligent Website (5-page)',
-      'Automated Business Hub',
-      'IEBC Automated Workflow setup',
-      'Hosting + domain included',
-      'Delivered in 6 weeks',
+      '🌐 Intelligent Website — 5 custom pages',
+      '⚙️ Automated Business Hub',
+      '📊 Accounting Platform (Silver)',
+      '🤖 8 IEBC AI Advisor consultants',
+      '🏢 Business Formation assistance',
+      '☁️ Hosting + domain included',
+      '📦 Delivered in 6 weeks',
     ],
     highlight: false,
-    cta: 'Get Started',
-    ctaHref: 'https://calendly.com/new56money/30min',
+    cta: 'Order Now',
+    ctaHref: '/checkout/bundle?plan=starter',
+    callHref: 'https://calendly.com/new56money/30min',
   },
   {
-    name: 'Growth',
+    name: 'Growth Bundle',
     setup: '$3,500',
     monthly: '$499/mo',
     consultants: 25,
-    desc: 'Full stack for serious, scaling businesses.',
+    desc: 'Full-stack for scaling businesses — every service, fully integrated.',
+    badge: 'Most Popular',
     features: [
-      '25 IEBC AI consultants',
-      '10-page website + booking + payments',
-      'Full Hub — CRM, invoicing, outreach',
-      'Complete IEBC Automated Workflows',
-      'Intelligent Infrastructure layer',
-      '52-week roadmap & strategy sessions',
-      'Priority build & dedicated manager',
+      '🌐 Website — 10 pages + booking + payments',
+      '⚙️ Full Hub — CRM, invoicing, outreach',
+      '📊 Accounting Platform (Gold)',
+      '🏗️ AI Advisor Workforce (3 advisors)',
+      '🤖 25 IEBC AI Consultants',
+      '🔗 Complete workflow automations',
+      '🎯 Priority build + dedicated manager',
     ],
     highlight: true,
-    cta: 'Schedule a Call',
-    ctaHref: 'https://calendly.com/new56money/30min',
+    cta: 'Order Now',
+    ctaHref: '/checkout/bundle?plan=growth',
+    callHref: 'https://calendly.com/new56money/30min',
   },
   {
-    name: 'Pro',
+    name: 'Pro Bundle',
     setup: '$6,500',
     monthly: '$799/mo',
     consultants: 60,
-    desc: 'Full enterprise deployment. No limits.',
+    desc: 'Full enterprise deployment across all six services. No limits.',
+    badge: '',
     features: [
-      'All 60 IEBC AI consultants',
-      'Unlimited pages + client login portal',
-      'Every hub module — no limits',
-      'Custom automations + API integrations',
-      'Full Intelligent Infrastructure build',
-      'Quarterly executive review',
-      'SLA guarantee + priority support',
+      '🌐 Unlimited pages + client login portal',
+      '⚙️ Every hub module — zero restrictions',
+      '📊 Accounting Platform (Platinum)',
+      '🏗️ AI Advisor Workforce (5 advisors)',
+      '🤖 All 60 IEBC AI Consultants',
+      '🔌 Custom automations + API integrations',
+      '🛡️ SLA guarantee + priority support',
     ],
     highlight: false,
-    cta: 'Book a Call',
-    ctaHref: 'https://calendly.com/new56money/30min',
+    cta: 'Order Now',
+    ctaHref: '/checkout/bundle?plan=pro',
+    callHref: 'https://calendly.com/new56money/30min',
   },
 ]
 
@@ -532,11 +538,11 @@ export default function AgencyHomepage() {
             <h2
               className={`${playfair.className} text-2xl sm:text-3xl md:text-4xl font-bold text-white`}
             >
-              Simple, transparent pricing.
+              Bundled services. One price.
             </h2>
             <p className="mt-4 max-w-xl mx-auto" style={{ color: 'rgba(255,255,255,0.6)' }}>
-              One-time setup fee plus a monthly retainer. No surprises, no hidden costs,
-              no long-term contracts.
+              Every bundle includes your Website, Business Hub, Accounting Platform, and AI Advisor Workforce —
+              fully integrated. One-time setup, then a flat monthly retainer.
             </p>
           </div>
 
@@ -544,82 +550,70 @@ export default function AgencyHomepage() {
             {PLANS.map((p, i) => (
               <div
                 key={i}
-                className="rounded-2xl p-7 flex flex-col"
+                className="rounded-2xl p-7 flex flex-col relative"
                 style={{
                   background: p.highlight ? '#fff' : 'rgba(255,255,255,0.05)',
                   border: p.highlight ? '2px solid #C8902A' : '1px solid rgba(255,255,255,0.1)',
                   color: p.highlight ? '#0B2140' : '#fff',
                 }}
               >
-                {p.highlight && (
-                  <div className="text-center mb-4">
-                    <span
-                      className="text-xs font-bold uppercase tracking-widest px-4 py-1 rounded-full"
-                      style={{ background: '#C8902A', color: '#fff' }}
-                    >
-                      Most Popular
+                {p.badge && (
+                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
+                    <span className="text-xs font-bold uppercase tracking-widest px-4 py-1 rounded-full whitespace-nowrap" style={{ background: '#C8902A', color: '#fff' }}>
+                      {p.badge}
                     </span>
                   </div>
                 )}
 
-                <h3 className={`${playfair.className} text-2xl font-bold mb-1`}>{p.name}</h3>
-                <p
-                  className="text-sm mb-4"
-                  style={{ color: p.highlight ? '#666' : 'rgba(255,255,255,0.55)' }}
-                >
+                <h3 className={`${playfair.className} text-xl font-bold mb-1`}>{p.name}</h3>
+                <p className="text-sm mb-4" style={{ color: p.highlight ? '#666' : 'rgba(255,255,255,0.55)' }}>
                   {p.desc}
                 </p>
 
                 <div className="mb-1">
                   <span className={`${playfair.className} text-3xl sm:text-4xl font-black`}>{p.setup}</span>
-                  <span
-                    className="text-sm ml-1.5"
-                    style={{ color: p.highlight ? '#999' : 'rgba(255,255,255,0.4)' }}
-                  >
-                    setup
-                  </span>
+                  <span className="text-sm ml-1.5" style={{ color: p.highlight ? '#999' : 'rgba(255,255,255,0.4)' }}>setup</span>
                 </div>
-                <p className="text-sm font-semibold mb-2" style={{ color: '#C8902A' }}>
+                <p className="text-sm font-semibold mb-5" style={{ color: '#C8902A' }}>
                   {p.monthly} retainer
                 </p>
-                <p
-                  className="text-xs mb-6"
-                  style={{ color: p.highlight ? '#888' : 'rgba(255,255,255,0.45)' }}
-                >
-                  {p.consultants} IEBC AI consultants included
-                </p>
 
-                <ul className="space-y-2.5 flex-1 mb-8">
+                <ul className="space-y-2 flex-1 mb-7">
                   {p.features.map((f, fi) => (
                     <li key={fi} className="flex items-start gap-2 text-sm">
-                      <span className="font-bold shrink-0 mt-0.5" style={{ color: '#C8902A' }}>
-                        ✓
-                      </span>
-                      <span
-                        style={{ color: p.highlight ? '#333' : 'rgba(255,255,255,0.8)' }}
-                      >
-                        {f}
-                      </span>
+                      <span style={{ color: p.highlight ? '#333' : 'rgba(255,255,255,0.85)' }}>{f}</span>
                     </li>
                   ))}
                 </ul>
 
-                <a
-                  href={p.ctaHref}
-                  target={p.ctaHref.startsWith('http') ? '_blank' : undefined}
-                  rel={p.ctaHref.startsWith('http') ? 'noopener noreferrer' : undefined}
-                  className="text-center py-3.5 rounded-xl font-bold text-sm transition-opacity hover:opacity-90 block shadow-md"
-                  style={{ background: '#C8902A', color: '#fff' }}
-                >
-                  {p.cta}
-                </a>
+                <div className="space-y-2">
+                  <Link
+                    href={p.ctaHref}
+                    className="text-center py-3 rounded-xl font-bold text-sm transition-opacity hover:opacity-90 block shadow-md"
+                    style={{ background: '#C8902A', color: '#fff' }}
+                  >
+                    {p.cta} →
+                  </Link>
+                  <a
+                    href={p.callHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-center py-2.5 rounded-xl font-semibold text-sm block transition-opacity hover:opacity-80"
+                    style={{
+                      border: `1px solid ${p.highlight ? '#0B2140' : 'rgba(255,255,255,0.25)'}`,
+                      color: p.highlight ? '#0B2140' : 'rgba(255,255,255,0.75)',
+                    }}
+                  >
+                    Book a Call Instead
+                  </a>
+                </div>
               </div>
             ))}
           </div>
 
           <p className="text-center text-sm mt-8" style={{ color: 'rgba(255,255,255,0.35)' }}>
-            Monthly retainers cover ongoing support, updates, hosting, and your AI consultant access.
-            No long-term contracts.
+            Every bundle includes Website · Hub · Accounting · AI Advisor Workforce — fully integrated.
+            Monthly retainer covers hosting, support, and AI consultant access. No long-term contracts.
           </p>
         </div>
       </section>

@@ -1,316 +1,252 @@
 'use client'
-import { useState } from 'react'
 
-const PACKAGES = [
+import { useState } from 'react'
+import Link from 'next/link'
+
+const TIERS = [
   {
     id: 'starter',
-    label: '1–5 Page Website',
-    price: 500,
-    displayPrice: '$500',
-    desc: 'Perfect for solo businesses, freelancers, and service providers who need a clean, professional web presence fast.',
+    label: 'Starter',
+    build: 500,
+    monthly: 149,
+    badge: '',
+    desc: 'A clean, professional web presence — fast.',
     features: [
-      'Up to 5 custom pages (Home, About, Services, Contact + 1 more)',
+      'Up to 5 custom pages',
       'Mobile-first responsive design',
       'Online booking & contact form',
-      'Lead capture → flows into your IEBC hub',
+      'Lead capture → flows into IEBC hub',
       'Domain + hosting setup included',
+      'SEO optimized at launch',
       'Delivered in 2–3 weeks',
     ],
-    monthly: '$149/mo hosting & support',
-    highlight: false,
   },
   {
     id: 'growth',
-    label: '6–10 Page Website',
-    price: 1000,
-    displayPrice: '$1,000',
-    desc: 'For growing businesses that need more content, deeper service pages, client portals, and payment collection built in.',
+    label: 'Growth',
+    build: 1000,
+    monthly: 149,
+    badge: 'Most Popular',
+    desc: 'More content, client portal, and payments built in.',
     features: [
       'Up to 10 custom pages',
       'Client payment portal integration',
       'Blog or resource section',
       'Appointment & event booking system',
-      'Lead capture & CRM sync',
+      'Lead capture + CRM sync to hub',
       'Custom branding & brand kit',
-      'Domain + hosting setup included',
+      'Domain + hosting included',
       'Delivered in 3–4 weeks',
     ],
-    monthly: '$149/mo hosting & support',
-    highlight: true,
+  },
+  {
+    id: 'enterprise',
+    label: 'Enterprise',
+    build: 2500,
+    monthly: 249,
+    badge: '',
+    desc: 'Unlimited scale — e-commerce, portals, and integrations.',
+    features: [
+      'Unlimited pages',
+      'E-commerce / product catalog',
+      'Custom client login portal',
+      'Advanced API integrations',
+      'Multi-location or franchise ready',
+      'Priority 2-week build',
+      'Dedicated project manager',
+      'Ongoing monthly enhancements',
+    ],
   },
 ]
 
-const US_STATES = [
-  'AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA','HI','ID','IL','IN','IA',
-  'KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ',
-  'NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT',
-  'VA','WA','WV','WI','WY','DC',
-]
+const DARK = '#0B2140'
+const BLUE = '#1D4ED8'
+const GOLD = '#C9A02E'
 
-function getMilestones(price: number) {
-  const down = Math.round(price * 0.25)
-  const deploy = Math.round(price * 0.50)
-  const final = price - down - deploy
-  return { down, deploy, final }
-}
+export default function WebsiteCheckout() {
+  const [selected, setSelected] = useState<string | null>(null)
+  const [showForm, setShowForm] = useState(false)
+  const [submitted, setSubmitted] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [form, setForm] = useState({ name: '', email: '', phone: '', company: '', notes: '' })
 
-export default function WebsiteCheckoutPage() {
-  const [step, setStep] = useState<1 | 2>(1)
-  const [selectedPkg, setSelectedPkg] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-
-  const [form, setForm] = useState({
-    name: '', email: '', phone: '', company: '', state: '', website: '', notes: '',
-  })
-
-  const pkg = PACKAGES.find(p => p.id === selectedPkg)
-  const milestones = pkg ? getMilestones(pkg.price) : null
-
-  function handleField(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) {
-    setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
-  }
+  const tier = TIERS.find(t => t.id === selected)
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!pkg || !milestones) return
-    setLoading(true)
-    setError('')
+    setSubmitting(true)
     try {
-      const res = await fetch('/api/stripe/agency-checkout', {
+      await fetch('/api/infrastructure/order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          industryId: `website_${pkg.id}`,
-          industryLabel: `Intelligent Website — ${pkg.label}`,
-          setupAmount: pkg.price,
-          downPaymentAmount: milestones.down,
-          name: form.name,
-          email: form.email,
-          phone: form.phone,
-          company: form.company,
-          state: form.state,
-        }),
+        body: JSON.stringify({ type: 'website', ...form, plan: selected, build: tier?.build, monthly: tier?.monthly }),
       })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Checkout failed')
-      window.location.href = data.url
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.')
-      setLoading(false)
-    }
+    } catch { /* non-blocking */ }
+    setSubmitting(false)
+    setSubmitted(true)
+  }
+
+  if (submitted && tier) {
+    return (
+      <main className="min-h-screen flex items-center justify-center px-4 py-12" style={{ background: '#F5F7FA' }}>
+        <div className="max-w-lg w-full text-center">
+          <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg" style={{ background: BLUE }}>
+            <svg className="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <p className="text-xs font-black uppercase tracking-widest mb-3" style={{ color: GOLD }}>Order Received</p>
+          <h1 className="text-3xl font-extrabold mb-4" style={{ color: DARK }}>Your website is on the way!</h1>
+          <p className="text-gray-600 leading-relaxed mb-8">
+            Your <strong>{tier.label} website</strong> order is in. An IEBC web specialist will contact <strong>{form.email}</strong> within 2 business hours to start the build.
+          </p>
+          <div className="rounded-2xl p-5 mb-6 text-left" style={{ background: '#fff', border: '1px solid #e5e7eb' }}>
+            <p className="font-bold text-sm mb-3" style={{ color: DARK }}>Your Order</p>
+            <div className="flex justify-between text-sm mb-1"><span className="text-gray-500">{tier.label} website build</span><span className="font-bold">${tier.build.toLocaleString()}</span></div>
+            <div className="flex justify-between text-sm"><span className="text-gray-500">Monthly hosting & support</span><span className="font-bold" style={{ color: GOLD }}>${tier.monthly}/mo</span></div>
+          </div>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Link href="/" className="px-7 py-3 rounded-xl font-bold text-sm text-white shadow-md" style={{ background: DARK }}>Back to Homepage</Link>
+            <a href="https://calendly.com/new56money/30min" target="_blank" rel="noopener noreferrer" className="px-7 py-3 rounded-xl font-bold text-sm border-2 hover:bg-gray-50 transition" style={{ borderColor: DARK, color: DARK }}>Book a Call</a>
+          </div>
+        </div>
+      </main>
+    )
   }
 
   return (
-    <main className="min-h-screen" style={{ background: '#F8F6F1' }}>
+    <main className="min-h-screen" style={{ background: '#F5F7FA' }}>
       {/* Header */}
-      <div className="px-6 py-4 border-b bg-white">
-        <div className="max-w-5xl mx-auto flex items-center justify-between">
-          <a href="/" className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: '#0B2140' }}>
-              <span className="text-white font-extrabold text-xs">IEBC</span>
-            </div>
-            <span className="font-bold text-sm" style={{ color: '#0B2140' }}>Intelligent Websites</span>
-          </a>
-          <div className="flex items-center gap-2 text-xs text-gray-400">
-            <span className={`font-semibold ${step === 1 ? 'text-[#0B2140]' : ''}`}>1. Choose Package</span>
-            <span className="mx-1">→</span>
-            <span className={`font-semibold ${step === 2 ? 'text-[#0B2140]' : ''}`}>2. Your Info</span>
-            <span className="mx-1">→</span>
-            <span className="text-gray-300 font-semibold">3. Payment</span>
+      <div style={{ background: DARK }}>
+        <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10">
+          <Link href="/" className="text-blue-300 text-sm hover:text-white mb-4 inline-block">← Back to IEBC</Link>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-white mb-3">Intelligent Website Plans</h1>
+          <p className="text-blue-200 text-base max-w-2xl">
+            AI-powered, mobile-first websites built for your industry — booking, payments, and lead capture connected directly to your IEBC hub.
+          </p>
+          <div className="flex flex-wrap gap-x-6 gap-y-2 mt-5 text-sm text-blue-300">
+            <span>✓ Mobile-first design</span>
+            <span>✓ Connected to your hub</span>
+            <span>✓ Hosting included</span>
+            <span>✓ Delivered in weeks, not months</span>
           </div>
         </div>
       </div>
 
-      <div className="max-w-5xl mx-auto px-4 py-10">
-
-        {/* ── STEP 1: Package Selection ── */}
-        {step === 1 && (
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-12">
+        {/* Pricing tiers */}
+        {!showForm && (
           <>
-            <div className="text-center mb-10">
-              <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: '#C8902A' }}>Step 1 of 3</p>
-              <h1 className="text-3xl font-extrabold mb-2" style={{ color: '#0B2140' }}>Choose your website package</h1>
-              <p className="text-gray-500 text-sm">AI-powered, mobile-first website built for your industry. Delivered in weeks, not months.</p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 max-w-3xl mx-auto">
-              {PACKAGES.map(p => {
-                const isSelected = selectedPkg === p.id
-                const m = getMilestones(p.price)
-                return (
-                  <button
-                    key={p.id}
-                    onClick={() => setSelectedPkg(p.id)}
-                    className="rounded-2xl border-2 flex flex-col text-left transition-all bg-white w-full relative"
-                    style={{
-                      borderColor: isSelected ? '#0B2140' : p.highlight ? '#C8902A' : '#e5e7eb',
-                      boxShadow: isSelected ? '0 4px 24px rgba(11,33,64,0.15)' : p.highlight ? '0 2px 12px rgba(200,144,42,0.15)' : undefined,
-                    }}
-                  >
-                    {p.highlight && (
-                      <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-                        <span className="text-white text-xs font-bold px-4 py-1 rounded-full uppercase tracking-widest whitespace-nowrap" style={{ background: '#C8902A' }}>
-                          Most Popular
-                        </span>
-                      </div>
-                    )}
-                    {isSelected && (
-                      <div className="absolute top-3 right-3 w-5 h-5 rounded-full flex items-center justify-center" style={{ background: '#0B2140' }}>
-                        <span className="text-white text-[10px] font-bold">✓</span>
-                      </div>
-                    )}
-                    <div className="p-6 flex flex-col flex-1">
-                      <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: '#C8902A' }}>Website Package</p>
-                      <h3 className="font-extrabold text-xl mb-1" style={{ color: '#0B2140' }}>{p.label}</h3>
-                      <div className="flex items-baseline gap-1.5 mb-1">
-                        <span className="text-4xl font-extrabold" style={{ color: '#0B2140' }}>{p.displayPrice}</span>
-                        <span className="text-gray-400 text-sm">one-time build</span>
-                      </div>
-                      <p className="text-xs font-medium mb-4" style={{ color: '#C8902A' }}>+ {p.monthly}</p>
-                      <p className="text-sm text-gray-500 mb-5 leading-relaxed">{p.desc}</p>
-                      <ul className="space-y-2 flex-1 mb-4">
-                        {p.features.map((f, i) => (
-                          <li key={i} className="flex items-start gap-2 text-sm text-gray-600">
-                            <span className="font-bold shrink-0 mt-0.5" style={{ color: '#C8902A' }}>→</span>
-                            <span>{f}</span>
-                          </li>
-                        ))}
-                      </ul>
-                      <div className="rounded-lg p-3 text-xs border" style={{ background: '#F8F6F1', borderColor: '#e5e7eb' }}>
-                        <p className="font-bold mb-1" style={{ color: '#0B2140' }}>Payment schedule</p>
-                        <div className="space-y-0.5 text-gray-500">
-                          <p>Down today (25%): <span className="font-semibold text-gray-700">${m.down}</span></p>
-                          <p>At deployment (50%): <span className="font-semibold text-gray-700">${m.deploy}</span></p>
-                          <p>On delivery (25%): <span className="font-semibold text-gray-700">${m.final}</span></p>
-                        </div>
-                      </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
+              {TIERS.map(t => (
+                <div
+                  key={t.id}
+                  className={`bg-white rounded-2xl border-2 p-7 flex flex-col relative transition ${
+                    selected === t.id ? 'border-[#1D4ED8] shadow-xl' : 'border-gray-100 hover:border-gray-200 hover:shadow-md'
+                  }`}
+                >
+                  {t.badge && (
+                    <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
+                      <span className="text-xs font-bold uppercase tracking-widest px-4 py-1 rounded-full whitespace-nowrap text-white" style={{ background: GOLD }}>{t.badge}</span>
                     </div>
-                  </button>
-                )
-              })}
+                  )}
+
+                  <h3 className="text-xl font-extrabold text-gray-900 mb-1">{t.label}</h3>
+                  <p className="text-sm text-gray-500 mb-5">{t.desc}</p>
+
+                  <div className="mb-1">
+                    <span className="text-4xl font-black text-gray-900">${t.build.toLocaleString()}</span>
+                    <span className="text-sm text-gray-400 ml-1.5">one-time build</span>
+                  </div>
+                  <p className="text-sm font-semibold mb-6" style={{ color: GOLD }}>${t.monthly}/mo hosting & support</p>
+
+                  <ul className="space-y-2.5 flex-1 mb-8">
+                    {t.features.map((f, i) => (
+                      <li key={i} className="flex items-start gap-2 text-sm text-gray-700">
+                        <span className="font-bold shrink-0 mt-0.5" style={{ color: BLUE }}>✓</span>
+                        <span>{f}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <div className="space-y-2">
+                    <button
+                      onClick={() => { setSelected(t.id); setShowForm(true) }}
+                      className="w-full py-3 rounded-xl font-bold text-sm text-white transition hover:opacity-90 shadow-md"
+                      style={{ background: BLUE }}
+                    >
+                      Order Now →
+                    </button>
+                    <a
+                      href="https://calendly.com/new56money/30min"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="w-full py-2.5 rounded-xl font-semibold text-sm text-center block border-2 transition hover:bg-gray-50"
+                      style={{ borderColor: DARK, color: DARK }}
+                    >
+                      Book a Call Instead
+                    </a>
+                  </div>
+                </div>
+              ))}
             </div>
 
-            <div className="flex justify-center">
-              <button
-                onClick={() => { if (selectedPkg) setStep(2) }}
-                disabled={!selectedPkg}
-                className="px-10 py-3.5 rounded-xl font-bold text-sm text-white transition disabled:opacity-40 disabled:cursor-not-allowed"
-                style={{ background: '#0B2140' }}
-              >
-                Continue — {pkg?.displayPrice ?? 'Select a package'} →
-              </button>
-            </div>
-            <p className="text-center text-xs text-gray-400 mt-4">
-              25% due today · 50% at deployment · 25% on final delivery
+            <p className="text-center text-sm text-gray-400">
+              Not sure which to pick?{' '}
+              <a href="https://calendly.com/new56money/30min" target="_blank" rel="noopener noreferrer" className="underline font-medium text-gray-600">Book a free 30-min call</a>{' '}
+              and we&apos;ll recommend the right fit.
             </p>
           </>
         )}
 
-        {/* ── STEP 2: Your Info ── */}
-        {step === 2 && pkg && milestones && (
-          <div className="max-w-xl mx-auto">
-            <div className="text-center mb-8">
-              <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: '#C8902A' }}>Step 2 of 3</p>
-              <h1 className="text-3xl font-extrabold mb-2" style={{ color: '#0B2140' }}>Your information</h1>
-              <p className="text-gray-500 text-sm">Tell us about your business so we can build the right site for you.</p>
-            </div>
+        {/* Order form */}
+        {showForm && tier && (
+          <div className="max-w-2xl mx-auto">
+            <button onClick={() => setShowForm(false)} className="text-sm text-gray-500 hover:text-gray-800 mb-6 inline-block">← Back to plans</button>
 
-            {/* Package summary */}
-            <div className="rounded-xl border p-4 mb-6 flex items-center justify-between bg-white" style={{ borderColor: '#e5e7eb' }}>
-              <div>
-                <p className="font-bold text-sm" style={{ color: '#0B2140' }}>{pkg.label}</p>
-                <p className="text-xs text-gray-400">{pkg.monthly} after launch</p>
+            <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+              <div className="px-6 py-5" style={{ background: DARK }}>
+                <p className="text-white font-bold">Order: {tier.label} Website</p>
+                <p className="text-blue-300 text-sm">${tier.build.toLocaleString()} build · ${tier.monthly}/mo hosting & support</p>
               </div>
-              <div className="flex items-center gap-3">
-                <div className="text-right">
-                  <p className="text-xl font-extrabold" style={{ color: '#0B2140' }}>{pkg.displayPrice}</p>
-                  <p className="text-xs text-gray-400">${milestones.down} due today</p>
+              <div className="p-6">
+                <div className="bg-blue-50 border border-blue-100 rounded-xl px-4 py-3 mb-5 text-xs text-blue-700">
+                  No payment today. We&apos;ll review your request, send a proposal, and you pay only after approving.
                 </div>
-                <button onClick={() => setStep(1)} className="text-xs hover:underline" style={{ color: '#C8902A' }}>Change</button>
+                <form onSubmit={handleSubmit} className="space-y-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide">Full Name *</label>
+                      <input required value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1D4ED8] focus:border-transparent" placeholder="Jane Smith" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide">Email *</label>
+                      <input required type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1D4ED8] focus:border-transparent" placeholder="jane@company.com" />
+                    </div>
+                  </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div>
+                      <label className="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide">Phone</label>
+                      <input value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1D4ED8] focus:border-transparent" placeholder="(555) 000-0000" />
+                    </div>
+                    <div>
+                      <label className="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide">Business Name *</label>
+                      <input required value={form.company} onChange={e => setForm(f => ({ ...f, company: e.target.value }))} className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1D4ED8] focus:border-transparent" placeholder="Acme Corp" />
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide">Tell us about your business & website goals</label>
+                    <textarea value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} rows={4} className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1D4ED8] focus:border-transparent resize-none" placeholder="Industry, what pages you need, style preferences, any specific features…" />
+                  </div>
+                  <button type="submit" disabled={submitting} className="w-full py-3.5 rounded-xl font-bold text-sm text-white shadow-md disabled:opacity-50 transition" style={{ background: BLUE }}>
+                    {submitting ? 'Submitting…' : 'Submit Order →'}
+                  </button>
+                  <div className="text-center pt-1">
+                    <p className="text-xs text-gray-400 mb-1.5">Prefer to talk through it first?</p>
+                    <a href="https://calendly.com/new56money/30min" target="_blank" rel="noopener noreferrer" className="text-sm font-semibold underline" style={{ color: DARK }}>Book a 30-min call →</a>
+                  </div>
+                </form>
               </div>
-            </div>
-
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {[
-                { name: 'name', label: 'Full Name', type: 'text', placeholder: 'Jane Smith', required: true },
-                { name: 'email', label: 'Email Address', type: 'email', placeholder: 'jane@company.com', required: true },
-                { name: 'phone', label: 'Phone Number', type: 'tel', placeholder: '(555) 000-0000', required: false },
-                { name: 'company', label: 'Business Name', type: 'text', placeholder: 'Your Business LLC', required: false },
-                { name: 'website', label: 'Current Website (if any)', type: 'text', placeholder: 'www.yourbusiness.com', required: false },
-              ].map(field => (
-                <div key={field.name}>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                    {field.label} {field.required && <span className="text-red-500">*</span>}
-                  </label>
-                  <input
-                    name={field.name}
-                    type={field.type}
-                    required={field.required}
-                    value={form[field.name as keyof typeof form]}
-                    onChange={handleField}
-                    placeholder={field.placeholder}
-                    className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:border-transparent"
-                    style={{ '--tw-ring-color': '#0B2140' } as React.CSSProperties}
-                  />
-                </div>
-              ))}
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1.5">State</label>
-                <select
-                  name="state"
-                  value={form.state}
-                  onChange={handleField}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none bg-white"
-                >
-                  <option value="">Select state</option>
-                  {US_STATES.map(s => <option key={s} value={s}>{s}</option>)}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1.5">Notes (optional)</label>
-                <textarea
-                  name="notes"
-                  value={form.notes}
-                  onChange={handleField}
-                  placeholder="Tell us about your business, goals, or anything specific you want on your site..."
-                  rows={3}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none resize-none"
-                />
-              </div>
-
-              {error && (
-                <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg">{error}</div>
-              )}
-
-              {/* Payment reminder */}
-              <div className="rounded-xl p-4 border" style={{ background: '#F8F6F1', borderColor: '#e5e7eb' }}>
-                <p className="font-bold text-sm mb-2" style={{ color: '#0B2140' }}>Payment due today: ${milestones.down}</p>
-                <div className="space-y-1 text-xs text-gray-500">
-                  <p>✓ Down payment (25%) — <span className="font-semibold text-gray-700">${milestones.down}</span> — charged now</p>
-                  <p>○ Deployment phase (50%) — <span className="font-semibold text-gray-700">${milestones.deploy}</span> — invoiced at launch</p>
-                  <p>○ Final delivery (25%) — <span className="font-semibold text-gray-700">${milestones.final}</span> — invoiced on completion</p>
-                </div>
-              </div>
-
-              <div className="pt-1">
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full py-3.5 rounded-xl font-bold text-sm text-white transition disabled:opacity-60"
-                  style={{ background: '#0B2140' }}
-                >
-                  {loading ? 'Redirecting to payment...' : `Pay $${milestones.down} Down Payment →`}
-                </button>
-                <p className="text-center text-xs text-gray-400 mt-3">
-                  Secure checkout via Stripe · 25% due today · balance invoiced at milestones
-                </p>
-              </div>
-            </form>
-
-            <div className="mt-4 text-center">
-              <button onClick={() => setStep(1)} className="text-sm text-gray-500 hover:text-gray-700">← Back to packages</button>
             </div>
           </div>
         )}

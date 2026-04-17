@@ -1,379 +1,226 @@
 'use client'
-import { useState, useEffect } from 'react'
 
-const BUNDLES = [
+import { useState, useEffect, Suspense } from 'react'
+import Link from 'next/link'
+import { useSearchParams } from 'next/navigation'
+
+const PLANS = [
   {
-    id: 'bundle_silver',
-    label: 'Silver Bundle',
-    tagline: 'For solo founders & small businesses getting started.',
-    setupAmount: 1500,
-    monthly: 199,
-    highlight: false,
-    badge: '',
-    includes: [
-      '1–5 page Intelligent Website (custom design)',
-      'Business Hub — CRM, invoicing & client portal',
-      'Accounting Silver ($9/mo after launch)',
-      'Lead capture wired into your hub',
-      'Domain + hosting & support ($149/mo after)',
-      '1 IEBC AI Consultant',
-      'Email support',
-      'Delivered in 4–6 weeks',
-    ],
-    accentColor: '#0B2140',
+    id: 'starter',
+    name: 'Starter Bundle',
+    setup: 1500,
+    monthly: 299,
+    desc: 'Website + Hub + Accounting + 8 AI Advisors',
+    includes: ['Intelligent Website (5 pages)', 'Automated Business Hub', 'Accounting — Silver plan', '8 IEBC AI Consultants', 'Business Formation assistance', 'Hosting + domain included', 'Delivered in 6 weeks'],
   },
   {
-    id: 'bundle_gold',
-    label: 'Gold Bundle',
-    tagline: 'For growing businesses that need the full system.',
-    setupAmount: 2500,
-    monthly: 349,
-    highlight: true,
-    badge: 'Most Popular',
-    includes: [
-      '6–10 page Intelligent Website + booking',
-      'Business Hub — full CRM, automation & outreach',
-      'Accounting Gold ($22/mo after launch)',
-      'Automated lead pipeline & follow-up sequences',
-      'Social media scheduling & content calendar',
-      'Domain + hosting & support ($149/mo after)',
-      '3 IEBC AI Consultants',
-      'Priority support + kickoff strategy call',
-      'Delivered in 4–6 weeks',
-    ],
-    accentColor: '#C8902A',
+    id: 'growth',
+    name: 'Growth Bundle',
+    setup: 3500,
+    monthly: 499,
+    desc: 'Website + Hub + Accounting + AI Workforce — fully integrated',
+    includes: ['Website — 10 pages + booking + payments', 'Full Hub — CRM, invoicing, outreach', 'Accounting — Gold plan', 'AI Advisor Workforce (3 advisors)', '25 IEBC AI Consultants', 'Complete workflow automations', 'Priority build + dedicated manager'],
   },
   {
-    id: 'bundle_platinum',
-    label: 'Platinum Bundle',
-    tagline: 'Full-stack infrastructure — no limits.',
-    setupAmount: 4000,
-    monthly: 549,
-    highlight: false,
-    badge: '',
-    includes: [
-      'Unlimited page website + client login portal',
-      'Premium Business Hub — all modules, no limits',
-      'Accounting Platinum — full 22-module suite ($42/mo after)',
-      'Custom automations & API integrations',
-      'Payroll, tax center, inventory & job costing',
-      'Domain + hosting & support ($149/mo after)',
-      '5 IEBC AI Consultants',
-      'Dedicated account manager + quarterly reviews',
-      'Delivered in 6–8 weeks',
-    ],
-    accentColor: '#7C3AED',
+    id: 'pro',
+    name: 'Pro Bundle',
+    setup: 6500,
+    monthly: 799,
+    desc: 'All six services, enterprise-grade, no limits',
+    includes: ['Unlimited pages + client login portal', 'Every hub module — zero restrictions', 'Accounting — Platinum plan', 'AI Advisor Workforce (5 advisors)', 'All 60 IEBC AI Consultants', 'Custom automations + API integrations', 'SLA guarantee + priority support'],
   },
 ]
 
-const US_STATES = [
-  'AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA','HI','ID','IL','IN','IA',
-  'KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ',
-  'NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT',
-  'VA','WA','WV','WI','WY','DC',
-]
+const DARK = '#0B2140'
+const GOLD = '#C9A02E'
 
-function milestones(setup: number) {
-  const down = Math.round(setup * 0.25)
-  const deploy = Math.round(setup * 0.50)
-  const final = setup - down - deploy
-  return { down, deploy, final }
-}
-
-export default function BundleCheckoutPage() {
-  const [step, setStep] = useState<1 | 2>(1)
-  const [selectedId, setSelectedId] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState('')
-  const [canceled, setCanceled] = useState(false)
-
-  const [form, setForm] = useState({
-    name: '', email: '', phone: '', company: '', state: '', notes: '',
-  })
+function BundleCheckoutContent() {
+  const searchParams = useSearchParams()
+  const [selectedPlan, setSelectedPlan] = useState('growth')
+  const [submitted, setSubmitted] = useState(false)
+  const [submitting, setSubmitting] = useState(false)
+  const [form, setForm] = useState({ name: '', email: '', phone: '', company: '', notes: '' })
 
   useEffect(() => {
-    if (typeof window !== 'undefined') {
-      const params = new URLSearchParams(window.location.search)
-      const plan = params.get('plan')
-      if (plan) {
-        const match = BUNDLES.find(b => b.id === `bundle_${plan}` || b.label.toLowerCase().includes(plan))
-        if (match) setSelectedId(match.id)
-      }
-      if (params.get('canceled') === 'true') setCanceled(true)
-    }
-  }, [])
+    const p = searchParams.get('plan')
+    if (p && PLANS.find(x => x.id === p)) setSelectedPlan(p)
+  }, [searchParams])
 
-  const bundle = BUNDLES.find(b => b.id === selectedId) ?? null
-  const ms = bundle ? milestones(bundle.setupAmount) : null
-
-  function handleField(e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) {
-    setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
-  }
+  const plan = PLANS.find(p => p.id === selectedPlan)!
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
-    if (!bundle || !ms) return
-    setLoading(true)
-    setError('')
+    setSubmitting(true)
     try {
-      const res = await fetch('/api/stripe/agency-checkout', {
+      await fetch('/api/infrastructure/order', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          industryId: bundle.id,
-          industryLabel: bundle.label,
-          setupAmount: bundle.setupAmount,
-          downPaymentAmount: ms.down,
-          name: form.name,
-          email: form.email,
-          phone: form.phone,
-          company: form.company,
-          state: form.state,
-        }),
+        body: JSON.stringify({ type: 'bundle', ...form, plan: selectedPlan, setup: plan.setup, monthly: plan.monthly }),
       })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Checkout failed')
-      window.location.href = data.url
-    } catch (err: unknown) {
-      setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.')
-      setLoading(false)
-    }
+    } catch { /* non-blocking */ }
+    setSubmitting(false)
+    setSubmitted(true)
+  }
+
+  if (submitted) {
+    return (
+      <main className="min-h-screen flex items-center justify-center px-4 py-12" style={{ background: '#F5F7FA' }}>
+        <div className="max-w-lg w-full text-center">
+          <div className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 shadow-lg" style={{ background: DARK }}>
+            <svg className="w-10 h-10 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+            </svg>
+          </div>
+          <p className="text-xs font-black uppercase tracking-widest mb-3" style={{ color: GOLD }}>Order Received</p>
+          <h1 className="text-3xl font-extrabold mb-4" style={{ color: DARK }}>You&apos;re in!</h1>
+          <p className="text-gray-600 leading-relaxed mb-8">
+            Your <strong>{plan.name}</strong> order is confirmed. An IEBC account manager will reach out to <strong>{form.email}</strong> within 2 business hours to kick off onboarding.
+          </p>
+          <div className="rounded-2xl p-5 mb-6 text-left space-y-3" style={{ background: DARK }}>
+            <p className="font-bold text-sm text-white mb-1">What happens next:</p>
+            {[
+              { n: '1', t: 'Kickoff call scheduled', d: 'We reach out within 2 hours to book your onboarding session.' },
+              { n: '2', t: 'Contract + invoice sent', d: 'You receive a services agreement and setup invoice via email.' },
+              { n: '3', t: 'Build begins', d: 'Website, hub, and accounting are built in parallel by your IEBC team.' },
+              { n: '4', t: 'Portal access granted', d: 'Sign in to manage accounting, hub, and your AI Advisor workforce.' },
+            ].map(s => (
+              <div key={s.n} className="flex gap-3">
+                <div className="w-6 h-6 rounded-full flex items-center justify-center text-white text-[10px] font-bold shrink-0 mt-0.5" style={{ background: GOLD }}>{s.n}</div>
+                <div><p className="text-sm font-semibold text-white">{s.t}</p><p className="text-xs mt-0.5" style={{ color: 'rgba(255,255,255,0.6)' }}>{s.d}</p></div>
+              </div>
+            ))}
+          </div>
+          <div className="flex flex-col sm:flex-row gap-3 justify-center">
+            <Link href="/hub" className="px-7 py-3 rounded-xl font-bold text-sm text-white shadow-md" style={{ background: DARK }}>Go to Hub →</Link>
+            <Link href="/" className="px-7 py-3 rounded-xl font-bold text-sm border-2 hover:bg-gray-50 transition" style={{ borderColor: DARK, color: DARK }}>Back to Homepage</Link>
+          </div>
+        </div>
+      </main>
+    )
   }
 
   return (
-    <main className="min-h-screen" style={{ background: '#F8F6F1' }}>
-      {/* Header */}
-      <div className="px-6 py-4 border-b bg-white">
-        <div className="max-w-5xl mx-auto flex items-center justify-between">
-          <a href="/" className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg flex items-center justify-center" style={{ background: '#0B2140' }}>
-              <span className="text-white font-extrabold text-xs">IEBC</span>
+    <main className="min-h-screen px-4 py-10" style={{ background: '#F5F7FA' }}>
+      <div className="max-w-5xl mx-auto">
+        <Link href="/#pricing" className="text-sm text-gray-500 hover:text-gray-800 mb-6 inline-block">← Back to Pricing</Link>
+
+        <div className="text-center mb-10">
+          <p className="text-xs font-black uppercase tracking-widest mb-2" style={{ color: GOLD }}>Bundle Order</p>
+          <h1 className="text-3xl font-extrabold mb-2" style={{ color: DARK }}>Choose Your Bundle</h1>
+          <p className="text-gray-500 text-sm">Select a plan, fill in your info — we reach out within 2 hours. No payment until you sign the agreement.</p>
+        </div>
+
+        <div className="flex flex-col lg:flex-row gap-8">
+          <div className="flex-1 space-y-6">
+            {/* Plan selector */}
+            <div className="bg-white rounded-2xl border border-gray-200 p-5 shadow-sm">
+              <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">Select Bundle</p>
+              <div className="space-y-3">
+                {PLANS.map(p => (
+                  <button key={p.id} onClick={() => setSelectedPlan(p.id)}
+                    className={`w-full text-left rounded-xl border-2 p-4 transition ${selectedPlan === p.id ? 'border-[#0B2140] bg-blue-50' : 'border-gray-100 hover:border-gray-200'}`}
+                  >
+                    <div className="flex items-start justify-between gap-4">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-0.5">
+                          <div className={`w-4 h-4 rounded-full border-2 flex items-center justify-center shrink-0 ${selectedPlan === p.id ? 'border-[#0B2140] bg-[#0B2140]' : 'border-gray-300'}`}>
+                            {selectedPlan === p.id && <div className="w-1.5 h-1.5 bg-white rounded-full" />}
+                          </div>
+                          <p className="font-bold text-sm text-gray-900">{p.name}</p>
+                        </div>
+                        <p className="text-xs text-gray-500 ml-6">{p.desc}</p>
+                      </div>
+                      <div className="text-right shrink-0">
+                        <p className="font-extrabold text-gray-900 text-sm">${p.setup.toLocaleString()} <span className="font-normal text-xs text-gray-400">setup</span></p>
+                        <p className="text-xs font-semibold" style={{ color: GOLD }}>${p.monthly}/mo</p>
+                      </div>
+                    </div>
+                  </button>
+                ))}
+              </div>
             </div>
-            <span className="font-bold text-sm" style={{ color: '#0B2140' }}>Full-Stack Bundle</span>
-          </a>
-          <div className="flex items-center gap-2 text-xs text-gray-400">
-            <span className={`font-semibold ${step === 1 ? 'text-[#0B2140]' : ''}`}>1. Choose Bundle</span>
-            <span className="mx-1">→</span>
-            <span className={`font-semibold ${step === 2 ? 'text-[#0B2140]' : ''}`}>2. Your Info</span>
-            <span className="mx-1">→</span>
-            <span className="text-gray-300 font-semibold">3. Payment</span>
+
+            {/* Contact form */}
+            <div className="bg-white rounded-2xl border border-gray-200 p-6 shadow-sm">
+              <p className="text-xs font-bold text-gray-500 uppercase tracking-widest mb-4">Your Information</p>
+              <form onSubmit={handleSubmit} className="space-y-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide">Full Name *</label>
+                    <input required value={form.name} onChange={e => setForm(f => ({ ...f, name: e.target.value }))} className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2140] focus:border-transparent" placeholder="Jane Smith" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide">Email *</label>
+                    <input required type="email" value={form.email} onChange={e => setForm(f => ({ ...f, email: e.target.value }))} className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2140] focus:border-transparent" placeholder="jane@company.com" />
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <label className="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide">Phone</label>
+                    <input value={form.phone} onChange={e => setForm(f => ({ ...f, phone: e.target.value }))} className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2140] focus:border-transparent" placeholder="(555) 000-0000" />
+                  </div>
+                  <div>
+                    <label className="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide">Company *</label>
+                    <input required value={form.company} onChange={e => setForm(f => ({ ...f, company: e.target.value }))} className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2140] focus:border-transparent" placeholder="Acme Corp" />
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide">Tell us about your business</label>
+                  <textarea value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} rows={3} className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2140] focus:border-transparent resize-none" placeholder="Industry, current challenges, goals…" />
+                </div>
+                <button type="submit" disabled={submitting} className="w-full py-3.5 rounded-xl font-bold text-sm text-white transition shadow-md disabled:opacity-50" style={{ background: GOLD }}>
+                  {submitting ? 'Submitting…' : `Place Order — ${plan.name} →`}
+                </button>
+                <p className="text-[11px] text-gray-400 text-center">No payment until you review and sign the services agreement. We contact you within 2 business hours.</p>
+              </form>
+              <div className="mt-5 pt-4 border-t border-gray-100 text-center">
+                <p className="text-xs text-gray-400 mb-2">Prefer to talk first?</p>
+                <a href="https://calendly.com/new56money/30min" target="_blank" rel="noopener noreferrer"
+                  className="inline-block px-5 py-2.5 rounded-xl text-sm font-bold border-2 transition hover:bg-gray-50" style={{ borderColor: DARK, color: DARK }}>
+                  Book a 30-min Call →
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* Order summary sidebar */}
+          <div className="w-full lg:w-72 shrink-0">
+            <div className="sticky top-6 bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+              <div className="px-5 py-4" style={{ background: DARK }}>
+                <p className="text-white font-bold text-sm">Order Summary</p>
+              </div>
+              <div className="p-5">
+                <p className="font-bold text-gray-900 mb-1">{plan.name}</p>
+                <p className="text-xs text-gray-500 mb-4">{plan.desc}</p>
+                <ul className="space-y-2 mb-5">
+                  {plan.includes.map((f, i) => (
+                    <li key={i} className="flex items-start gap-2 text-xs text-gray-600">
+                      <span className="font-bold shrink-0 mt-0.5" style={{ color: GOLD }}>✓</span>
+                      <span>{f}</span>
+                    </li>
+                  ))}
+                </ul>
+                <div className="border-t border-gray-100 pt-4 space-y-2">
+                  <div className="flex justify-between text-sm"><span className="text-gray-500">One-time setup</span><span className="font-bold text-gray-900">${plan.setup.toLocaleString()}</span></div>
+                  <div className="flex justify-between text-sm"><span className="text-gray-500">Monthly retainer</span><span className="font-bold" style={{ color: GOLD }}>${plan.monthly}/mo</span></div>
+                </div>
+                <div className="mt-4 rounded-xl p-3 text-xs" style={{ background: '#F0F4FF', border: '1px solid #C7D7FF' }}>
+                  <p className="font-bold text-[#0B2140] mb-1">Includes all 6 services</p>
+                  <p className="text-blue-700">Website · Hub · Accounting · AI Advisors · Workflow · Infrastructure — fully integrated.</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
-
-      <div className="max-w-5xl mx-auto px-4 py-10">
-        {canceled && (
-          <div className="mb-6 bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg">
-            Payment was canceled. Select a bundle below to try again.
-          </div>
-        )}
-
-        {/* ── STEP 1: Bundle Selection ── */}
-        {step === 1 && (
-          <>
-            <div className="text-center mb-10">
-              <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: '#C8902A' }}>Step 1 of 3</p>
-              <h1 className="text-3xl font-extrabold mb-2" style={{ color: '#0B2140' }}>Choose your bundle</h1>
-              <p className="text-gray-500 text-sm max-w-xl mx-auto">
-                Every bundle includes a custom website, automated business hub, and accounting software — built, connected, and delivered.
-              </p>
-            </div>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-              {BUNDLES.map(b => {
-                const isSelected = selectedId === b.id
-                const ms = milestones(b.setupAmount)
-                return (
-                  <button
-                    key={b.id}
-                    onClick={() => setSelectedId(b.id)}
-                    className="rounded-2xl text-left flex flex-col transition-all relative bg-white w-full"
-                    style={{
-                      border: `2px solid ${isSelected ? b.accentColor : '#e5e7eb'}`,
-                      boxShadow: isSelected ? `0 8px 32px ${b.accentColor}22` : undefined,
-                    }}
-                  >
-                    {b.badge && (
-                      <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
-                        <span className="text-white text-xs font-bold px-4 py-1 rounded-full uppercase tracking-widest shadow-md whitespace-nowrap" style={{ background: b.accentColor }}>
-                          {b.badge}
-                        </span>
-                      </div>
-                    )}
-                    {isSelected && (
-                      <div className="absolute top-3 right-3 w-5 h-5 rounded-full flex items-center justify-center" style={{ background: b.accentColor }}>
-                        <span className="text-white text-[10px] font-bold">✓</span>
-                      </div>
-                    )}
-
-                    {/* Color bar */}
-                    <div className="h-1.5 rounded-t-2xl w-full" style={{ background: b.accentColor }} />
-
-                    <div className="p-6 flex flex-col flex-1">
-                      <div className="mb-4">
-                        <span className="text-xs font-bold uppercase tracking-widest mb-2 block" style={{ color: b.accentColor }}>{b.label}</span>
-                        <div className="flex items-baseline gap-1 mb-1">
-                          <span className="text-3xl font-extrabold" style={{ color: '#0B2140' }}>${b.setupAmount.toLocaleString()}</span>
-                          <span className="text-gray-400 text-sm">setup</span>
-                          <span className="text-gray-300 text-sm mx-1">+</span>
-                          <span className="text-lg font-bold" style={{ color: '#0B2140' }}>${b.monthly}/mo</span>
-                        </div>
-                        <p className="text-xs text-gray-500 mb-3">{b.tagline}</p>
-                        <div className="text-xs rounded-lg px-3 py-2" style={{ background: '#F8F6F1' }}>
-                          <span className="font-semibold" style={{ color: b.accentColor }}>${ms.down} due today</span>
-                          <span className="text-gray-400"> · ${ms.deploy} at build · ${ms.final} on delivery</span>
-                        </div>
-                      </div>
-
-                      <ul className="space-y-1.5 flex-1">
-                        {b.includes.map((f, i) => (
-                          <li key={i} className="flex items-start gap-2 text-xs text-gray-600">
-                            <span className="font-bold shrink-0 mt-0.5" style={{ color: b.accentColor }}>✓</span>
-                            <span>{f}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  </button>
-                )
-              })}
-            </div>
-
-            <div className="flex justify-center">
-              <button
-                onClick={() => { if (selectedId) setStep(2) }}
-                disabled={!selectedId}
-                className="px-10 py-3.5 rounded-xl font-bold text-sm text-white transition disabled:opacity-40 disabled:cursor-not-allowed shadow-lg"
-                style={{ background: bundle?.accentColor ?? '#0B2140' }}
-              >
-                Continue with {bundle?.label ?? 'a bundle'} →
-              </button>
-            </div>
-            <p className="text-center text-xs text-gray-400 mt-4">
-              25% down today · 50% at build start · 25% on final delivery
-            </p>
-          </>
-        )}
-
-        {/* ── STEP 2: Your Info ── */}
-        {step === 2 && bundle && ms && (
-          <div className="max-w-xl mx-auto">
-            <div className="text-center mb-8">
-              <p className="text-xs font-bold uppercase tracking-widest mb-2" style={{ color: '#C8902A' }}>Step 2 of 3</p>
-              <h1 className="text-3xl font-extrabold mb-2" style={{ color: '#0B2140' }}>Your information</h1>
-              <p className="text-gray-500 text-sm">We&apos;ll reach out within 24 hours to schedule your kickoff call.</p>
-            </div>
-
-            {/* Bundle summary */}
-            <div className="rounded-xl border p-4 mb-6 flex items-center justify-between bg-white" style={{ borderColor: '#e5e7eb' }}>
-              <div>
-                <span className="text-xs font-bold uppercase tracking-widest" style={{ color: bundle.accentColor }}>{bundle.label}</span>
-                <p className="text-xs text-gray-400 mt-0.5">${bundle.monthly}/mo after launch</p>
-              </div>
-              <div className="flex items-center gap-3">
-                <div className="text-right">
-                  <p className="text-xl font-extrabold" style={{ color: '#0B2140' }}>${bundle.setupAmount.toLocaleString()}</p>
-                  <p className="text-xs text-gray-400">${ms.down} due today</p>
-                </div>
-                <button onClick={() => setStep(1)} className="text-xs hover:underline" style={{ color: bundle.accentColor }}>Change</button>
-              </div>
-            </div>
-
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {[
-                { name: 'name', label: 'Full Name', type: 'text', placeholder: 'Jane Smith', required: true },
-                { name: 'email', label: 'Email Address', type: 'email', placeholder: 'jane@company.com', required: true },
-                { name: 'phone', label: 'Phone Number', type: 'tel', placeholder: '(555) 000-0000', required: false },
-                { name: 'company', label: 'Business Name', type: 'text', placeholder: 'Your Business LLC', required: false },
-              ].map(field => (
-                <div key={field.name}>
-                  <label className="block text-sm font-semibold text-gray-700 mb-1.5">
-                    {field.label}{field.required && <span className="text-red-500 ml-0.5">*</span>}
-                  </label>
-                  <input
-                    name={field.name}
-                    type={field.type}
-                    required={field.required}
-                    value={form[field.name as keyof typeof form]}
-                    onChange={handleField}
-                    placeholder={field.placeholder}
-                    className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:border-transparent"
-                    style={{ '--tw-ring-color': bundle.accentColor } as React.CSSProperties}
-                  />
-                </div>
-              ))}
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1.5">State</label>
-                <select
-                  name="state"
-                  value={form.state}
-                  onChange={handleField}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none bg-white"
-                >
-                  <option value="">Select state</option>
-                  {US_STATES.map(s => <option key={s} value={s}>{s}</option>)}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1.5">Notes <span className="text-gray-400 font-normal">(optional)</span></label>
-                <textarea
-                  name="notes"
-                  value={form.notes}
-                  onChange={handleField}
-                  placeholder="Tell us about your business and what you want to accomplish."
-                  rows={3}
-                  className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none resize-none"
-                />
-              </div>
-
-              {/* Payment breakdown */}
-              <div className="rounded-xl p-4 border" style={{ background: '#F8F6F1', borderColor: '#e5e7eb' }}>
-                <p className="font-bold text-sm mb-2" style={{ color: '#0B2140' }}>3-Milestone Payment — ${bundle.setupAmount.toLocaleString()} total setup</p>
-                <div className="space-y-1.5 text-xs text-gray-500">
-                  {[
-                    { label: `Down payment (25%) — charged today`, amount: ms.down, done: true },
-                    { label: `Build start (50%) — invoiced`, amount: ms.deploy, done: false },
-                    { label: `Final delivery (25%) — invoiced on launch`, amount: ms.final, done: false },
-                  ].map((m, i) => (
-                    <p key={i}>
-                      <span className="mr-1">{m.done ? '✓' : '○'}</span>
-                      {m.label}:{' '}
-                      <span className="font-semibold text-gray-700">${m.amount.toLocaleString()}</span>
-                    </p>
-                  ))}
-                </div>
-                <p className="text-xs text-gray-400 mt-2 pt-2 border-t" style={{ borderColor: '#e5e7eb' }}>
-                  ${bundle.monthly}/mo retainer begins after your system launches.
-                </p>
-              </div>
-
-              {error && (
-                <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg">{error}</div>
-              )}
-
-              <div className="pt-1">
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full py-3.5 rounded-xl font-bold text-sm text-white transition disabled:opacity-60 shadow-lg"
-                  style={{ background: bundle.accentColor }}
-                >
-                  {loading ? 'Redirecting to payment...' : `Pay $${ms.down.toLocaleString()} Down Payment →`}
-                </button>
-                <p className="text-center text-xs text-gray-400 mt-3">
-                  Secure checkout via Stripe · balance invoiced at milestones · no long-term contracts
-                </p>
-              </div>
-            </form>
-
-            <div className="mt-4 text-center">
-              <button onClick={() => setStep(1)} className="text-sm text-gray-500 hover:text-gray-700">← Back to bundles</button>
-            </div>
-          </div>
-        )}
-      </div>
     </main>
+  )
+}
+
+export default function BundleCheckout() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-gray-50 flex items-center justify-center"><div className="text-gray-400 text-sm">Loading…</div></div>}>
+      <BundleCheckoutContent />
+    </Suspense>
   )
 }

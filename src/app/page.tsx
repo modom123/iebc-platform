@@ -299,7 +299,7 @@ export default function AgencyHomepage() {
               className="text-sm transition-colors hover:text-white/80"
               style={{ color: 'rgba(255,255,255,0.45)' }}
             >
-              Self-service SaaS from{' '}
+              Self-service Financial Infrastructure from{' '}
               <span style={{ color: '#C8902A', textDecoration: 'underline' }}>$9/mo →</span>
             </Link>
             <span style={{ color: 'rgba(255,255,255,0.2)' }}>·</span>
@@ -432,7 +432,7 @@ export default function AgencyHomepage() {
                   className="px-6 py-2.5 rounded-lg text-sm font-bold transition-opacity hover:opacity-90 shadow-md text-center"
                   style={{ background: '#C8902A', color: '#fff' }}
                 >
-                  Get Efficient SaaS — from $9/mo
+                  Get Financial Infrastructure — from $9/mo
                 </a>
                 <a
                   href="https://calendly.com/new56money/30min"
@@ -652,15 +652,15 @@ export default function AgencyHomepage() {
             Prefer to do it yourself?
           </h3>
           <p className="text-gray-500 mb-6 max-w-lg mx-auto">
-            Our self-service SaaS platform gives you access to Business Infrastructure, Automated Hub,
-            and IEBC Consultants — starting at $9/mo. No setup fee, no contract.
+            Our self-service Financial Infrastructure platform gives you access to Accounting, Automated Hub,
+            and IEBC AI Consultants — starting at $9/mo. No setup fee, no contract.
           </p>
           <Link
             href="/accounting/checkout"
             className="inline-flex items-center gap-2 px-7 py-3 rounded-xl font-bold text-sm border-2 transition-colors hover:bg-[#0B2140] hover:text-white"
             style={{ borderColor: '#0B2140', color: '#0B2140' }}
           >
-            View SaaS Plans &amp; Pricing →
+            View Financial Infrastructure Plans →
           </Link>
         </div>
       </section>
@@ -720,7 +720,7 @@ export default function AgencyHomepage() {
                   [
                     ['Book a Call', 'https://calendly.com/new56money/30min'],
                     ['Contact Us', '#contact'],
-                    ['SaaS Platform', '/platform'],
+                    ['Financial Infrastructure', '/accounting/checkout'],
                     ['Client Portal', '/auth/login'],
                     ['IEBC Consultants', '/auth/login?next=/hub/consultants'],
                     ['Create Account', '/auth/signup'],

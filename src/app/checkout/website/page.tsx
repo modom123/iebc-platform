@@ -173,7 +173,7 @@ export default function WebsiteCheckout() {
                     <button
                       onClick={() => { setSelected(t.id); setShowForm(true) }}
                       className="w-full py-3 rounded-xl font-bold text-sm text-white transition hover:opacity-90 shadow-md"
-                      style={{ background: BLUE }}
+                      style={{ background: GOLD }}
                     >
                       Order Now →
                     </button>
@@ -210,8 +210,27 @@ export default function WebsiteCheckout() {
                 <p className="text-blue-300 text-sm">${tier.build.toLocaleString()} build · ${tier.monthly}/mo hosting & support</p>
               </div>
               <div className="p-6">
-                <div className="bg-blue-50 border border-blue-100 rounded-xl px-4 py-3 mb-5 text-xs text-blue-700">
-                  No payment today. We&apos;ll review your request, send a proposal, and you pay only after approving.
+                {/* Payment milestones */}
+                <div className="rounded-xl p-4 mb-5 border border-gray-100" style={{ background: '#F8F8F8' }}>
+                  <p className="text-xs font-bold text-gray-700 mb-3">Payment Milestones</p>
+                  <div className="space-y-2">
+                    {[
+                      { pct: '25%', label: 'Down Payment', timing: 'Due upon signing agreement', color: '#C9A02E', done: false },
+                      { pct: '50%', label: 'Build Complete', timing: 'Invoiced when site is delivered', color: '#0B2140', done: false },
+                      { pct: '25%', label: 'Launch Approved', timing: 'Invoiced after you approve launch', color: '#6B7280', done: false },
+                    ].map((m, i) => (
+                      <div key={i} className="flex items-center justify-between text-xs gap-2">
+                        <div className="flex items-center gap-2">
+                          <div className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-white font-bold text-[10px]" style={{ background: m.color }}>{i + 1}</div>
+                          <div>
+                            <p className="font-semibold text-gray-700">{m.label}</p>
+                            <p className="text-gray-400">{m.timing}</p>
+                          </div>
+                        </div>
+                        <span className="font-bold shrink-0" style={{ color: m.color }}>{m.pct}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
                 <form onSubmit={handleSubmit} className="space-y-4">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -238,7 +257,7 @@ export default function WebsiteCheckout() {
                     <label className="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide">Tell us about your business & website goals</label>
                     <textarea value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} rows={4} className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#1D4ED8] focus:border-transparent resize-none" placeholder="Industry, what pages you need, style preferences, any specific features…" />
                   </div>
-                  <button type="submit" disabled={submitting} className="w-full py-3.5 rounded-xl font-bold text-sm text-white shadow-md disabled:opacity-50 transition" style={{ background: BLUE }}>
+                  <button type="submit" disabled={submitting} className="w-full py-3.5 rounded-xl font-bold text-sm text-white shadow-md disabled:opacity-50 transition" style={{ background: GOLD }}>
                     {submitting ? 'Submitting…' : 'Submit Order →'}
                   </button>
                   <div className="text-center pt-1">

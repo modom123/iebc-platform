@@ -87,7 +87,7 @@ export default function HomeMobileNav() {
                 className="block w-full text-center py-3 rounded-xl font-bold text-base transition-opacity hover:opacity-90"
                 style={{ background: '#C8902A', color: '#fff' }}
               >
-                Get SaaS — $9/mo
+                Get Financial Infrastructure — $9/mo
               </Link>
 
               <div className="pt-1">

@@ -200,11 +200,35 @@ function BundleCheckoutContent() {
                     </li>
                   ))}
                 </ul>
-                <div className="border-t border-gray-100 pt-4 space-y-2">
+                <div className="border-t border-gray-100 pt-4 space-y-2 mb-4">
                   <div className="flex justify-between text-sm"><span className="text-gray-500">One-time setup</span><span className="font-bold text-gray-900">${plan.setup.toLocaleString()}</span></div>
                   <div className="flex justify-between text-sm"><span className="text-gray-500">Monthly retainer</span><span className="font-bold" style={{ color: GOLD }}>${plan.monthly}/mo</span></div>
                 </div>
-                <div className="mt-4 rounded-xl p-3 text-xs" style={{ background: '#F0F4FF', border: '1px solid #C7D7FF' }}>
+
+                {/* Payment milestones */}
+                <div className="rounded-xl p-3 border border-gray-100 mb-4" style={{ background: '#F8F8F8' }}>
+                  <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2.5">Setup Payment Milestones</p>
+                  <div className="space-y-2">
+                    {[
+                      { pct: '25%', label: 'Down Payment', timing: 'Due upon signing', color: GOLD },
+                      { pct: '50%', label: 'Build Complete', timing: 'Invoiced at delivery', color: DARK },
+                      { pct: '25%', label: 'Launch Approved', timing: 'Invoiced at go-live', color: '#6B7280' },
+                    ].map((m, i) => (
+                      <div key={i} className="flex items-center justify-between text-xs gap-2">
+                        <div className="flex items-center gap-2">
+                          <div className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-white font-bold text-[10px]" style={{ background: m.color }}>{i + 1}</div>
+                          <div>
+                            <p className="font-semibold text-gray-700">{m.label}</p>
+                            <p className="text-gray-400">{m.timing}</p>
+                          </div>
+                        </div>
+                        <span className="font-bold shrink-0" style={{ color: m.color }}>{m.pct}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                <div className="rounded-xl p-3 text-xs" style={{ background: '#F0F4FF', border: '1px solid #C7D7FF' }}>
                   <p className="font-bold text-[#0B2140] mb-1">Includes all 6 services</p>
                   <p className="text-blue-700">Website · Hub · Accounting · AI Advisors · Workflow · Infrastructure — fully integrated.</p>
                 </div>

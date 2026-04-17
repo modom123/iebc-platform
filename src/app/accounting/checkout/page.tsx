@@ -175,7 +175,7 @@ function CheckoutContent() {
               <span className="text-white font-extrabold text-sm">I</span>
             </div>
             <span className="font-extrabold text-[#0F4C81] text-lg">IEBC</span>
-            <span className="text-gray-400 text-sm">/ Efficient SaaS</span>
+            <span className="text-gray-400 text-sm">/ Financial Infrastructure</span>
           </Link>
           <div className="flex items-center gap-2 text-xs text-gray-400">
             <span className={`font-semibold ${step === 1 ? 'text-[#0F4C81]' : 'text-gray-400'}`}>1. Choose Plan</span>

@@ -185,6 +185,28 @@ export default function InfrastructureCheckout() {
                   <label className="block text-xs font-bold text-gray-600 mb-1.5 uppercase tracking-wide">Additional Notes</label>
                   <textarea value={form.notes} onChange={e => setForm(f => ({ ...f, notes: e.target.value }))} rows={3} className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2140] focus:border-transparent transition resize-none" placeholder="Tell us about your business, key priorities, or specific challenges you want the team to address…" />
                 </div>
+                {/* Payment milestones */}
+                <div className="rounded-xl p-3 border border-gray-100" style={{ background: '#F8F8F8' }}>
+                  <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2.5">Payment Milestones</p>
+                  <div className="space-y-2">
+                    {[
+                      { pct: '25%', label: 'Down Payment', timing: 'Due upon signing agreement', color: GOLD },
+                      { pct: '50%', label: 'Team Onboarded', timing: 'Invoiced when advisors go live', color: DARK },
+                      { pct: '25%', label: 'First Month Complete', timing: 'Invoiced at day 30', color: '#6B7280' },
+                    ].map((m, i) => (
+                      <div key={i} className="flex items-center justify-between text-xs gap-2">
+                        <div className="flex items-center gap-2">
+                          <div className="w-5 h-5 rounded-full flex items-center justify-center shrink-0 text-white font-bold text-[10px]" style={{ background: m.color }}>{i + 1}</div>
+                          <div>
+                            <p className="font-semibold text-gray-700">{m.label}</p>
+                            <p className="text-gray-400">{m.timing}</p>
+                          </div>
+                        </div>
+                        <span className="font-bold shrink-0" style={{ color: m.color }}>{m.pct}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
                 <button type="submit" disabled={submitting || !cartData || cartData.contractors.length === 0} className="w-full py-3.5 rounded-xl font-bold text-sm text-white transition shadow-md disabled:opacity-50" style={{ background: GOLD }}>
                   {submitting ? 'Submitting…' : 'Assemble My AI Advisor Team →'}
                 </button>

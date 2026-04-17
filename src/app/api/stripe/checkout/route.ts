@@ -14,9 +14,9 @@ const PLAN_AMOUNTS: Record<string, number> = {
 }
 
 const PLAN_NAMES: Record<string, string> = {
-  silver:   'IEBC Efficient SaaS — Silver',
-  gold:     'IEBC Efficient SaaS — Gold',
-  platinum: 'IEBC Efficient SaaS — Platinum',
+  silver:   'IEBC Financial Infrastructure — Silver',
+  gold:     'IEBC Financial Infrastructure — Gold',
+  platinum: 'IEBC Financial Infrastructure — Platinum',
 }
 
 export async function POST(req: Request) {

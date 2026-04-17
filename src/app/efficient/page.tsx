@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import MobileNav from '@/components/MobileNav'
 
 const MODULES = [
   { icon: '🧾', name: 'Invoicing & Estimates', desc: 'Create professional invoices and estimates in seconds. Track status, send reminders, and collect payment online.' },
@@ -40,7 +41,7 @@ const PLANS = [
     badgeCls: 'bg-slate-100 text-slate-600',
     features: ['Core accounting dashboard', 'Invoicing & estimates', 'Income & expense tracking', 'Client payment portal', 'Email support'],
     cta: 'Start with Silver',
-    href: '/accounting/checkout',
+    href: '/accounting/checkout?plan=silver',
     highlight: false,
   },
   {
@@ -51,7 +52,7 @@ const PLANS = [
     badgeCls: 'bg-amber-50 text-amber-700 border border-amber-200',
     features: ['Everything in Silver', 'Bank reconciliation', 'Reports & dashboards', 'Cash flow forecast', 'AI receipt scanner', 'Recurring transactions', 'Budgets & rules', 'Priority support'],
     cta: 'Start with Gold',
-    href: '/accounting/checkout',
+    href: '/accounting/checkout?plan=gold',
     highlight: true,
   },
   {
@@ -61,8 +62,8 @@ const PLANS = [
     period: '/mo',
     badgeCls: 'bg-blue-50 text-[#0F4C81] border border-blue-200',
     features: ['Everything in Gold', 'Full 22-module suite', 'Payroll', 'Inventory & POs', 'Tax center & 1099s', 'Mileage & time tracker', 'Projects & job costing', 'Audit trail'],
-    cta: 'Efficient Accounting',
-    href: '/accounting/checkout',
+    cta: 'Get Platinum',
+    href: '/accounting/checkout?plan=platinum',
     highlight: false,
   },
 ]
@@ -93,9 +94,21 @@ export default function EfficientPage() {
 
           <div className="flex items-center gap-2">
             <Link href="/auth/login" className="hidden md:block px-4 py-2 text-sm font-medium text-gray-600 hover:text-[#0F4C81] transition">Sign In</Link>
-            <Link href="/accounting/checkout" className="bg-[#C02020] hover:bg-[#A01818] text-white px-5 py-2 rounded-lg text-sm font-bold transition shadow-sm">
+            <Link href="/accounting/checkout?plan=silver" className="bg-[#C02020] hover:bg-[#A01818] text-white px-5 py-2 rounded-lg text-sm font-bold transition shadow-sm">
               Start Free
             </Link>
+            <MobileNav
+              links={[
+                { label: 'Features', href: '#features' },
+                { label: 'How It Works', href: '#how-it-works' },
+                { label: 'Pricing', href: '#pricing' },
+                { label: '← IEBC Home', href: '/' },
+              ]}
+              cta={{ label: 'Start Free — From $9/mo', href: '/accounting/checkout?plan=silver' }}
+              loginHref="/auth/login"
+              loginLabel="Sign In"
+              brandSub="Business Infrastructure"
+            />
           </div>
         </div>
       </nav>
@@ -111,23 +124,23 @@ export default function EfficientPage() {
             Business Infrastructure by IEBC
           </div>
 
-          <h1 className="text-5xl md:text-6xl font-extrabold leading-tight mb-6 tracking-tight text-gray-900">
+          <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold leading-tight mb-6 tracking-tight text-gray-900">
             The financial infrastructure
-            <br />
-            <span className="text-[#0F4C81]">your business runs on.</span>
+            <br className="hidden sm:block" />
+            <span className="text-[#0F4C81]"> your business runs on.</span>
           </h1>
 
-          <p className="text-lg md:text-xl text-gray-500 max-w-2xl mx-auto mb-10 leading-relaxed">
+          <p className="text-base sm:text-lg md:text-xl text-gray-500 max-w-2xl mx-auto mb-10 leading-relaxed">
             22 modules. One dashboard. Fully automated.
             <br />
             <span className="text-gray-800 font-semibold">From invoices to payroll to tax prep — built into your business infrastructure.</span>
           </p>
 
-          <div className="flex flex-wrap gap-3 justify-center mb-8">
-            <Link href="/accounting/checkout" className="bg-[#C02020] hover:bg-[#A01818] text-white px-8 py-3.5 rounded-xl font-bold text-base transition shadow-lg shadow-red-200">
+          <div className="flex flex-col sm:flex-row flex-wrap gap-3 justify-center mb-8">
+            <Link href="/accounting/checkout?plan=silver" className="bg-[#C02020] hover:bg-[#A01818] text-white px-8 py-3.5 rounded-xl font-bold text-base transition shadow-lg shadow-red-200 text-center">
               Get Started — From $9/mo
             </Link>
-            <Link href="/accounting" className="bg-white hover:bg-blue-50 border-2 border-[#0F4C81] text-[#0F4C81] px-8 py-3.5 rounded-xl font-bold text-base transition shadow-sm">
+            <Link href="/accounting" className="bg-white hover:bg-blue-50 border-2 border-[#0F4C81] text-[#0F4C81] px-8 py-3.5 rounded-xl font-bold text-base transition shadow-sm text-center">
               View Dashboard
             </Link>
           </div>
@@ -137,7 +150,7 @@ export default function EfficientPage() {
 
         {/* Metric bar */}
         <div className="bg-[#0F4C81]">
-          <div className="max-w-4xl mx-auto px-6 py-5 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+          <div className="max-w-4xl mx-auto px-6 py-5 grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
             {[
               ['22+', 'accounting modules'],
               ['60 sec', 'to create an invoice'],
@@ -145,7 +158,7 @@ export default function EfficientPage() {
               ['Real-time', 'cash flow visibility'],
             ].map(([val, label], i) => (
               <div key={i}>
-                <p className="text-2xl font-extrabold text-white">{val}</p>
+                <p className="text-xl sm:text-2xl font-extrabold text-white">{val}</p>
                 <p className="text-xs text-blue-200 mt-0.5">{label}</p>
               </div>
             ))}
@@ -158,7 +171,7 @@ export default function EfficientPage() {
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-14">
             <p className="text-xs font-bold text-[#C9A02E] uppercase tracking-widest mb-3">How It Works</p>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900">Up and running in minutes.</h2>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900">Up and running in minutes.</h2>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
@@ -180,7 +193,7 @@ export default function EfficientPage() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-14">
             <p className="text-xs font-bold text-[#C9A02E] uppercase tracking-widest mb-3">Full Module Suite</p>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900">Everything your books need.</h2>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900">Everything your books need.</h2>
             <p className="text-gray-500 mt-4 max-w-xl mx-auto">22 modules designed to cover every corner of your financial operations — without the enterprise price tag.</p>
           </div>
 
@@ -206,7 +219,7 @@ export default function EfficientPage() {
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-14">
             <p className="text-xs font-bold text-[#C9A02E] uppercase tracking-widest mb-3">Pricing</p>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900">Start at $9. Scale as you grow.</h2>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900">Start at $9. Scale as you grow.</h2>
             <p className="text-gray-500 mt-4">All plans include the core accounting suite. No setup fees. Cancel anytime.</p>
           </div>
 
@@ -231,7 +244,7 @@ export default function EfficientPage() {
                   <div className="mb-5">
                     <span className={`inline-block px-2.5 py-0.5 rounded-md text-xs font-bold mb-3 ${p.badgeCls}`}>{p.label}</span>
                     <div className="flex items-baseline gap-1">
-                      <span className="text-4xl font-extrabold text-gray-900">{p.price}</span>
+                      <span className="text-3xl sm:text-4xl font-extrabold text-gray-900">{p.price}</span>
                       <span className="text-gray-400 text-sm">{p.period}</span>
                     </div>
                   </div>
@@ -269,13 +282,13 @@ export default function EfficientPage() {
         }} />
         <div className="absolute -top-12 right-1/3 w-56 h-56 bg-[#C9A02E] opacity-10 rounded-full pointer-events-none" />
         <div className="relative max-w-2xl mx-auto">
-          <h2 className="text-3xl md:text-4xl font-extrabold mb-4">Your books won't keep themselves.</h2>
-          <p className="text-blue-200 mb-8 text-lg">Build your financial infrastructure today and close your books faster every month.</p>
-          <div className="flex flex-wrap gap-3 justify-center">
-            <Link href="/accounting/checkout" className="bg-[#C02020] hover:bg-[#A01818] text-white px-8 py-3.5 rounded-xl font-bold transition shadow-lg shadow-black/20">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold mb-4">Your books won't keep themselves.</h2>
+          <p className="text-blue-200 mb-8 text-base sm:text-lg">Build your financial infrastructure today and close your books faster every month.</p>
+          <div className="flex flex-col sm:flex-row flex-wrap gap-3 justify-center">
+            <Link href="/accounting/checkout?plan=silver" className="bg-[#C02020] hover:bg-[#A01818] text-white px-8 py-3.5 rounded-xl font-bold transition shadow-lg shadow-black/20 text-center">
               Get Started — From $9/mo
             </Link>
-            <Link href="/" className="bg-white hover:bg-blue-50 text-[#0F4C81] px-8 py-3.5 rounded-xl font-bold transition shadow-md">
+            <Link href="/" className="bg-white hover:bg-blue-50 text-[#0F4C81] px-8 py-3.5 rounded-xl font-bold transition shadow-md text-center">
               Back to IEBC
             </Link>
           </div>

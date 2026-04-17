@@ -13,7 +13,6 @@ const PLANS = [
     users: 1,
     desc: 'For individuals & solo founders.',
     badge: '',
-    highlight: false,
     features: [
       '1 IEBC AI Consultant',
       '1 user account',
@@ -35,7 +34,6 @@ const PLANS = [
     users: 3,
     desc: 'For small teams & growing businesses.',
     badge: 'Most Popular',
-    highlight: true,
     features: [
       '3 IEBC AI Consultants',
       'Up to 3 users',
@@ -57,7 +55,6 @@ const PLANS = [
     users: 10,
     desc: 'Full accounting suite. Every module.',
     badge: '',
-    highlight: false,
     features: [
       '5 IEBC AI Consultants',
       'Up to 10 users',
@@ -72,12 +69,6 @@ const PLANS = [
   },
 ]
 
-const US_STATES = [
-  'AL','AK','AZ','AR','CA','CO','CT','DE','FL','GA','HI','ID','IL','IN','IA',
-  'KS','KY','LA','ME','MD','MA','MI','MN','MS','MO','MT','NE','NV','NH','NJ',
-  'NM','NY','NC','ND','OH','OK','OR','PA','RI','SC','SD','TN','TX','UT','VT',
-  'VA','WA','WV','WI','WY','DC',
-]
 
 function CheckoutContent() {
   const searchParams = useSearchParams()
@@ -88,16 +79,12 @@ function CheckoutContent() {
   const [canceled, setCanceled] = useState(false)
 
   const [form, setForm] = useState({
-    name: '',
     email: '',
-    phone: '',
-    street: '',
-    city: '',
-    state: '',
-    zip: '',
+    password: '',
+    confirmPassword: '',
+    businessName: '',
   })
 
-  // Pre-select plan from URL ?plan=silver / ?plan=gold / ?plan=platinum
   useEffect(() => {
     const planParam = searchParams.get('plan')
     if (planParam && ['silver', 'gold', 'platinum'].includes(planParam)) {
@@ -118,54 +105,59 @@ function CheckoutContent() {
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault()
     if (!selectedPlan) return
+
+    if (form.password.length < 8) {
+      setError('Password must be at least 8 characters.')
+      return
+    }
+    if (form.password !== form.confirmPassword) {
+      setError('Passwords do not match.')
+      return
+    }
+
     setLoading(true)
     setError('')
 
-    // Direct Stripe payment links — no server API key needed.
-    // Set NEXT_PUBLIC_STRIPE_LINK_SILVER / _GOLD / _PLATINUM in Vercel env vars.
-    const PLAN_LINKS: Record<string, string> = {
-      silver:   process.env.NEXT_PUBLIC_STRIPE_LINK_SILVER   || '',
-      gold:     process.env.NEXT_PUBLIC_STRIPE_LINK_GOLD     || '',
-      platinum: process.env.NEXT_PUBLIC_STRIPE_LINK_PLATINUM || '',
-    }
+    // Save credentials to sessionStorage so success page can auto-sign-in
+    sessionStorage.setItem('iebc_pending', JSON.stringify({
+      email: form.email,
+      password: form.password,
+    }))
 
-    const directLink = PLAN_LINKS[selectedPlan]
-    if (directLink) {
-      try {
-        const url = new URL(directLink)
-        if (form.email) url.searchParams.set('prefilled_email', form.email)
-        // Pass plan so the webhook can identify which subscription was purchased
-        url.searchParams.set('client_reference_id', selectedPlan)
-        window.location.href = url.toString()
-        return
-      } catch {
-        // Invalid URL — fall through to API checkout
-      }
-    }
-
-    // Fallback: API-based checkout (requires STRIPE_SECRET_KEY in Vercel)
+    // API checkout — Stripe collects name/phone/address on their page
     try {
       const res = await fetch('/api/stripe/checkout', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           plan: selectedPlan,
-          name: form.name,
           email: form.email,
-          phone: form.phone,
-          billing_address: {
-            street: form.street,
-            city: form.city,
-            state: form.state,
-            zip: form.zip,
-          },
+          password: form.password,
+          businessName: form.businessName,
         }),
       })
 
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Checkout failed')
       window.location.href = data.url
+      return
     } catch (err: unknown) {
+      // API failed — fall back to direct payment link (no auto-signin, check-email flow)
+      const PLAN_LINKS: Record<string, string> = {
+        silver:   process.env.NEXT_PUBLIC_STRIPE_LINK_SILVER   || 'https://buy.stripe.com/dRm7sF9Hr6kNbx0frVgEg03',
+        gold:     process.env.NEXT_PUBLIC_STRIPE_LINK_GOLD     || 'https://buy.stripe.com/4gM8wJ8Dn10teJc6VpgEg02',
+        platinum: process.env.NEXT_PUBLIC_STRIPE_LINK_PLATINUM || 'https://buy.stripe.com/bJe14h1aVeRj58CfrVgEg01',
+      }
+      const directLink = PLAN_LINKS[selectedPlan]
+      if (directLink) {
+        try {
+          const url = new URL(directLink)
+          if (form.email) url.searchParams.set('prefilled_email', form.email)
+          url.searchParams.set('client_reference_id', selectedPlan)
+          window.location.href = url.toString()
+          return
+        } catch { /* fall through */ }
+      }
       setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.')
       setLoading(false)
     }
@@ -183,7 +175,7 @@ function CheckoutContent() {
               <span className="text-white font-extrabold text-sm">I</span>
             </div>
             <span className="font-extrabold text-[#0F4C81] text-lg">IEBC</span>
-            <span className="text-gray-400 text-sm">/ Efficient SaaS</span>
+            <span className="text-gray-400 text-sm">/ Financial Infrastructure</span>
           </Link>
           <div className="flex items-center gap-2 text-xs text-gray-400">
             <span className={`font-semibold ${step === 1 ? 'text-[#0F4C81]' : 'text-gray-400'}`}>1. Choose Plan</span>
@@ -252,7 +244,6 @@ function CheckoutContent() {
                           {p.consultants} IEBC AI Consultant{p.consultants > 1 ? 's' : ''} · Up to {p.users} user{p.users > 1 ? 's' : ''}
                         </p>
                       </div>
-
                       <ul className="space-y-2 flex-1 mb-4">
                         {p.features.map((f, i) => (
                           <li key={i} className="flex items-start gap-2 text-sm text-gray-600">
@@ -288,7 +279,7 @@ function CheckoutContent() {
             <div className="text-center mb-8">
               <p className="text-xs font-bold text-[#C9A02E] uppercase tracking-widest mb-2">Step 2 of 3</p>
               <h1 className="text-3xl font-extrabold text-gray-900 mb-2">Your information</h1>
-              <p className="text-gray-500">We&apos;ll use this to set up your account after payment.</p>
+              <p className="text-gray-500">Create your account — you&apos;ll be signed in automatically after payment.</p>
             </div>
 
             {/* Plan summary */}
@@ -307,109 +298,57 @@ function CheckoutContent() {
               </div>
             </div>
 
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Name */}
-              <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1.5">Full Name <span className="text-red-500">*</span></label>
-                <input
-                  name="name"
-                  type="text"
-                  required
-                  value={form.name}
-                  onChange={handleField}
-                  placeholder="Jane Smith"
-                  className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F4C81] focus:border-transparent"
-                />
-              </div>
+            {/* What Stripe collects callout */}
+            <div className="bg-blue-50 border border-blue-100 rounded-xl px-4 py-3 mb-2 flex items-start gap-2.5">
+              <span className="text-blue-400 mt-0.5 shrink-0">ℹ</span>
+              <p className="text-xs text-blue-700 leading-relaxed">
+                Your name, phone, and billing address are collected securely on the next screen by Stripe — no need to enter them twice.
+              </p>
+            </div>
 
+            <form onSubmit={handleSubmit} className="space-y-4">
               {/* Email */}
               <div>
                 <label className="block text-sm font-semibold text-gray-700 mb-1.5">Email Address <span className="text-red-500">*</span></label>
-                <input
-                  name="email"
-                  type="email"
-                  required
-                  value={form.email}
-                  onChange={handleField}
+                <input name="email" type="email" required value={form.email} onChange={handleField}
                   placeholder="jane@company.com"
-                  className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F4C81] focus:border-transparent"
-                />
-                <p className="text-xs text-gray-400 mt-1">Your login credentials will be sent to this email after payment.</p>
+                  className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F4C81] focus:border-transparent" />
+                <p className="text-xs text-gray-400 mt-1">This will be your login email.</p>
               </div>
 
-              {/* Phone */}
+              {/* Password */}
               <div>
-                <label className="block text-sm font-semibold text-gray-700 mb-1.5">Phone Number</label>
-                <input
-                  name="phone"
-                  type="tel"
-                  value={form.phone}
-                  onChange={handleField}
-                  placeholder="(555) 000-0000"
-                  className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F4C81] focus:border-transparent"
-                />
+                <label className="block text-sm font-semibold text-gray-700 mb-1.5">Create Password <span className="text-red-500">*</span></label>
+                <input name="password" type="password" required value={form.password} onChange={handleField}
+                  placeholder="At least 8 characters"
+                  autoComplete="new-password"
+                  className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F4C81] focus:border-transparent" />
+              </div>
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1.5">Confirm Password <span className="text-red-500">*</span></label>
+                <input name="confirmPassword" type="password" required value={form.confirmPassword} onChange={handleField}
+                  placeholder="Re-enter password"
+                  autoComplete="new-password"
+                  className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F4C81] focus:border-transparent" />
               </div>
 
-              {/* Billing Address */}
-              <div className="pt-2">
-                <p className="text-sm font-semibold text-gray-700 mb-3">Billing Address</p>
-                <div className="space-y-3">
-                  <input
-                    name="street"
-                    type="text"
-                    required
-                    value={form.street}
-                    onChange={handleField}
-                    placeholder="Street address"
-                    className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F4C81] focus:border-transparent"
-                  />
-                  <div className="grid grid-cols-2 gap-3">
-                    <input
-                      name="city"
-                      type="text"
-                      required
-                      value={form.city}
-                      onChange={handleField}
-                      placeholder="City"
-                      className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F4C81] focus:border-transparent"
-                    />
-                    <select
-                      name="state"
-                      required
-                      value={form.state}
-                      onChange={handleField}
-                      className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F4C81] focus:border-transparent bg-white"
-                    >
-                      <option value="">State</option>
-                      {US_STATES.map(s => <option key={s} value={s}>{s}</option>)}
-                    </select>
-                  </div>
-                  <input
-                    name="zip"
-                    type="text"
-                    required
-                    value={form.zip}
-                    onChange={handleField}
-                    placeholder="ZIP code"
-                    maxLength={10}
-                    className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F4C81] focus:border-transparent"
-                  />
-                </div>
+              {/* Business name — not collected by Stripe */}
+              <div>
+                <label className="block text-sm font-semibold text-gray-700 mb-1.5">Business Name <span className="text-gray-400 font-normal">(optional)</span></label>
+                <input name="businessName" type="text" value={form.businessName} onChange={handleField}
+                  placeholder="Acme Corp"
+                  className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F4C81] focus:border-transparent" />
               </div>
 
-              {/* Error display */}
+              {/* Error */}
               {error && (
                 isStripeError ? (
                   <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-4 space-y-2">
                     <p className="font-semibold text-amber-800 text-sm">Payment setup in progress</p>
-                    <p className="text-amber-700 text-sm">Our payment system is being finalized. Book a quick call and we&apos;ll get your {plan.label} plan activated right away — no wait.</p>
-                    <a
-                      href="https://calendly.com/new56money/30min"
-                      target="_blank"
-                      rel="noopener noreferrer"
+                    <p className="text-amber-700 text-sm">Book a quick call and we&apos;ll get your {plan.label} plan activated right away.</p>
+                    <a href="https://calendly.com/new56money/30min" target="_blank" rel="noopener noreferrer"
                       className="block text-center py-2.5 rounded-lg font-bold text-sm transition-opacity hover:opacity-90 mt-1"
-                      style={{ background: '#C9A02E', color: '#fff' }}
-                    >
+                      style={{ background: '#C9A02E', color: '#fff' }}>
                       Book a Call to Subscribe — {plan.price}/mo →
                     </a>
                   </div>
@@ -421,15 +360,12 @@ function CheckoutContent() {
               )}
 
               <div className="pt-2">
-                <button
-                  type="submit"
-                  disabled={loading}
-                  className="w-full py-3.5 rounded-xl font-bold text-sm bg-[#0F4C81] hover:bg-[#082D4F] text-white transition shadow-lg disabled:opacity-60 disabled:cursor-not-allowed"
-                >
-                  {loading ? 'Redirecting to payment...' : `Start 7-Day Free Trial — ${plan.price}/mo after`}
+                <button type="submit" disabled={loading}
+                  className="w-full py-3.5 rounded-xl font-bold text-sm bg-[#0F4C81] hover:bg-[#082D4F] text-white transition shadow-lg disabled:opacity-60 disabled:cursor-not-allowed">
+                  {loading ? 'Redirecting to payment...' : `Continue to Payment — ${plan.price}/mo after trial`}
                 </button>
                 <p className="text-center text-xs text-gray-400 mt-3">
-                  Secure checkout via Stripe · No charge for 7 days · Cancel anytime
+                  Secure checkout via Stripe · 7-day free trial · Cancel anytime
                 </p>
               </div>
             </form>

@@ -6,7 +6,15 @@ import { MonthlyBarChart, DonutChart } from '@/components/Charts'
 const DONUT_COLORS = ['#0F4C81','#2563eb','#7c3aed','#db2777','#ea580c','#16a34a']
 
 export default async function Accounting() {
-  const supabase = createServerSupabaseClient()
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    redirect('/auth/login')
+  }
+  let supabase: ReturnType<typeof createServerSupabaseClient>
+  try {
+    supabase = createServerSupabaseClient()
+  } catch {
+    redirect('/auth/login')
+  }
   const { data: { session } } = await supabase.auth.getSession()
   if (!session) redirect('/auth/login')
 
@@ -116,10 +124,10 @@ export default async function Accounting() {
             { label: 'Net Profit', value: fmt(netProfit), sub: netProfit >= 0 ? 'Profitable' : 'Net loss', color: netProfit >= 0 ? 'text-green-700' : 'text-red-600' },
             { label: 'Outstanding AR', value: fmt(outstanding), sub: overdueCount > 0 ? `${overdueCount} overdue` : 'No overdue', color: outstanding > 0 ? 'text-orange-600' : 'text-gray-700' },
           ].map((card, i) => (
-            <div key={i} className="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
-              <p className="text-xs text-gray-500 font-medium uppercase tracking-wide">{card.label}</p>
-              <p className={`text-xl sm:text-2xl font-bold mt-1 ${card.color}`}>{card.value}</p>
-              <p className="text-xs text-gray-400 mt-1">{card.sub}</p>
+            <div key={i} className="bg-white p-3 sm:p-5 rounded-xl border border-gray-200 shadow-sm">
+              <p className="text-[10px] sm:text-xs text-gray-500 font-medium uppercase tracking-wide truncate">{card.label}</p>
+              <p className={`text-lg sm:text-2xl font-bold mt-1 ${card.color}`}>{card.value}</p>
+              <p className="text-[10px] sm:text-xs text-gray-400 mt-1 truncate">{card.sub}</p>
             </div>
           ))}
         </div>
@@ -160,7 +168,7 @@ export default async function Accounting() {
         </div>
 
         {/* Quick Actions */}
-        <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
           {[
             { href: '/accounting/transactions', icon: '💰', label: 'Add Transaction' },
             { href: '/accounting/invoices/new', icon: '📄', label: 'New Invoice' },
@@ -203,7 +211,7 @@ export default async function Accounting() {
                     {recentTx.map(t => (
                       <tr key={t.id} className="hover:bg-gray-50">
                         <td className="p-2 sm:p-3 text-gray-500">{t.date}</td>
-                        <td className="p-2 sm:p-3 font-medium">{t.description}</td>
+                        <td className="p-2 sm:p-3 font-medium truncate max-w-[90px] sm:max-w-none">{t.description}</td>
                         <td className="p-2 sm:p-3 hidden sm:table-cell"><span className="px-2 py-0.5 bg-gray-100 rounded text-xs">{t.category || 'Uncategorized'}</span></td>
                         <td className={`p-2 sm:p-3 text-right font-mono font-semibold ${t.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
                           {t.type === 'income' ? '+' : '-'}{fmt(Number(t.amount))}

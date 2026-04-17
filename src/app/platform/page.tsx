@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import MobileNav from '@/components/MobileNav'
 
 const NAV_LINKS = [
   { label: 'Services', href: '#services' },
@@ -217,6 +218,18 @@ export default function PlatformPage() {
             <Link href="/accounting/checkout?plan=silver" className="bg-[#0F4C81] hover:bg-[#082D4F] text-white px-5 py-2 rounded-lg text-sm font-bold transition shadow-sm">
               Get Started — $9/mo
             </Link>
+            <MobileNav
+              links={[
+                { label: 'Services', href: '#services' },
+                { label: 'Infrastructure', href: '/efficient' },
+                { label: 'Automation Hub', href: '/hub' },
+                { label: 'Pricing', href: '#pricing' },
+              ]}
+              cta={{ label: 'Get Started — $9/mo', href: '/accounting/checkout?plan=silver' }}
+              loginHref="/auth/login"
+              loginLabel="Client Portal"
+              brandSub="Platform"
+            />
           </div>
         </div>
       </nav>
@@ -232,26 +245,26 @@ export default function PlatformPage() {
             Self-Service Platform — From $9/mo
           </div>
 
-          <h1 className="text-5xl md:text-6xl font-extrabold leading-tight mb-6 tracking-tight text-gray-900">
+          <h1 className="text-3xl sm:text-5xl md:text-6xl font-extrabold leading-tight mb-6 tracking-tight text-gray-900">
             Everything your business
-            <br />
+            <br className="hidden sm:block" />
             needs to{' '}
             <span className="text-[#0F4C81]">build</span>,{' '}
             <span className="text-[#C9A02E]">run</span>, and{' '}
             <span className="text-[#059669]">grow</span>.
           </h1>
 
-          <p className="text-lg md:text-xl text-gray-500 max-w-2xl mx-auto mb-10 leading-relaxed">
+          <p className="text-base sm:text-lg md:text-xl text-gray-500 max-w-2xl mx-auto mb-10 leading-relaxed">
             5 integrated services — Formation, Websites, Automation Hubs, Infrastructure, and AI Consultants.
             <br />
             <span className="text-gray-800 font-semibold">One platform. Self-service. No setup fee.</span>
           </p>
 
-          <div className="flex flex-wrap gap-3 justify-center mb-8">
-            <Link href="/accounting/checkout?plan=silver" className="bg-[#0F4C81] hover:bg-[#082D4F] text-white px-8 py-3.5 rounded-xl font-bold text-base transition shadow-lg">
+          <div className="flex flex-col sm:flex-row flex-wrap gap-3 justify-center mb-8">
+            <Link href="/accounting/checkout?plan=silver" className="bg-[#0F4C81] hover:bg-[#082D4F] text-white px-8 py-3.5 rounded-xl font-bold text-base transition shadow-lg text-center">
               Start Free — From $9/mo
             </Link>
-            <Link href="#services" className="bg-white hover:bg-blue-50 border-2 border-[#0F4C81] text-[#0F4C81] px-8 py-3.5 rounded-xl font-bold text-base transition shadow-sm">
+            <Link href="#services" className="bg-white hover:bg-blue-50 border-2 border-[#0F4C81] text-[#0F4C81] px-8 py-3.5 rounded-xl font-bold text-base transition shadow-sm text-center">
               Explore Services
             </Link>
           </div>
@@ -260,10 +273,10 @@ export default function PlatformPage() {
         </div>
 
         <div className="bg-[#0F4C81]">
-          <div className="max-w-5xl mx-auto px-6 py-5 grid grid-cols-2 md:grid-cols-4 gap-6 text-center">
+          <div className="max-w-5xl mx-auto px-6 py-5 grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
             {STATS.map((s, i) => (
               <div key={i}>
-                <p className="text-2xl font-extrabold text-white">{s.value}</p>
+                <p className="text-xl sm:text-2xl font-extrabold text-white">{s.value}</p>
                 <p className="text-xs text-blue-200 mt-0.5">{s.label}</p>
               </div>
             ))}
@@ -276,7 +289,7 @@ export default function PlatformPage() {
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-16">
             <p className="text-xs font-bold text-[#C9A02E] uppercase tracking-widest mb-3">What We Do</p>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900">5 services. One integrated platform.</h2>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900">5 services. One integrated platform.</h2>
             <p className="text-gray-500 mt-4 max-w-xl mx-auto">
               IEBC is not a single product — it is a complete business operating system. Each service is powerful alone, and unstoppable together.
             </p>
@@ -335,7 +348,7 @@ export default function PlatformPage() {
         <div className="max-w-5xl mx-auto">
           <div className="text-center mb-14">
             <p className="text-xs font-bold text-[#C9A02E] uppercase tracking-widest mb-3">Pricing</p>
-            <h2 className="text-3xl md:text-4xl font-extrabold text-gray-900">Simple, transparent pricing.</h2>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-gray-900">Simple, transparent pricing.</h2>
             <p className="text-gray-500 mt-4">All 5 services, bundled by plan. No hidden fees, no long-term contracts.</p>
           </div>
 
@@ -364,7 +377,7 @@ export default function PlatformPage() {
                       'bg-blue-50 text-[#0F4C81] border border-blue-200'
                     }`}>{p.label}</span>
                     <div className="flex items-baseline gap-1">
-                      <span className="text-4xl font-extrabold text-gray-900">{p.price}</span>
+                      <span className="text-3xl sm:text-4xl font-extrabold text-gray-900">{p.price}</span>
                       <span className="text-gray-400 text-sm">{p.period}</span>
                     </div>
                     <p className="text-sm text-gray-500 mt-1">{p.desc}</p>
@@ -411,12 +424,12 @@ export default function PlatformPage() {
         }} />
         <div className="relative max-w-2xl mx-auto">
           <p className="text-xs font-bold uppercase tracking-widest mb-3 text-blue-300">Done-For-You Option</p>
-          <h2 className="text-3xl md:text-4xl font-extrabold mb-4">Need it done for you?</h2>
-          <p className="text-blue-200 mb-8 text-lg">
+          <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold mb-4">Need it done for you?</h2>
+          <p className="text-blue-200 mb-8 text-base sm:text-lg">
             Our agency team builds your full system in 6 weeks — custom website, hub, infrastructure, and AI consultants.
             Starter at $1,500 setup.
           </p>
-          <div className="flex flex-wrap gap-3 justify-center">
+          <div className="flex flex-col sm:flex-row flex-wrap gap-3 justify-center">
             <a
               href="https://calendly.com/new56money/30min"
               target="_blank"
@@ -438,7 +451,7 @@ export default function PlatformPage() {
       {/* ── Footer ── */}
       <footer className="bg-gray-50 border-t border-gray-200 px-6 py-14">
         <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-10 mb-10">
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-6 md:gap-10 mb-10">
             <div>
               <div className="flex items-center gap-2 mb-3">
                 <div className="w-8 h-8 bg-[#0F4C81] rounded-lg flex items-center justify-center shadow-sm">

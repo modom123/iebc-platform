@@ -14,6 +14,10 @@ function toCSV(rows: Record<string, unknown>[], columns: string[]): string {
 }
 
 export async function GET(req: Request) {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    return NextResponse.json({ error: 'Service unavailable' }, { status: 503 })
+  }
+
   const supabase = createServerSupabaseClient()
   const { data: { session } } = await supabase.auth.getSession()
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })

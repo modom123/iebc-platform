@@ -63,11 +63,13 @@ const NAV_SECTIONS = [
     title: 'Workspace',
     items: [
       { href: '/hub/consultants', icon: '🤖', label: 'AI Consultants' },
+      { href: '/hub/workforce', icon: '🏗️', label: 'AI Advisor Workforce' },
       { href: '/hub/leads', icon: '◆', label: 'CRM / Leads' },
       { href: '/hub/tasks', icon: '☑', label: 'Tasks' },
       { href: '/hub/team', icon: '◉', label: 'Team Members' },
       { href: '/hub/formation', icon: '⌂', label: 'Business Formation' },
       { href: '/hub/documents', icon: '⊞', label: 'Document Vault' },
+      { href: '/hub/social', icon: '📱', label: 'Social Optimize' },
     ],
   },
 ]
@@ -186,7 +188,7 @@ export default function AppShell({ user, children }: { user?: User; children: Re
         <header className="h-14 bg-white border-b border-gray-200 flex items-center px-4 gap-3 shrink-0 shadow-sm">
           <button
             onClick={() => setMobileOpen(true)}
-            className="lg:hidden p-1.5 rounded-lg text-gray-500 hover:bg-gray-100 transition"
+            className="lg:hidden p-2.5 rounded-lg text-gray-500 hover:bg-gray-100 transition min-w-[44px] min-h-[44px] flex items-center justify-center"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h7" />
@@ -216,7 +218,7 @@ export default function AppShell({ user, children }: { user?: User; children: Re
           </Link>
           <Link
             href="/accounting/checkout"
-            className="text-xs sm:text-[13px] bg-[#C9A02E] hover:bg-yellow-600 text-white px-3 py-1.5 rounded-lg font-semibold transition shadow-sm"
+            className="text-[11px] sm:text-[13px] bg-[#C9A02E] hover:bg-yellow-600 text-white px-2 sm:px-3 py-1.5 rounded-lg font-semibold transition shadow-sm whitespace-nowrap"
           >
             ★ Upgrade
           </Link>

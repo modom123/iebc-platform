@@ -3,6 +3,16 @@
 import { useState, useEffect, useRef } from 'react'
 import Link from 'next/link'
 
+// Assign a consistent ElevenLabs voice per advisor based on name
+const FEMALE_NAMES = new Set(['Sofia','Priya','Rachel','Lisa','Amara','Nina','Sandra','Jennifer','Michelle','Yuki','Christine','Emma','Maya','Natasha','Alicia','Dana','Sarah','Maria'])
+const MALE_VOICES   = ['pNInz6obpgDQGcFmaJgB','TxGEqnHWrfWFTfGW9XjX','ErXwobaYiN019PkySvjV']
+const FEMALE_VOICES = ['21m00Tcm4TlvDq8ikWAM','EXAVITQu4vr4xnSDxMaL','MF3mGyEYCl7XYWbV9V6O']
+function voiceFor(name: string, seed = 0) {
+  const first = name.split(' ')[0].replace('Dr.','').trim()
+  const pool = FEMALE_NAMES.has(first) ? FEMALE_VOICES : MALE_VOICES
+  return pool[seed % pool.length]
+}
+
 type Advisor = {
   id: string
   name: string
@@ -53,7 +63,8 @@ export default function AdvisorWorkspace() {
   const [voiceText, setVoiceText]   = useState('')
   const [voiceReply, setVoiceReply] = useState('')
   const [speaking, setSpeaking]     = useState(false)
-  const recRef = useRef<unknown>(null)
+  const recRef   = useRef<unknown>(null)
+  const audioRef = useRef<HTMLAudioElement | null>(null)
 
   // ── Documents ──
   const [docs, setDocs]       = useState<{ name: string; size: string; fileType: string; date: string }[]>([])
@@ -132,10 +143,30 @@ export default function AdvisorWorkspace() {
         const reply = data.reply ?? 'Sorry, I could not process that.'
         setVoiceReply(reply)
         setSpeaking(true)
-        const utt = new SpeechSynthesisUtterance(reply)
-        utt.rate = 0.95; utt.pitch = 1
-        utt.onend = () => setSpeaking(false)
-        window.speechSynthesis.speak(utt)
+        // ElevenLabs TTS
+        try {
+          const ttsRes = await fetch('/api/advisor/voice', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ text: reply, voiceId: voiceFor(selected.name) }),
+          })
+          if (ttsRes.ok) {
+            const blob = await ttsRes.blob()
+            const url = URL.createObjectURL(blob)
+            const audio = new Audio(url)
+            audioRef.current = audio
+            audio.onended = () => { setSpeaking(false); URL.revokeObjectURL(url) }
+            await audio.play()
+          } else {
+            // Fallback to browser TTS if ElevenLabs not configured
+            const utt = new SpeechSynthesisUtterance(reply)
+            utt.rate = 0.95
+            utt.onend = () => setSpeaking(false)
+            window.speechSynthesis.speak(utt)
+          }
+        } catch {
+          setSpeaking(false)
+        }
       } catch { setVoiceReply('Could not reach the advisor. Please try again.') }
       setThinking(false)
     }
@@ -146,6 +177,7 @@ export default function AdvisorWorkspace() {
 
   function stopAll() {
     (recRef.current as { stop(): void } | null)?.stop()
+    if (audioRef.current) { audioRef.current.pause(); audioRef.current = null }
     window.speechSynthesis?.cancel()
     setListening(false); setSpeaking(false)
   }

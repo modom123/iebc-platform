@@ -1,4 +1,4 @@
-import AppShell from '@/components/AppShell'
+import AccountingShell from '@/components/AccountingShell'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 
 export const dynamic = 'force-dynamic'
@@ -20,5 +20,5 @@ export default async function AccountingLayout({ children }: { children: React.R
     }
   } catch { /* Supabase not configured */ }
 
-  return <AppShell user={user}>{children}</AppShell>
+  return <AccountingShell user={user}>{children}</AccountingShell>
 }

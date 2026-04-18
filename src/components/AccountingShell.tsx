@@ -1,70 +1,67 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
 type User = { name?: string | null; email?: string | null; role?: string | null }
 
-const NAV_SECTIONS = [
+const NAV = [
   {
-    title: 'Overview',
+    title: 'Accounting',
     items: [
-      { href: '/hub', icon: '⊞', label: 'Dashboard', exact: true },
+      { href: '/accounting',              icon: '◈', label: 'Overview',          exact: true },
+      { href: '/accounting/transactions', icon: '⇄', label: 'Transactions' },
+      { href: '/accounting/invoices',     icon: '▤', label: 'Invoices' },
+      { href: '/accounting/estimates',    icon: '◻', label: 'Estimates' },
+      { href: '/accounting/bills',        icon: '▥', label: 'Bills & Payables' },
+      { href: '/accounting/customers',    icon: '◯', label: 'Customers' },
+      { href: '/accounting/vendors',      icon: '⬡', label: 'Vendors & 1099' },
+      { href: '/accounting/payroll',      icon: '◫', label: 'Payroll' },
     ],
   },
   {
-    title: 'Orders & Clients',
+    title: 'Finance',
     items: [
-      { href: '/hub/orders',     icon: '📋', label: 'Orders Inbox' },
-      { href: '/hub/clients',    icon: '◯',  label: 'Client Directory' },
-      { href: '/hub/leads',      icon: '◆',  label: 'CRM / Leads' },
-      { href: '/hub/tasks',      icon: '☑',  label: 'Tasks' },
+      { href: '/accounting/coa',              icon: '≡', label: 'Chart of Accounts' },
+      { href: '/accounting/journal',          icon: '⊟', label: 'Journal Entries' },
+      { href: '/accounting/reconcile',        icon: '⇌', label: 'Reconciliation' },
+      { href: '/accounting/reports',          icon: '▦', label: 'Reports' },
+      { href: '/accounting/tax',              icon: '◈', label: 'Tax Center' },
+      { href: '/accounting/budgets',          icon: '◎', label: 'Budgets' },
+      { href: '/accounting/aged-receivables', icon: '⏱', label: 'Aged Receivables' },
+      { href: '/accounting/forecast',         icon: '▲', label: 'Cash Forecast' },
+      { href: '/accounting/rules',            icon: '⚡', label: 'Auto Rules' },
+      { href: '/accounting/scanner',          icon: '✦', label: 'AI Receipt Scanner' },
     ],
   },
   {
-    title: 'Advisor Operations',
+    title: 'Operations',
     items: [
-      { href: '/hub/workspace',  icon: '💬', label: 'Advisor Workspace' },
-      { href: '/hub/workforce',  icon: '🏗️', label: 'AI Advisor Workforce' },
-      { href: '/hub/consultants',icon: '🤖', label: 'AI Consultants' },
-      { href: '/hub/team',       icon: '◉',  label: 'Team Members' },
+      { href: '/accounting/purchaseorders', icon: '⊕', label: 'Purchase Orders' },
+      { href: '/accounting/inventory',      icon: '▣', label: 'Inventory' },
+      { href: '/accounting/projects',       icon: '◧', label: 'Projects' },
+      { href: '/accounting/tracker',        icon: '▷', label: 'Mileage & Time' },
+      { href: '/accounting/recurring',      icon: '↺', label: 'Recurring' },
     ],
   },
   {
-    title: 'Business Tools',
+    title: 'Connect',
     items: [
-      { href: '/hub/documents',  icon: '⊞',  label: 'Document Vault' },
-      { href: '/hub/formation',  icon: '⌂',  label: 'Business Formation' },
-      { href: '/hub/social',     icon: '📱',  label: 'Social Optimize' },
+      { href: '/accounting/connect', icon: '⬡', label: 'Bank Connect' },
+      { href: '/accounting/clients', icon: '◈', label: 'Client Portals' },
+      { href: '/accounting/audit',   icon: '◉', label: 'Audit Trail' },
     ],
   },
 ]
 
-export default function AppShell({ user, children }: { user?: User; children: React.ReactNode }) {
-  const [mobileOpen, setMobileOpen]   = useState(false)
-  const [pendingOrders, setPendingOrders] = useState(0)
+export default function AccountingShell({ user, children }: { user?: User; children: React.ReactNode }) {
+  const [mobileOpen, setMobileOpen] = useState(false)
   const pathname = usePathname()
-
-  // Poll for pending orders count (new II/bundle/website orders)
-  useEffect(() => {
-    async function fetchCount() {
-      try {
-        const res = await fetch('/api/infrastructure/order')
-        if (!res.ok) return
-        const data = await res.json()
-        const pending = (data.orders as { status?: string }[]).filter(o => o.status === 'pending').length
-        setPendingOrders(pending)
-      } catch { /* non-blocking */ }
-    }
-    fetchCount()
-    const id = setInterval(fetchCount, 60_000)
-    return () => clearInterval(id)
-  }, [])
+  const isAdmin = user?.role === 'admin' || user?.role === 'iebc_staff'
 
   function active(href: string, exact?: boolean) {
     if (exact) return pathname === href
-    if (href === '/hub') return pathname === '/hub'
     return pathname === href || pathname.startsWith(href + '/')
   }
 
@@ -72,9 +69,9 @@ export default function AppShell({ user, children }: { user?: User; children: Re
     ? user.name.split(' ').filter(Boolean).map(n => n[0]).join('').toUpperCase().slice(0, 2)
     : user?.email?.slice(0, 2).toUpperCase() ?? 'U'
 
-  const allItems = NAV_SECTIONS.flatMap(s => s.items)
+  const allItems = NAV.flatMap(s => s.items)
   const activeItem = allItems.filter(i => active(i.href, i.exact)).pop()
-  const activeSection = NAV_SECTIONS.find(s => s.items.some(i => i.href === activeItem?.href))
+  const activeSection = NAV.find(s => s.items.some(i => i.href === activeItem?.href))
 
   const Sidebar = () => (
     <aside className="w-56 flex flex-col bg-white border-r border-gray-200 h-full">
@@ -84,20 +81,19 @@ export default function AppShell({ user, children }: { user?: User; children: Re
           <span className="text-white font-black text-[11px] tracking-tight">IEBC</span>
         </div>
         <div className="leading-tight">
-          <p className="text-white font-bold text-sm">Master Hub</p>
-          <p className="text-blue-300 text-[10px]">Operations · Infrastructure</p>
+          <p className="text-white font-bold text-sm">Efficient</p>
+          <p className="text-blue-300 text-[10px]">Accounting & Finance</p>
         </div>
       </div>
 
       {/* Nav */}
       <nav className="flex-1 overflow-y-auto py-3 space-y-3 px-2">
-        {NAV_SECTIONS.map(({ title, items }) => (
+        {NAV.map(({ title, items }) => (
           <div key={title}>
             <p className="px-2 mb-1 text-[10px] font-bold text-gray-400 uppercase tracking-[0.12em]">{title}</p>
             <div className="space-y-px">
               {items.map(({ href, icon, label, exact }) => {
                 const isActive = active(href, exact)
-                const badge = href === '/hub/orders' && pendingOrders > 0 ? pendingOrders : null
                 return (
                   <Link key={label} href={href} onClick={() => setMobileOpen(false)}
                     className={`flex items-center gap-2.5 px-2.5 py-[7px] rounded-lg text-[13px] transition-all duration-100 ${
@@ -106,39 +102,25 @@ export default function AppShell({ user, children }: { user?: User; children: Re
                         : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 border-l-[3px] border-transparent'
                     }`}>
                     <span className={`text-[15px] leading-none w-4 text-center shrink-0 ${isActive ? 'text-[#0F4C81]' : 'text-gray-400'}`}>{icon}</span>
-                    <span className="truncate flex-1">{label}</span>
-                    {badge && (
-                      <span className="ml-auto bg-red-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full shrink-0 min-w-[18px] text-center">
-                        {badge}
-                      </span>
-                    )}
+                    <span className="truncate">{label}</span>
                   </Link>
                 )
               })}
             </div>
           </div>
         ))}
-
-        {/* Accounting App link */}
-        <div>
-          <p className="px-2 mb-1 text-[10px] font-bold text-gray-400 uppercase tracking-[0.12em]">Apps</p>
-          <Link href="/accounting" className="flex items-center gap-2.5 px-2.5 py-[7px] rounded-lg text-[13px] text-gray-600 hover:bg-gray-50 border-l-[3px] border-transparent transition-all">
-            <span className="text-[15px] text-gray-400 w-4 text-center">◈</span>
-            <span className="truncate">Accounting App</span>
-            <span className="ml-auto text-[9px] bg-gray-100 text-gray-400 px-1.5 py-0.5 rounded font-bold">Efficient</span>
-          </Link>
-          <Link href="/infrastructure" className="flex items-center gap-2.5 px-2.5 py-[7px] rounded-lg text-[13px] text-gray-600 hover:bg-gray-50 border-l-[3px] border-transparent transition-all">
-            <span className="text-[15px] text-gray-400 w-4 text-center">🏗️</span>
-            <span className="truncate">Hire Advisors</span>
-            <span className="ml-auto text-[9px] bg-gray-100 text-gray-400 px-1.5 py-0.5 rounded font-bold">II</span>
-          </Link>
-        </div>
       </nav>
 
       {/* Footer */}
-      <div className="shrink-0 border-t border-gray-100 p-2">
+      <div className="shrink-0 border-t border-gray-100 p-2 space-y-1">
+        {isAdmin && (
+          <Link href="/hub" className="flex items-center gap-2.5 px-2.5 py-[7px] rounded-lg text-[13px] text-gray-600 hover:bg-gray-50 border-l-[3px] border-transparent transition-all">
+            <span className="text-[15px] text-gray-400 w-4 text-center">⊞</span>
+            <span>Master Hub</span>
+          </Link>
+        )}
         <Link href="/settings" onClick={() => setMobileOpen(false)}
-          className={`flex items-center gap-2.5 px-2.5 py-[7px] rounded-lg text-[13px] transition-all mb-1 ${
+          className={`flex items-center gap-2.5 px-2.5 py-[7px] rounded-lg text-[13px] transition-all ${
             pathname.startsWith('/settings') ? 'bg-blue-50 text-[#0F4C81] font-semibold border-l-[3px] border-[#0F4C81]' : 'text-gray-600 hover:bg-gray-50 border-l-[3px] border-transparent'
           }`}>
           <span className="text-[15px] text-gray-400 w-4 text-center">⚙</span>
@@ -148,7 +130,7 @@ export default function AppShell({ user, children }: { user?: User; children: Re
           <div className="w-7 h-7 rounded-full bg-[#0F4C81] flex items-center justify-center text-white text-[11px] font-bold shrink-0">{initials}</div>
           <div className="flex-1 min-w-0">
             <p className="text-[12px] font-semibold text-gray-800 truncate">{user?.name ?? 'My Account'}</p>
-            <p className="text-[10px] text-gray-400 capitalize truncate">{user?.role ?? 'admin'}</p>
+            <p className="text-[10px] text-gray-400 capitalize truncate">{user?.role ?? 'owner'}</p>
           </div>
           <span className="w-2 h-2 bg-green-400 rounded-full shrink-0 border-2 border-white" />
         </div>
@@ -166,6 +148,7 @@ export default function AppShell({ user, children }: { user?: User; children: Re
       </div>
 
       <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
+        {/* Top bar */}
         <header className="h-14 bg-white border-b border-gray-200 flex items-center px-4 gap-3 shrink-0 shadow-sm">
           <button onClick={() => setMobileOpen(true)} className="lg:hidden p-2.5 rounded-lg text-gray-500 hover:bg-gray-100 transition min-w-[44px] min-h-[44px] flex items-center justify-center">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -178,16 +161,8 @@ export default function AppShell({ user, children }: { user?: User; children: Re
             {activeItem && <span className="font-semibold text-gray-600">{activeItem.label}</span>}
           </div>
           <div className="flex-1" />
-          {pendingOrders > 0 && (
-            <Link href="/hub/orders" className="hidden sm:flex items-center gap-1.5 text-[13px] text-red-600 hover:bg-red-50 px-3 py-1.5 rounded-lg font-semibold transition border border-red-200 animate-pulse">
-              🔔 {pendingOrders} new order{pendingOrders !== 1 ? 's' : ''}
-            </Link>
-          )}
-          <Link href="/hub/orders" className="relative p-2 rounded-lg text-gray-500 hover:bg-gray-100 transition">
-            <span className="text-lg">🔔</span>
-            {pendingOrders > 0 && (
-              <span className="absolute -top-0.5 -right-0.5 w-4 h-4 bg-red-500 text-white text-[9px] font-bold rounded-full flex items-center justify-center">{pendingOrders}</span>
-            )}
+          <Link href="/accounting/scanner" className="hidden sm:flex items-center gap-1.5 text-[13px] text-[#0F4C81] hover:bg-blue-50 px-3 py-1.5 rounded-lg font-medium transition border border-blue-100">
+            ✦ AI Scanner
           </Link>
           <Link href="/accounting/checkout" className="text-[11px] sm:text-[13px] bg-[#C9A02E] hover:bg-yellow-600 text-white px-2 sm:px-3 py-1.5 rounded-lg font-semibold transition shadow-sm whitespace-nowrap">
             ★ Upgrade

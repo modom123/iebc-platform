@@ -25,7 +25,7 @@ export default async function ClientPortalPage({ params }: { params: { token: st
   if (!portalToken) return notFound()
 
   // Check expiry
-  if (portalToken.expires_at && new Date(portalToken.expires_at) < new Date()) {
+  if (portalToken.expires_at && new Date(portalToken.expires_at as string) < new Date()) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="bg-white rounded-xl shadow p-6 sm:p-8 w-full max-w-sm sm:max-w-md text-center mx-4">
@@ -40,5 +40,6 @@ export default async function ClientPortalPage({ params }: { params: { token: st
   const invoice = portalToken.invoices
   if (!invoice) return notFound()
 
-  return <ClientPortalView invoice={invoice} token={params.token} />
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return <ClientPortalView invoice={invoice as any} token={params.token} />
 }

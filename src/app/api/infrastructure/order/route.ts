@@ -123,7 +123,7 @@ async function sendNotification(order: Record<string, unknown>) {
     await resend.emails.send({
       from: 'IEBC Orders <orders@iebusinessconsultants.com>',
       to: notifyEmail,
-      reply_to: String(order.email ?? notifyEmail),
+      replyTo: String(order.email ?? notifyEmail),
       subject,
       html: buildEmailHtml(order),
     })

@@ -132,14 +132,24 @@ async function sendNotification(order: Record<string, unknown>) {
   }
 }
 
+function generateClientId(): string {
+  const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'
+  let id = 'IEBC-'
+  for (let i = 0; i < 6; i++) id += chars[Math.floor(Math.random() * chars.length)]
+  return id
+}
+
 export async function POST(req: Request) {
   try {
     const body = await req.json()
+    const clientId = body.clientId || generateClientId()
     const order = {
       id: `infra_${Date.now()}`,
+      clientId,
       createdAt: new Date().toISOString(),
       status: 'pending',
       ...body,
+      clientId, // ensure clientId is not overwritten by body spread
     }
     orders.push(order)
 
@@ -158,6 +168,25 @@ export async function POST(req: Request) {
     sendNotification(order)
 
     return NextResponse.json({ success: true, orderId: order.id })
+  } catch {
+    return NextResponse.json({ success: false }, { status: 500 })
+  }
+}
+
+export async function PATCH(req: Request) {
+  try {
+    const { id, status } = await req.json()
+    const order = orders.find(o => o.id === id)
+    if (order) order.status = status
+
+    if (process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+      try {
+        const { createServerSupabaseClient } = await import('@/lib/supabase/server')
+        const supabase = createServerSupabaseClient()
+        await supabase.from('infrastructure_orders').update({ status }).eq('id', id)
+      } catch { /* ignore */ }
+    }
+    return NextResponse.json({ success: true })
   } catch {
     return NextResponse.json({ success: false }, { status: 500 })
   }

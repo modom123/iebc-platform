@@ -39,6 +39,19 @@ const NAV_SECTIONS = [
       { href: '/hub/social',     icon: '📱',  label: 'Social Optimize' },
     ],
   },
+  {
+    title: 'Accounting & Finance',
+    items: [
+      { href: '/accounting',              icon: '◈', label: 'Overview' },
+      { href: '/accounting/transactions', icon: '⇄', label: 'Transactions' },
+      { href: '/accounting/invoices',     icon: '▤', label: 'Invoices' },
+      { href: '/accounting/reports',      icon: '▦', label: 'Reports' },
+      { href: '/accounting/coa',          icon: '≡', label: 'Chart of Accounts' },
+      { href: '/accounting/payroll',      icon: '◫', label: 'Payroll' },
+      { href: '/accounting/tax',          icon: '◈', label: 'Tax Center' },
+      { href: '/accounting/bills',        icon: '▥', label: 'Bills & Payables' },
+    ],
+  },
 ]
 
 export default function AppShell({ user, children }: { user?: User; children: React.ReactNode }) {
@@ -119,14 +132,9 @@ export default function AppShell({ user, children }: { user?: User; children: Re
           </div>
         ))}
 
-        {/* Accounting App link */}
+        {/* Quick links */}
         <div>
-          <p className="px-2 mb-1 text-[10px] font-bold text-gray-400 uppercase tracking-[0.12em]">Apps</p>
-          <Link href="/accounting" className="flex items-center gap-2.5 px-2.5 py-[7px] rounded-lg text-[13px] text-gray-600 hover:bg-gray-50 border-l-[3px] border-transparent transition-all">
-            <span className="text-[15px] text-gray-400 w-4 text-center">◈</span>
-            <span className="truncate">Accounting App</span>
-            <span className="ml-auto text-[9px] bg-gray-100 text-gray-400 px-1.5 py-0.5 rounded font-bold">Efficient</span>
-          </Link>
+          <p className="px-2 mb-1 text-[10px] font-bold text-gray-400 uppercase tracking-[0.12em]">Quick Links</p>
           <Link href="/infrastructure" className="flex items-center gap-2.5 px-2.5 py-[7px] rounded-lg text-[13px] text-gray-600 hover:bg-gray-50 border-l-[3px] border-transparent transition-all">
             <span className="text-[15px] text-gray-400 w-4 text-center">🏗️</span>
             <span className="truncate">Hire Advisors</span>

@@ -1,25 +1,31 @@
 import { NextResponse } from 'next/server'
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 
+async function getSessionAndRole(supabase: ReturnType<typeof createServerSupabaseClient>) {
+  const { data: { session } } = await supabase.auth.getSession()
+  if (!session) return { session: null, isAdmin: false }
+  const { data: profile } = await supabase.from('profiles').select('role').eq('id', session.user.id).single()
+  const isAdmin = profile?.role === 'admin' || profile?.role === 'iebc_staff'
+  return { session, isAdmin }
+}
+
 export async function GET(req: Request) {
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
     return NextResponse.json({ error: 'Service unavailable' }, { status: 503 })
   }
 
   const supabase = createServerSupabaseClient()
-  const { data: { session } } = await supabase.auth.getSession()
+  const { session, isAdmin } = await getSessionAndRole(supabase)
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { searchParams } = new URL(req.url)
   const status = searchParams.get('status')
   const heat = searchParams.get('heat')
 
-  let query = supabase
-    .from('leads')
-    .select('*')
-    .eq('user_id', session.user.id)
-    .order('created_at', { ascending: false })
+  let query = supabase.from('leads').select('*').order('created_at', { ascending: false })
 
+  // Admins and IEBC staff see ALL leads; clients see only their own
+  if (!isAdmin) query = query.eq('user_id', session.user.id)
   if (status) query = query.eq('status', status)
   if (heat) query = query.eq('heat', heat)
 
@@ -30,7 +36,7 @@ export async function GET(req: Request) {
 
 export async function POST(req: Request) {
   const supabase = createServerSupabaseClient()
-  const { data: { session } } = await supabase.auth.getSession()
+  const { session } = await getSessionAndRole(supabase)
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const body = await req.json()
@@ -58,38 +64,33 @@ export async function POST(req: Request) {
 
 export async function PATCH(req: Request) {
   const supabase = createServerSupabaseClient()
-  const { data: { session } } = await supabase.auth.getSession()
+  const { session, isAdmin } = await getSessionAndRole(supabase)
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const body = await req.json()
   const { id, ...updates } = body
 
-  const { data, error } = await supabase
-    .from('leads')
-    .update(updates)
-    .eq('id', id)
-    .eq('user_id', session.user.id)
-    .select()
-    .single()
+  let query = supabase.from('leads').update(updates).eq('id', id).select().single()
+  // Non-admins can only update their own leads
+  if (!isAdmin) query = supabase.from('leads').update(updates).eq('id', id).eq('user_id', session.user.id).select().single()
 
+  const { data, error } = await query
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json(data)
 }
 
 export async function DELETE(req: Request) {
   const supabase = createServerSupabaseClient()
-  const { data: { session } } = await supabase.auth.getSession()
+  const { session, isAdmin } = await getSessionAndRole(supabase)
   if (!session) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const { searchParams } = new URL(req.url)
   const id = searchParams.get('id')
 
-  const { error } = await supabase
-    .from('leads')
-    .delete()
-    .eq('id', id!)
-    .eq('user_id', session.user.id)
+  let query = supabase.from('leads').delete().eq('id', id!)
+  if (!isAdmin) query = query.eq('user_id', session.user.id)
 
+  const { error } = await query
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json({ success: true })
 }

@@ -62,6 +62,7 @@ const NAV_SECTIONS = [
   {
     title: 'Workspace',
     items: [
+      { href: '/hub/workspace', icon: '💬', label: 'Advisor Workspace' },
       { href: '/hub/consultants', icon: '🤖', label: 'AI Consultants' },
       { href: '/hub/workforce', icon: '🏗️', label: 'AI Advisor Workforce' },
       { href: '/hub/leads', icon: '◆', label: 'CRM / Leads' },

@@ -78,11 +78,10 @@ export async function POST(req: Request) {
         billing_address: JSON.stringify(billingAddress),
       }).eq('id', userId)
     } else {
-      // New user — create with the password they set during checkout (from metadata)
-      const password = session.metadata?.account_password
+      // New user — create without password; the success-page /complete endpoint
+      // will set the real password using the value from the user's sessionStorage.
       const { data: created, error: createErr } = await supabase.auth.admin.createUser({
         email,
-        password: password || undefined,
         email_confirm: true,
         user_metadata: { full_name: name, plan, stripe_customer_id: stripeCustomerId },
       })

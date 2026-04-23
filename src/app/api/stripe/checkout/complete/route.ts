@@ -10,31 +10,39 @@ function getAdminClient() {
   )
 }
 
-export async function GET(req: Request) {
-  const { searchParams } = new URL(req.url)
-  const sessionId = searchParams.get('session_id')
+// POST: verify Stripe session and provision account using the password the
+// user entered on the checkout form (never stored outside their browser).
+export async function POST(req: Request) {
+  if (!process.env.STRIPE_SECRET_KEY) {
+    return NextResponse.json({ error: 'Stripe not configured' }, { status: 503 })
+  }
+
+  let sessionId: string
+  let password: string | undefined
+
+  try {
+    const body = await req.json()
+    sessionId = body.session_id
+    password = body.password // provided by the client from sessionStorage
+  } catch {
+    return NextResponse.json({ error: 'Invalid request body' }, { status: 400 })
+  }
 
   if (!sessionId) {
     return NextResponse.json({ error: 'Missing session_id' }, { status: 400 })
   }
 
-  if (!process.env.STRIPE_SECRET_KEY) {
-    return NextResponse.json({ error: 'Stripe not configured' }, { status: 503 })
-  }
-
   try {
     const session = await stripe.checkout.sessions.retrieve(sessionId)
 
-    // Not paid yet — tell client to keep polling
     if (session.payment_status !== 'paid' && session.status !== 'complete') {
       return NextResponse.json({ ready: false })
     }
 
     const email = session.customer_details?.email ?? session.metadata?.customer_email ?? ''
-    const name = session.customer_details?.name ?? session.metadata?.customer_name ?? ''
-    const phone = session.customer_details?.phone ?? session.metadata?.customer_phone ?? ''
+    const name = session.customer_details?.name ?? ''
+    const phone = session.customer_details?.phone ?? ''
     const plan = session.metadata?.plan ?? session.client_reference_id ?? ''
-    const password = session.metadata?.account_password ?? ''
     const stripeCustomerId = typeof session.customer === 'string' ? session.customer : ''
     const stripeSubId = typeof session.subscription === 'string' ? session.subscription : ''
 
@@ -43,13 +51,11 @@ export async function GET(req: Request) {
     }
 
     if (!process.env.SUPABASE_SERVICE_ROLE_KEY) {
-      // Supabase not configured — return email so client can show it
-      return NextResponse.json({ ready: true, email, plan, password: '' })
+      return NextResponse.json({ ready: true, email, plan })
     }
 
     const supabase = getAdminClient()
 
-    // Check if user already exists
     const { data: existingProfile } = await supabase
       .from('profiles')
       .select('id')
@@ -60,13 +66,15 @@ export async function GET(req: Request) {
 
     if (existingProfile?.id) {
       userId = existingProfile.id
-      // Update plan for existing user
       await supabase.from('profiles').update({
         plan,
         stripe_customer_id: stripeCustomerId,
       }).eq('id', userId)
+      // If webhook created the user without a password, set it now
+      if (password) {
+        await supabase.auth.admin.updateUserById(userId, { password })
+      }
     } else {
-      // Create user with the password they chose during checkout
       const { data: created, error: createErr } = await supabase.auth.admin.createUser({
         email,
         password: password || undefined,
@@ -81,11 +89,13 @@ export async function GET(req: Request) {
 
       userId = created.user.id
 
+      const addr = session.customer_details?.address
       const billingAddress = {
-        street: session.metadata?.billing_street ?? '',
-        city: session.metadata?.billing_city ?? '',
-        state: session.metadata?.billing_state ?? '',
-        zip: session.metadata?.billing_zip ?? '',
+        street: addr?.line1 ?? '',
+        city: addr?.city ?? '',
+        state: addr?.state ?? '',
+        zip: addr?.postal_code ?? '',
+        country: addr?.country ?? '',
       }
 
       await supabase.from('profiles').upsert({
@@ -101,7 +111,6 @@ export async function GET(req: Request) {
       }, { onConflict: 'id' })
     }
 
-    // Upsert subscription record
     await supabase.from('subscriptions').upsert({
       user_id: userId,
       plan,
@@ -112,7 +121,7 @@ export async function GET(req: Request) {
       updated_at: new Date().toISOString(),
     }, { onConflict: 'user_id' })
 
-    return NextResponse.json({ ready: true, email, plan, password })
+    return NextResponse.json({ ready: true, email, plan })
   } catch (err) {
     console.error('Checkout complete error:', err)
     return NextResponse.json({ ready: false })

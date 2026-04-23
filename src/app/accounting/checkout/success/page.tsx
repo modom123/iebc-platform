@@ -41,7 +41,14 @@ function SuccessContent() {
       }
 
       try {
-        const res = await fetch(`/api/stripe/checkout/complete?session_id=${sessionId}`)
+        const res = await fetch('/api/stripe/checkout/complete', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            session_id: sessionId,
+            password: saved?.password || undefined,
+          }),
+        })
         const data = await res.json()
 
         if (!data.ready) return // keep polling
@@ -49,7 +56,7 @@ function SuccessContent() {
         clearInterval(pollRef.current!)
 
         const resolvedEmail = data.email || saved?.email || ''
-        const resolvedPassword = data.password || saved?.password || ''
+        const resolvedPassword = saved?.password || ''
         const resolvedPlan = data.plan || ''
 
         setEmail(resolvedEmail)

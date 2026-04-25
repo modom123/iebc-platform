@@ -846,7 +846,6 @@ CREATE TABLE IF NOT EXISTS public.journal_entry_lines (
   credit            NUMERIC(14,2) NOT NULL DEFAULT 0
 );
 
-CREATE INDEX IF NOT EXISTS idx_jel_entry ON public.journal_entry_lines(journal_entry_id);
 ALTER TABLE public.journal_entry_lines ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS jel_owner ON public.journal_entry_lines;
 CREATE POLICY jel_owner ON public.journal_entry_lines FOR ALL USING (user_id = auth.uid());
@@ -1128,6 +1127,7 @@ ALTER TABLE public.transactions ADD COLUMN IF NOT EXISTS project_id uuid;
 -- journal_entry_lines: phase1 uses entry_id, phase7 uses journal_entry_id — add both
 ALTER TABLE public.journal_entry_lines ADD COLUMN IF NOT EXISTS entry_id uuid REFERENCES public.journal_entries(id) ON DELETE CASCADE;
 ALTER TABLE public.journal_entry_lines ADD COLUMN IF NOT EXISTS journal_entry_id uuid REFERENCES public.journal_entries(id) ON DELETE CASCADE;
+CREATE INDEX IF NOT EXISTS idx_jel_entry ON public.journal_entry_lines(journal_entry_id);
 ALTER TABLE public.journal_entry_lines ADD COLUMN IF NOT EXISTS account_id uuid REFERENCES public.accounts(id);
 ALTER TABLE public.journal_entry_lines ADD COLUMN IF NOT EXISTS account_code text DEFAULT '';
 ALTER TABLE public.journal_entry_lines ADD COLUMN IF NOT EXISTS account_name text DEFAULT '';

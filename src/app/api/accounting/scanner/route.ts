@@ -5,33 +5,58 @@ import Anthropic from '@anthropic-ai/sdk'
 const anthropic = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
 const IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif', 'image/heic', 'image/heif']
-const IMAGE_LIMIT = 10 * 1024 * 1024   // 10 MB
-const PDF_LIMIT   = 20 * 1024 * 1024   // 20 MB
+const IMAGE_LIMIT = 10 * 1024 * 1024
+const PDF_LIMIT   = 20 * 1024 * 1024
 
-const EXTRACT_PROMPT = `You are an expert accounting assistant scanning a financial document (receipt, invoice, or bill).
+const EXTRACT_PROMPT = `You are an expert document scanning assistant for a business accounting and document management platform.
 
-Extract every field you can find. Respond ONLY with a valid JSON object — no markdown, no explanation, no code fences.
+First, identify what TYPE of document this is. Then extract all relevant fields based on that type.
+
+Respond ONLY with a valid JSON object — no markdown, no code fences, no explanation.
 
 {
-  "vendor": "vendor or business name (string or null)",
-  "amount": total amount as a number (e.g. 42.50, do not include currency symbol),
-  "date": "date in YYYY-MM-DD format or null",
-  "category": "one of: Revenue, Consulting, Product Sale, Payroll, Marketing, Software / SaaS, Office & Supplies, Travel, Legal & Professional, Taxes, Meals & Entertainment, Utilities, Insurance, Shipping, Rent, Equipment, Other Income, Other Expense",
-  "type": "income or expense",
-  "description": "concise description max 80 chars — include what was purchased/sold",
-  "line_items": [{"description": "...", "qty": 1, "unit_price": 0.00, "amount": 0.00}],
-  "tax_amount": tax amount as number or null,
+  "document_type": "one of: receipt | invoice | bill | contract | legal | id_card | bank_statement | tax_form | payroll | purchase_order | estimate | insurance | other",
+  "confidence": "high | medium | low",
+
+  // ── FINANCIAL fields (fill when document_type is receipt, invoice, bill, bank_statement, etc.) ──
+  "vendor": "business or person name on the document, or null",
+  "amount": total dollar amount as a number or null,
   "subtotal": subtotal before tax as number or null,
-  "invoice_number": "invoice or receipt number as string or null",
-  "confidence": "high, medium, or low"
+  "tax_amount": tax amount as number or null,
+  "date": "YYYY-MM-DD or null",
+  "due_date": "YYYY-MM-DD for invoices/bills or null",
+  "invoice_number": "invoice, receipt, or document reference number as string or null",
+  "category": "one of: Revenue | Consulting | Product Sale | Payroll | Marketing | Software / SaaS | Office & Supplies | Travel | Legal & Professional | Taxes | Meals & Entertainment | Utilities | Insurance | Shipping | Rent | Equipment | Other Income | Other Expense | N/A",
+  "type": "income | expense | N/A",
+  "description": "brief description of what this document is about (max 100 chars)",
+  "line_items": [{"description": "...", "qty": 1, "unit_price": 0.00, "amount": 0.00}],
+
+  // ── IDENTITY / LEGAL fields (fill when document_type is id_card, contract, legal, etc.) ──
+  "full_name": "person or entity name or null",
+  "id_number": "license/ID number or null",
+  "address": "full address or null",
+  "date_of_birth": "YYYY-MM-DD or null",
+  "expiration_date": "YYYY-MM-DD for IDs or null",
+  "issuing_authority": "state, agency, or organization that issued this or null",
+  "document_title": "official title of the document or null",
+  "parties": ["list of names of parties involved in contracts/legal docs"],
+  "key_dates": [{"label": "Notarized", "date": "YYYY-MM-DD"}],
+  "notary": "notary public name if present or null",
+  "case_or_reference_number": "any case, order, or reference number or null",
+
+  // ── UNIVERSAL ──
+  "raw_text_summary": "2-3 sentence summary of what this document is and what it says"
 }
 
 Rules:
-- Use the TOTAL amount (after tax) for the "amount" field
-- For receipts from stores use "expense"; for sales invoices use "income"
-- If the document is not a financial document, return: {"error": "Not a financial document"}
-- Be thorough — multi-page PDFs may have totals on the last page
-- line_items: include all line items if visible, otherwise return []`
+- Extract ALL visible text including handwritten fields
+- For handwritten fields, read them carefully — they are often names, dates, amounts, or locations
+- Set fields to null if not present — do not guess
+- line_items: return [] if none visible
+- parties: return [] if none visible
+- key_dates: return [] if none visible
+- Be thorough on multi-page PDFs
+- NEVER return an error for "wrong document type" — always extract what you can`
 
 export async function POST(req: NextRequest) {
   if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
@@ -39,7 +64,7 @@ export async function POST(req: NextRequest) {
   }
 
   if (!process.env.ANTHROPIC_API_KEY) {
-    return NextResponse.json({ error: 'AI scanner is not configured' }, { status: 503 })
+    return NextResponse.json({ error: 'AI scanner is not configured. Add ANTHROPIC_API_KEY to environment variables.' }, { status: 503 })
   }
 
   const supabase = createServerSupabaseClient()
@@ -64,7 +89,7 @@ export async function POST(req: NextRequest) {
     const limit = isPdf ? PDF_LIMIT : IMAGE_LIMIT
     if (file.size > limit) {
       return NextResponse.json(
-        { error: `File too large. Maximum ${isPdf ? '20MB for PDFs' : '10MB for images'}.` },
+        { error: `File too large. Max ${isPdf ? '20MB for PDFs' : '10MB for images'}.` },
         { status: 400 }
       )
     }
@@ -72,25 +97,26 @@ export async function POST(req: NextRequest) {
     const arrayBuffer = await file.arrayBuffer()
     const base64 = Buffer.from(arrayBuffer).toString('base64')
 
-    // Build content block — document for PDFs, image for everything else
-    const fileBlock = isPdf
-      ? ({
-          type: 'document' as const,
-          source: { type: 'base64' as const, media_type: 'application/pdf' as const, data: base64 },
-        } as Parameters<typeof anthropic.messages.create>[0]['messages'][0]['content'][number])
-      : ({
-          type: 'image' as const,
+    type ContentBlock = Parameters<typeof anthropic.messages.create>[0]['messages'][0]['content'][number]
+
+    const fileBlock: ContentBlock = isPdf
+      ? {
+          type: 'document',
+          source: { type: 'base64', media_type: 'application/pdf', data: base64 },
+        }
+      : {
+          type: 'image',
           source: {
-            type: 'base64' as const,
+            type: 'base64',
             media_type: (file.type.startsWith('image/') ? file.type : 'image/jpeg') as
               'image/jpeg' | 'image/png' | 'image/webp' | 'image/gif',
             data: base64,
           },
-        } as Parameters<typeof anthropic.messages.create>[0]['messages'][0]['content'][number])
+        }
 
     const response = await anthropic.messages.create({
       model: 'claude-sonnet-4-6',
-      max_tokens: 1024,
+      max_tokens: 1500,
       messages: [
         {
           role: 'user',
@@ -112,26 +138,50 @@ export async function POST(req: NextRequest) {
       if (match) {
         extracted = JSON.parse(match[0])
       } else {
-        return NextResponse.json({ error: 'AI could not read this document. Try a clearer image.' }, { status: 422 })
+        return NextResponse.json(
+          { error: 'AI could not read this document. Try a clearer photo with better lighting.' },
+          { status: 422 }
+        )
       }
     }
 
-    if (extracted.error) {
-      return NextResponse.json({ error: extracted.error }, { status: 422 })
-    }
+    // Determine if this is a financial document
+    const financialTypes = ['receipt', 'invoice', 'bill', 'bank_statement', 'purchase_order', 'estimate', 'payroll', 'tax_form']
+    const docType = String(extracted.document_type || 'other')
+    const isFinancial = financialTypes.includes(docType)
 
     return NextResponse.json({
-      vendor:          extracted.vendor         ?? null,
-      amount:          extracted.amount         ?? null,
-      date:            extracted.date           ?? new Date().toISOString().split('T')[0],
-      category:        extracted.category       ?? 'Other Expense',
-      type:            extracted.type           ?? 'expense',
-      description:     extracted.description    ?? `Payment to ${extracted.vendor ?? 'vendor'}`,
-      line_items:      Array.isArray(extracted.line_items) ? extracted.line_items : [],
-      tax_amount:      extracted.tax_amount     ?? null,
-      subtotal:        extracted.subtotal       ?? null,
-      invoice_number:  extracted.invoice_number ?? null,
-      confidence:      extracted.confidence     ?? 'medium',
+      // Universal
+      document_type:    extracted.document_type    ?? 'other',
+      confidence:       extracted.confidence        ?? 'medium',
+      raw_text_summary: extracted.raw_text_summary  ?? null,
+      is_financial:     isFinancial,
+
+      // Financial
+      vendor:           extracted.vendor            ?? null,
+      amount:           extracted.amount            ?? null,
+      subtotal:         extracted.subtotal           ?? null,
+      tax_amount:       extracted.tax_amount         ?? null,
+      date:             extracted.date               ?? (isFinancial ? new Date().toISOString().split('T')[0] : null),
+      due_date:         extracted.due_date           ?? null,
+      invoice_number:   extracted.invoice_number    ?? null,
+      category:         extracted.category           ?? (isFinancial ? 'Other Expense' : 'N/A'),
+      type:             extracted.type               ?? (isFinancial ? 'expense' : 'N/A'),
+      description:      extracted.description        ?? extracted.document_title ?? extracted.raw_text_summary ?? '',
+      line_items:       Array.isArray(extracted.line_items) ? extracted.line_items : [],
+
+      // Identity / Legal
+      full_name:              extracted.full_name             ?? null,
+      id_number:              extracted.id_number             ?? null,
+      address:                extracted.address               ?? null,
+      date_of_birth:          extracted.date_of_birth         ?? null,
+      expiration_date:        extracted.expiration_date        ?? null,
+      issuing_authority:      extracted.issuing_authority     ?? null,
+      document_title:         extracted.document_title        ?? null,
+      parties:                Array.isArray(extracted.parties) ? extracted.parties : [],
+      key_dates:              Array.isArray(extracted.key_dates) ? extracted.key_dates : [],
+      notary:                 extracted.notary                ?? null,
+      case_or_reference_number: extracted.case_or_reference_number ?? null,
     })
   } catch (err) {
     console.error('Scanner error:', err)

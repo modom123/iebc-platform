@@ -771,6 +771,7 @@ CREATE TABLE IF NOT EXISTS chart_of_accounts (
 CREATE INDEX IF NOT EXISTS idx_coa_user ON chart_of_accounts(user_id);
 
 ALTER TABLE chart_of_accounts ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS coa_owner ON chart_of_accounts;
 CREATE POLICY coa_owner ON chart_of_accounts FOR ALL USING (user_id = auth.uid());
 
 -- ============================================================
@@ -789,6 +790,7 @@ CREATE TABLE IF NOT EXISTS journal_entries (
 
 CREATE INDEX IF NOT EXISTS idx_journal_user ON journal_entries(user_id);
 ALTER TABLE journal_entries ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS je_owner ON journal_entries;
 CREATE POLICY je_owner ON journal_entries FOR ALL USING (user_id = auth.uid());
 
 CREATE TABLE IF NOT EXISTS journal_entry_lines (
@@ -804,6 +806,7 @@ CREATE TABLE IF NOT EXISTS journal_entry_lines (
 
 CREATE INDEX IF NOT EXISTS idx_jel_entry ON journal_entry_lines(journal_entry_id);
 ALTER TABLE journal_entry_lines ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS jel_owner ON journal_entry_lines;
 CREATE POLICY jel_owner ON journal_entry_lines FOR ALL USING (user_id = auth.uid());
 
 -- ============================================================
@@ -828,6 +831,7 @@ CREATE TABLE IF NOT EXISTS purchase_orders (
 
 CREATE INDEX IF NOT EXISTS idx_po_user ON purchase_orders(user_id);
 ALTER TABLE purchase_orders ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS po_owner ON purchase_orders;
 CREATE POLICY po_owner ON purchase_orders FOR ALL USING (user_id = auth.uid());
 
 CREATE TABLE IF NOT EXISTS purchase_order_lines (
@@ -843,6 +847,7 @@ CREATE TABLE IF NOT EXISTS purchase_order_lines (
 
 CREATE INDEX IF NOT EXISTS idx_pol_po ON purchase_order_lines(purchase_order_id);
 ALTER TABLE purchase_order_lines ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS pol_owner ON purchase_order_lines;
 CREATE POLICY pol_owner ON purchase_order_lines FOR ALL USING (user_id = auth.uid());
 
 -- ============================================================
@@ -868,6 +873,7 @@ CREATE TABLE IF NOT EXISTS inventory_items (
 
 CREATE INDEX IF NOT EXISTS idx_inv_user ON inventory_items(user_id);
 ALTER TABLE inventory_items ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS inv_owner ON inventory_items;
 CREATE POLICY inv_owner ON inventory_items FOR ALL USING (user_id = auth.uid());
 
 CREATE TABLE IF NOT EXISTS inventory_adjustments (
@@ -880,6 +886,7 @@ CREATE TABLE IF NOT EXISTS inventory_adjustments (
 );
 
 ALTER TABLE inventory_adjustments ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS inv_adj_owner ON inventory_adjustments;
 CREATE POLICY inv_adj_owner ON inventory_adjustments FOR ALL USING (user_id = auth.uid());
 
 -- ============================================================
@@ -901,8 +908,10 @@ CREATE INDEX IF NOT EXISTS idx_portal_invoice ON client_portal_tokens(invoice_id
 -- No RLS auth check on SELECT for token lookup (public portal page validates by token value)
 ALTER TABLE client_portal_tokens ENABLE ROW LEVEL SECURITY;
 -- Users can manage their own tokens
+DROP POLICY IF EXISTS portal_token_owner ON client_portal_tokens;
 CREATE POLICY portal_token_owner ON client_portal_tokens FOR ALL USING (user_id = auth.uid());
 -- Public read by token value (for portal page — no auth)
+DROP POLICY IF EXISTS portal_token_public_read ON client_portal_tokens;
 CREATE POLICY portal_token_public_read ON client_portal_tokens FOR SELECT USING (true);
 
 -- ============================================================
@@ -921,6 +930,7 @@ CREATE TABLE IF NOT EXISTS invoice_payments (
 
 CREATE INDEX IF NOT EXISTS idx_payments_invoice ON invoice_payments(invoice_id);
 ALTER TABLE invoice_payments ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS payments_owner ON invoice_payments;
 CREATE POLICY payments_owner ON invoice_payments FOR ALL USING (user_id = auth.uid());
 
 -- ============================================================
@@ -952,6 +962,7 @@ CREATE TABLE IF NOT EXISTS employees (
 );
 
 ALTER TABLE employees ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS emp_owner ON employees;
 CREATE POLICY emp_owner ON employees FOR ALL USING (user_id = auth.uid());
 
 CREATE TABLE IF NOT EXISTS pay_runs (
@@ -968,6 +979,7 @@ CREATE TABLE IF NOT EXISTS pay_runs (
 );
 
 ALTER TABLE pay_runs ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS payrun_owner ON pay_runs;
 CREATE POLICY payrun_owner ON pay_runs FOR ALL USING (user_id = auth.uid());
 
 CREATE TABLE IF NOT EXISTS pay_stubs (
@@ -986,6 +998,7 @@ CREATE TABLE IF NOT EXISTS pay_stubs (
 );
 
 ALTER TABLE pay_stubs ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS stub_owner ON pay_stubs;
 CREATE POLICY stub_owner ON pay_stubs FOR ALL USING (user_id = auth.uid());
 
 CREATE TABLE IF NOT EXISTS vendors (
@@ -1006,6 +1019,7 @@ CREATE TABLE IF NOT EXISTS vendors (
 );
 
 ALTER TABLE vendors ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS vendor_owner ON vendors;
 CREATE POLICY vendor_owner ON vendors FOR ALL USING (user_id = auth.uid());
 
 CREATE TABLE IF NOT EXISTS vault_documents (
@@ -1020,6 +1034,7 @@ CREATE TABLE IF NOT EXISTS vault_documents (
 );
 
 ALTER TABLE vault_documents ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS vault_owner ON vault_documents;
 CREATE POLICY vault_owner ON vault_documents FOR ALL USING (user_id = auth.uid());
 
 -- ============================================================
@@ -1027,7 +1042,8 @@ CREATE POLICY vault_owner ON vault_documents FOR ALL USING (user_id = auth.uid()
 -- Run in Supabase dashboard > Storage
 -- ============================================================
 -- INSERT INTO storage.buckets (id, name, public) VALUES ('documents', 'documents', false);
--- CREATE POLICY "Users manage own documents" ON storage.objects FOR ALL USING (
+-- DROP POLICY IF EXISTS "Users manage own documents" ON storage.objects;
+CREATE POLICY "Users manage own documents" ON storage.objects FOR ALL USING (
 --   bucket_id = 'documents' AND auth.uid()::text = (storage.foldername(name))[1]
 -- );
 
@@ -1085,6 +1101,7 @@ CREATE TABLE IF NOT EXISTS public.bank_accounts (
   created_at timestamptz DEFAULT now()
 );
 ALTER TABLE public.bank_accounts ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users manage own bank accounts" ON public.bank_accounts;
 CREATE POLICY "Users manage own bank accounts" ON public.bank_accounts FOR ALL USING (auth.uid() = user_id);
 CREATE INDEX IF NOT EXISTS bank_accounts_user_id_idx ON public.bank_accounts(user_id);
 
@@ -1098,6 +1115,7 @@ CREATE TABLE IF NOT EXISTS public.plaid_sync_cursors (
   UNIQUE(connection_id)
 );
 ALTER TABLE public.plaid_sync_cursors ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users manage own sync cursors" ON public.plaid_sync_cursors;
 CREATE POLICY "Users manage own sync cursors" ON public.plaid_sync_cursors FOR ALL USING (auth.uid() = user_id);
 
 -- hub_prospects (Master Hub lead pipeline)
@@ -1115,6 +1133,7 @@ CREATE TABLE IF NOT EXISTS public.hub_prospects (
   created_at timestamptz DEFAULT now()
 );
 ALTER TABLE public.hub_prospects ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Staff manage prospects" ON public.hub_prospects;
 CREATE POLICY "Staff manage prospects" ON public.hub_prospects FOR ALL USING (
   EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('consultant','admin'))
 );
@@ -1132,9 +1151,11 @@ CREATE TABLE IF NOT EXISTS public.audit_logs (
   created_at timestamptz DEFAULT now()
 );
 ALTER TABLE public.audit_logs ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Admins view audit logs" ON public.audit_logs;
 CREATE POLICY "Admins view audit logs" ON public.audit_logs FOR SELECT USING (
   EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
 );
+DROP POLICY IF EXISTS "Service role writes audit logs" ON public.audit_logs;
 CREATE POLICY "Service role writes audit logs" ON public.audit_logs FOR INSERT WITH CHECK (auth.role() = 'service_role');
 CREATE INDEX IF NOT EXISTS audit_logs_user_idx ON public.audit_logs(user_id);
 CREATE INDEX IF NOT EXISTS audit_logs_created_idx ON public.audit_logs(created_at DESC);

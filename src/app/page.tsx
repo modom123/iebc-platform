@@ -750,15 +750,17 @@ export default function AgencyHomepage() {
           </div>
 
           <div
-            className="border-t pt-6 flex flex-col md:flex-row justify-between items-center gap-2"
+            className="border-t pt-6 flex flex-col md:flex-row justify-between items-center gap-3"
             style={{ borderColor: 'rgba(255,255,255,0.08)' }}
           >
             <p className="text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>
               © {year} Integrated Efficiency Business Consultants (IEBC). All rights reserved.
             </p>
-            <p className="text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>
-              Secured by Supabase · Powered by IEBC Platform
-            </p>
+            <div className="flex items-center gap-4">
+              <a href="/privacy" className="text-xs hover:text-white transition-colors" style={{ color: 'rgba(255,255,255,0.3)' }}>Privacy Policy</a>
+              <a href="/terms" className="text-xs hover:text-white transition-colors" style={{ color: 'rgba(255,255,255,0.3)' }}>Terms of Service</a>
+              <p className="text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>Secured by Supabase · Powered by IEBC Platform</p>
+            </div>
           </div>
         </div>
       </footer>

@@ -72,7 +72,7 @@ export async function POST(req: Request) {
       payment_method_types: ['card'],
       line_items: lineItems,
       subscription_data: {
-        trial_period_days: 7,
+        trial_period_days: 30,
         metadata: { plan },
       },
       // Stripe collects name, billing address, phone — no duplicate entry

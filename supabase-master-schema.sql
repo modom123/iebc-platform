@@ -1084,8 +1084,7 @@ CREATE POLICY vault_owner ON public.vault_documents FOR ALL USING (user_id = aut
 -- Run in Supabase dashboard > Storage
 -- ============================================================
 -- INSERT INTO storage.buckets (id, name, public) VALUES ('documents', 'documents', false);
--- -- DROP POLICY IF EXISTS "Users manage own documents" ON storage.objects;
-CREATE POLICY "Users manage own documents" ON storage.objects FOR ALL USING (
+-- CREATE POLICY "Users manage own documents" ON storage.objects FOR ALL USING (
 --   bucket_id = 'documents' AND auth.uid()::text = (storage.foldername(name))[1]
 -- );
 

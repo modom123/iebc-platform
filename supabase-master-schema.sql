@@ -755,7 +755,7 @@ CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
 -- ============================================================
 -- CHART OF ACCOUNTS
 -- ============================================================
-CREATE TABLE IF NOT EXISTS chart_of_accounts (
+CREATE TABLE IF NOT EXISTS public.chart_of_accounts (
   id            UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id       UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   code          TEXT NOT NULL,
@@ -768,15 +768,16 @@ CREATE TABLE IF NOT EXISTS chart_of_accounts (
   UNIQUE (user_id, code)
 );
 
-CREATE INDEX IF NOT EXISTS idx_coa_user ON chart_of_accounts(user_id);
+CREATE INDEX IF NOT EXISTS idx_coa_user ON public.chart_of_accounts(user_id);
 
-ALTER TABLE chart_of_accounts ENABLE ROW LEVEL SECURITY;
-CREATE POLICY coa_owner ON chart_of_accounts FOR ALL USING (user_id = auth.uid());
+ALTER TABLE public.chart_of_accounts ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS coa_owner ON public.chart_of_accounts;
+CREATE POLICY coa_owner ON public.chart_of_accounts FOR ALL USING (user_id = auth.uid());
 
 -- ============================================================
 -- JOURNAL ENTRIES
 -- ============================================================
-CREATE TABLE IF NOT EXISTS journal_entries (
+CREATE TABLE IF NOT EXISTS public.journal_entries (
   id            UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id       UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   entry_number  TEXT NOT NULL,
@@ -787,13 +788,14 @@ CREATE TABLE IF NOT EXISTS journal_entries (
   created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE INDEX IF NOT EXISTS idx_journal_user ON journal_entries(user_id);
-ALTER TABLE journal_entries ENABLE ROW LEVEL SECURITY;
-CREATE POLICY je_owner ON journal_entries FOR ALL USING (user_id = auth.uid());
+CREATE INDEX IF NOT EXISTS idx_journal_user ON public.journal_entries(user_id);
+ALTER TABLE public.journal_entries ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS je_owner ON public.journal_entries;
+CREATE POLICY je_owner ON public.journal_entries FOR ALL USING (user_id = auth.uid());
 
-CREATE TABLE IF NOT EXISTS journal_entry_lines (
+CREATE TABLE IF NOT EXISTS public.journal_entry_lines (
   id                UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  journal_entry_id  UUID NOT NULL REFERENCES journal_entries(id) ON DELETE CASCADE,
+  journal_entry_id  UUID NOT NULL REFERENCES public.journal_entries(id) ON DELETE CASCADE,
   user_id           UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   account_code      TEXT NOT NULL DEFAULT '',
   account_name      TEXT NOT NULL DEFAULT '',
@@ -802,14 +804,15 @@ CREATE TABLE IF NOT EXISTS journal_entry_lines (
   credit            NUMERIC(14,2) NOT NULL DEFAULT 0
 );
 
-CREATE INDEX IF NOT EXISTS idx_jel_entry ON journal_entry_lines(journal_entry_id);
-ALTER TABLE journal_entry_lines ENABLE ROW LEVEL SECURITY;
-CREATE POLICY jel_owner ON journal_entry_lines FOR ALL USING (user_id = auth.uid());
+CREATE INDEX IF NOT EXISTS idx_jel_entry ON public.journal_entry_lines(journal_entry_id);
+ALTER TABLE public.journal_entry_lines ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS jel_owner ON public.journal_entry_lines;
+CREATE POLICY jel_owner ON public.journal_entry_lines FOR ALL USING (user_id = auth.uid());
 
 -- ============================================================
 -- PURCHASE ORDERS
 -- ============================================================
-CREATE TABLE IF NOT EXISTS purchase_orders (
+CREATE TABLE IF NOT EXISTS public.purchase_orders (
   id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id         UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   po_number       TEXT NOT NULL,
@@ -826,13 +829,14 @@ CREATE TABLE IF NOT EXISTS purchase_orders (
   created_at      TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE INDEX IF NOT EXISTS idx_po_user ON purchase_orders(user_id);
-ALTER TABLE purchase_orders ENABLE ROW LEVEL SECURITY;
-CREATE POLICY po_owner ON purchase_orders FOR ALL USING (user_id = auth.uid());
+CREATE INDEX IF NOT EXISTS idx_po_user ON public.purchase_orders(user_id);
+ALTER TABLE public.purchase_orders ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS po_owner ON public.purchase_orders;
+CREATE POLICY po_owner ON public.purchase_orders FOR ALL USING (user_id = auth.uid());
 
-CREATE TABLE IF NOT EXISTS purchase_order_lines (
+CREATE TABLE IF NOT EXISTS public.purchase_order_lines (
   id                  UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
-  purchase_order_id   UUID NOT NULL REFERENCES purchase_orders(id) ON DELETE CASCADE,
+  purchase_order_id   UUID NOT NULL REFERENCES public.purchase_orders(id) ON DELETE CASCADE,
   user_id             UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   description         TEXT NOT NULL,
   qty                 NUMERIC(12,3) NOT NULL DEFAULT 1,
@@ -841,14 +845,15 @@ CREATE TABLE IF NOT EXISTS purchase_order_lines (
   total               NUMERIC(14,2) NOT NULL DEFAULT 0
 );
 
-CREATE INDEX IF NOT EXISTS idx_pol_po ON purchase_order_lines(purchase_order_id);
-ALTER TABLE purchase_order_lines ENABLE ROW LEVEL SECURITY;
-CREATE POLICY pol_owner ON purchase_order_lines FOR ALL USING (user_id = auth.uid());
+CREATE INDEX IF NOT EXISTS idx_pol_po ON public.purchase_order_lines(purchase_order_id);
+ALTER TABLE public.purchase_order_lines ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS pol_owner ON public.purchase_order_lines;
+CREATE POLICY pol_owner ON public.purchase_order_lines FOR ALL USING (user_id = auth.uid());
 
 -- ============================================================
 -- INVENTORY
 -- ============================================================
-CREATE TABLE IF NOT EXISTS inventory_items (
+CREATE TABLE IF NOT EXISTS public.inventory_items (
   id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id         UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   sku             TEXT NOT NULL,
@@ -866,62 +871,67 @@ CREATE TABLE IF NOT EXISTS inventory_items (
   UNIQUE (user_id, sku)
 );
 
-CREATE INDEX IF NOT EXISTS idx_inv_user ON inventory_items(user_id);
-ALTER TABLE inventory_items ENABLE ROW LEVEL SECURITY;
-CREATE POLICY inv_owner ON inventory_items FOR ALL USING (user_id = auth.uid());
+CREATE INDEX IF NOT EXISTS idx_inv_user ON public.inventory_items(user_id);
+ALTER TABLE public.inventory_items ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS inv_owner ON public.inventory_items;
+CREATE POLICY inv_owner ON public.inventory_items FOR ALL USING (user_id = auth.uid());
 
-CREATE TABLE IF NOT EXISTS inventory_adjustments (
+CREATE TABLE IF NOT EXISTS public.inventory_adjustments (
   id                  UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id             UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  inventory_item_id   UUID NOT NULL REFERENCES inventory_items(id) ON DELETE CASCADE,
+  inventory_item_id   UUID NOT NULL REFERENCES public.inventory_items(id) ON DELETE CASCADE,
   qty_change          NUMERIC(12,3) NOT NULL,
   note                TEXT,
   adjusted_at         TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-ALTER TABLE inventory_adjustments ENABLE ROW LEVEL SECURITY;
-CREATE POLICY inv_adj_owner ON inventory_adjustments FOR ALL USING (user_id = auth.uid());
+ALTER TABLE public.inventory_adjustments ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS inv_adj_owner ON public.inventory_adjustments;
+CREATE POLICY inv_adj_owner ON public.inventory_adjustments FOR ALL USING (user_id = auth.uid());
 
 -- ============================================================
 -- CLIENT PORTAL TOKENS
 -- ============================================================
-CREATE TABLE IF NOT EXISTS client_portal_tokens (
+CREATE TABLE IF NOT EXISTS public.client_portal_tokens (
   id            UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id       UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  invoice_id    UUID NOT NULL REFERENCES invoices(id) ON DELETE CASCADE,
+  invoice_id    UUID NOT NULL REFERENCES public.invoices(id) ON DELETE CASCADE,
   token         TEXT NOT NULL UNIQUE,
   expires_at    TIMESTAMPTZ,
   is_active     BOOLEAN NOT NULL DEFAULT true,
   created_at    TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE INDEX IF NOT EXISTS idx_portal_token ON client_portal_tokens(token);
-CREATE INDEX IF NOT EXISTS idx_portal_invoice ON client_portal_tokens(invoice_id);
+CREATE INDEX IF NOT EXISTS idx_portal_token ON public.client_portal_tokens(token);
+CREATE INDEX IF NOT EXISTS idx_portal_invoice ON public.client_portal_tokens(invoice_id);
 
 -- No RLS auth check on SELECT for token lookup (public portal page validates by token value)
-ALTER TABLE client_portal_tokens ENABLE ROW LEVEL SECURITY;
+ALTER TABLE public.client_portal_tokens ENABLE ROW LEVEL SECURITY;
 -- Users can manage their own tokens
-CREATE POLICY portal_token_owner ON client_portal_tokens FOR ALL USING (user_id = auth.uid());
+DROP POLICY IF EXISTS portal_token_owner ON public.client_portal_tokens;
+CREATE POLICY portal_token_owner ON public.client_portal_tokens FOR ALL USING (user_id = auth.uid());
 -- Public read by token value (for portal page — no auth)
-CREATE POLICY portal_token_public_read ON client_portal_tokens FOR SELECT USING (true);
+DROP POLICY IF EXISTS portal_token_public_read ON public.client_portal_tokens;
+CREATE POLICY portal_token_public_read ON public.client_portal_tokens FOR SELECT USING (true);
 
 -- ============================================================
 -- INVOICE PAYMENTS (tracks payments made via portal or manually)
 -- ============================================================
-CREATE TABLE IF NOT EXISTS invoice_payments (
+CREATE TABLE IF NOT EXISTS public.invoice_payments (
   id                    UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id               UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  invoice_id            UUID NOT NULL REFERENCES invoices(id) ON DELETE CASCADE,
+  invoice_id            UUID NOT NULL REFERENCES public.invoices(id) ON DELETE CASCADE,
   amount                NUMERIC(14,2) NOT NULL,
   method                TEXT, -- card, ach, check, cash
-  portal_token_id       UUID REFERENCES client_portal_tokens(id),
+  portal_token_id       UUID REFERENCES public.client_portal_tokens(id),
   stripe_payment_id     TEXT,
   paid_at               TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-CREATE INDEX IF NOT EXISTS idx_payments_invoice ON invoice_payments(invoice_id);
-ALTER TABLE invoice_payments ENABLE ROW LEVEL SECURITY;
-CREATE POLICY payments_owner ON invoice_payments FOR ALL USING (user_id = auth.uid());
+CREATE INDEX IF NOT EXISTS idx_payments_invoice ON public.invoice_payments(invoice_id);
+ALTER TABLE public.invoice_payments ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS payments_owner ON public.invoice_payments;
+CREATE POLICY payments_owner ON public.invoice_payments FOR ALL USING (user_id = auth.uid());
 
 -- ============================================================
 -- ALTER INVOICES: add paid_at + payment_method columns
@@ -934,7 +944,7 @@ ALTER TABLE invoices ADD COLUMN IF NOT EXISTS payment_method TEXT;
 -- for completeness if not yet applied
 -- ============================================================
 
-CREATE TABLE IF NOT EXISTS employees (
+CREATE TABLE IF NOT EXISTS public.employees (
   id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id         UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   first_name      TEXT NOT NULL,
@@ -951,10 +961,11 @@ CREATE TABLE IF NOT EXISTS employees (
   created_at      TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-ALTER TABLE employees ENABLE ROW LEVEL SECURITY;
-CREATE POLICY emp_owner ON employees FOR ALL USING (user_id = auth.uid());
+ALTER TABLE public.employees ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS emp_owner ON public.employees;
+CREATE POLICY emp_owner ON public.employees FOR ALL USING (user_id = auth.uid());
 
-CREATE TABLE IF NOT EXISTS pay_runs (
+CREATE TABLE IF NOT EXISTS public.pay_runs (
   id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id         UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   period_start    DATE NOT NULL,
@@ -967,14 +978,15 @@ CREATE TABLE IF NOT EXISTS pay_runs (
   created_at      TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-ALTER TABLE pay_runs ENABLE ROW LEVEL SECURITY;
-CREATE POLICY payrun_owner ON pay_runs FOR ALL USING (user_id = auth.uid());
+ALTER TABLE public.pay_runs ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS payrun_owner ON public.pay_runs;
+CREATE POLICY payrun_owner ON public.pay_runs FOR ALL USING (user_id = auth.uid());
 
-CREATE TABLE IF NOT EXISTS pay_stubs (
+CREATE TABLE IF NOT EXISTS public.pay_stubs (
   id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id         UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
-  pay_run_id      UUID NOT NULL REFERENCES pay_runs(id) ON DELETE CASCADE,
-  employee_id     UUID NOT NULL REFERENCES employees(id) ON DELETE CASCADE,
+  pay_run_id      UUID NOT NULL REFERENCES public.pay_runs(id) ON DELETE CASCADE,
+  employee_id     UUID NOT NULL REFERENCES public.employees(id) ON DELETE CASCADE,
   gross_pay       NUMERIC(14,2) NOT NULL DEFAULT 0,
   federal_tax     NUMERIC(14,2) NOT NULL DEFAULT 0,
   state_tax       NUMERIC(14,2) NOT NULL DEFAULT 0,
@@ -985,10 +997,11 @@ CREATE TABLE IF NOT EXISTS pay_stubs (
   created_at      TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-ALTER TABLE pay_stubs ENABLE ROW LEVEL SECURITY;
-CREATE POLICY stub_owner ON pay_stubs FOR ALL USING (user_id = auth.uid());
+ALTER TABLE public.pay_stubs ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS stub_owner ON public.pay_stubs;
+CREATE POLICY stub_owner ON public.pay_stubs FOR ALL USING (user_id = auth.uid());
 
-CREATE TABLE IF NOT EXISTS vendors (
+CREATE TABLE IF NOT EXISTS public.vendors (
   id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id         UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   name            TEXT NOT NULL,
@@ -1005,10 +1018,11 @@ CREATE TABLE IF NOT EXISTS vendors (
   created_at      TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-ALTER TABLE vendors ENABLE ROW LEVEL SECURITY;
-CREATE POLICY vendor_owner ON vendors FOR ALL USING (user_id = auth.uid());
+ALTER TABLE public.vendors ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS vendor_owner ON public.vendors;
+CREATE POLICY vendor_owner ON public.vendors FOR ALL USING (user_id = auth.uid());
 
-CREATE TABLE IF NOT EXISTS vault_documents (
+CREATE TABLE IF NOT EXISTS public.vault_documents (
   id              UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   user_id         UUID NOT NULL REFERENCES auth.users(id) ON DELETE CASCADE,
   name            TEXT NOT NULL,
@@ -1019,15 +1033,17 @@ CREATE TABLE IF NOT EXISTS vault_documents (
   uploaded_at     TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
-ALTER TABLE vault_documents ENABLE ROW LEVEL SECURITY;
-CREATE POLICY vault_owner ON vault_documents FOR ALL USING (user_id = auth.uid());
+ALTER TABLE public.vault_documents ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS vault_owner ON public.vault_documents;
+CREATE POLICY vault_owner ON public.vault_documents FOR ALL USING (user_id = auth.uid());
 
 -- ============================================================
 -- STORAGE BUCKET for Document Vault
 -- Run in Supabase dashboard > Storage
 -- ============================================================
 -- INSERT INTO storage.buckets (id, name, public) VALUES ('documents', 'documents', false);
--- CREATE POLICY "Users manage own documents" ON storage.objects FOR ALL USING (
+-- DROP POLICY IF EXISTS "Users manage own documents" ON storage.objects;
+CREATE POLICY "Users manage own documents" ON storage.objects FOR ALL USING (
 --   bucket_id = 'documents' AND auth.uid()::text = (storage.foldername(name))[1]
 -- );
 
@@ -1085,6 +1101,7 @@ CREATE TABLE IF NOT EXISTS public.bank_accounts (
   created_at timestamptz DEFAULT now()
 );
 ALTER TABLE public.bank_accounts ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users manage own bank accounts" ON public.bank_accounts;
 CREATE POLICY "Users manage own bank accounts" ON public.bank_accounts FOR ALL USING (auth.uid() = user_id);
 CREATE INDEX IF NOT EXISTS bank_accounts_user_id_idx ON public.bank_accounts(user_id);
 
@@ -1098,6 +1115,7 @@ CREATE TABLE IF NOT EXISTS public.plaid_sync_cursors (
   UNIQUE(connection_id)
 );
 ALTER TABLE public.plaid_sync_cursors ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Users manage own sync cursors" ON public.plaid_sync_cursors;
 CREATE POLICY "Users manage own sync cursors" ON public.plaid_sync_cursors FOR ALL USING (auth.uid() = user_id);
 
 -- hub_prospects (Master Hub lead pipeline)
@@ -1115,6 +1133,7 @@ CREATE TABLE IF NOT EXISTS public.hub_prospects (
   created_at timestamptz DEFAULT now()
 );
 ALTER TABLE public.hub_prospects ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Staff manage prospects" ON public.hub_prospects;
 CREATE POLICY "Staff manage prospects" ON public.hub_prospects FOR ALL USING (
   EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role IN ('consultant','admin'))
 );
@@ -1132,9 +1151,11 @@ CREATE TABLE IF NOT EXISTS public.audit_logs (
   created_at timestamptz DEFAULT now()
 );
 ALTER TABLE public.audit_logs ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Admins view audit logs" ON public.audit_logs;
 CREATE POLICY "Admins view audit logs" ON public.audit_logs FOR SELECT USING (
   EXISTS (SELECT 1 FROM public.profiles WHERE id = auth.uid() AND role = 'admin')
 );
+DROP POLICY IF EXISTS "Service role writes audit logs" ON public.audit_logs;
 CREATE POLICY "Service role writes audit logs" ON public.audit_logs FOR INSERT WITH CHECK (auth.role() = 'service_role');
 CREATE INDEX IF NOT EXISTS audit_logs_user_idx ON public.audit_logs(user_id);
 CREATE INDEX IF NOT EXISTS audit_logs_created_idx ON public.audit_logs(created_at DESC);

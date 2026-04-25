@@ -1089,11 +1089,11 @@ CREATE POLICY vault_owner ON public.vault_documents FOR ALL USING (user_id = aut
 -- );
 
 -- ============================================================
--- FIXUPS: Add columns that later phases expect but base schema
--- didn't include (all idempotent with IF NOT EXISTS)
+-- FIXUPS: Add ALL columns from every phase variant of each table.
+-- Uses ADD COLUMN IF NOT EXISTS so it never errors on re-run.
 -- ============================================================
 
--- profiles: extra fields written by webhook / checkout
+-- profiles
 ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS phone text;
 ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS business_name text;
 ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS plan text;
@@ -1101,7 +1101,7 @@ ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS stripe_customer_id text;
 ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS billing_address text;
 ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS updated_at timestamptz DEFAULT now();
 
--- subscriptions: stripe_customer_id column used by webhook
+-- subscriptions
 ALTER TABLE public.subscriptions ADD COLUMN IF NOT EXISTS stripe_customer_id text;
 ALTER TABLE public.subscriptions ADD COLUMN IF NOT EXISTS updated_at timestamptz DEFAULT now();
 
@@ -1124,6 +1124,60 @@ ALTER TABLE public.transactions ADD COLUMN IF NOT EXISTS reconciled boolean DEFA
 ALTER TABLE public.transactions ADD COLUMN IF NOT EXISTS plaid_transaction_id text;
 ALTER TABLE public.transactions ADD COLUMN IF NOT EXISTS receipt_url text;
 ALTER TABLE public.transactions ADD COLUMN IF NOT EXISTS project_id uuid;
+
+-- journal_entry_lines: phase1 uses entry_id, phase7 uses journal_entry_id — add both
+ALTER TABLE public.journal_entry_lines ADD COLUMN IF NOT EXISTS entry_id uuid REFERENCES public.journal_entries(id) ON DELETE CASCADE;
+ALTER TABLE public.journal_entry_lines ADD COLUMN IF NOT EXISTS journal_entry_id uuid REFERENCES public.journal_entries(id) ON DELETE CASCADE;
+ALTER TABLE public.journal_entry_lines ADD COLUMN IF NOT EXISTS account_id uuid REFERENCES public.accounts(id);
+ALTER TABLE public.journal_entry_lines ADD COLUMN IF NOT EXISTS account_code text DEFAULT '';
+ALTER TABLE public.journal_entry_lines ADD COLUMN IF NOT EXISTS account_name text DEFAULT '';
+ALTER TABLE public.journal_entry_lines ADD COLUMN IF NOT EXISTS description text DEFAULT '';
+ALTER TABLE public.journal_entry_lines ADD COLUMN IF NOT EXISTS memo text;
+ALTER TABLE public.journal_entry_lines ADD COLUMN IF NOT EXISTS user_id uuid REFERENCES public.profiles(id) ON DELETE CASCADE;
+
+-- journal_entries: phase7 adds entry_number
+ALTER TABLE public.journal_entries ADD COLUMN IF NOT EXISTS entry_number text;
+
+-- employees: phase6 uses name, phase7 splits into first_name/last_name; add all
+ALTER TABLE public.employees ADD COLUMN IF NOT EXISTS name text;
+ALTER TABLE public.employees ADD COLUMN IF NOT EXISTS first_name text;
+ALTER TABLE public.employees ADD COLUMN IF NOT EXISTS last_name text;
+ALTER TABLE public.employees ADD COLUMN IF NOT EXISTS department text;
+ALTER TABLE public.employees ADD COLUMN IF NOT EXISTS start_date date;
+ALTER TABLE public.employees ADD COLUMN IF NOT EXISTS is_active boolean DEFAULT true;
+ALTER TABLE public.employees ADD COLUMN IF NOT EXISTS status text DEFAULT 'active';
+
+-- pay_runs: phase6 uses total_taxes, phase7 uses total_tax; add both
+ALTER TABLE public.pay_runs ADD COLUMN IF NOT EXISTS total_taxes numeric DEFAULT 0;
+ALTER TABLE public.pay_runs ADD COLUMN IF NOT EXISTS total_tax numeric DEFAULT 0;
+ALTER TABLE public.pay_runs ADD COLUMN IF NOT EXISTS employee_count integer DEFAULT 0;
+
+-- pay_stubs: phase6 uses social_security/medicare, phase7 uses ss_tax/medicare_tax; add all
+ALTER TABLE public.pay_stubs ADD COLUMN IF NOT EXISTS employee_name text;
+ALTER TABLE public.pay_stubs ADD COLUMN IF NOT EXISTS social_security numeric DEFAULT 0;
+ALTER TABLE public.pay_stubs ADD COLUMN IF NOT EXISTS medicare numeric DEFAULT 0;
+ALTER TABLE public.pay_stubs ADD COLUMN IF NOT EXISTS ss_tax numeric DEFAULT 0;
+ALTER TABLE public.pay_stubs ADD COLUMN IF NOT EXISTS medicare_tax numeric DEFAULT 0;
+ALTER TABLE public.pay_stubs ADD COLUMN IF NOT EXISTS hours numeric;
+ALTER TABLE public.pay_stubs ADD COLUMN IF NOT EXISTS hours_worked numeric;
+
+-- vendors: phase6 uses tin/contact_name, phase7 uses tax_id/company; add all
+ALTER TABLE public.vendors ADD COLUMN IF NOT EXISTS tin text;
+ALTER TABLE public.vendors ADD COLUMN IF NOT EXISTS tax_id text;
+ALTER TABLE public.vendors ADD COLUMN IF NOT EXISTS contact_name text;
+ALTER TABLE public.vendors ADD COLUMN IF NOT EXISTS company text;
+ALTER TABLE public.vendors ADD COLUMN IF NOT EXISTS payment_terms text DEFAULT 'net30';
+ALTER TABLE public.vendors ADD COLUMN IF NOT EXISTS is_active boolean DEFAULT true;
+ALTER TABLE public.vendors ADD COLUMN IF NOT EXISTS vendor_type text DEFAULT 'vendor';
+
+-- vault_documents: phase6 uses storage_path/file_type, phase7 uses file_path/mime_type; add all
+ALTER TABLE public.vault_documents ADD COLUMN IF NOT EXISTS storage_path text;
+ALTER TABLE public.vault_documents ADD COLUMN IF NOT EXISTS file_path text;
+ALTER TABLE public.vault_documents ADD COLUMN IF NOT EXISTS file_type text;
+ALTER TABLE public.vault_documents ADD COLUMN IF NOT EXISTS mime_type text;
+ALTER TABLE public.vault_documents ADD COLUMN IF NOT EXISTS file_size bigint DEFAULT 0;
+ALTER TABLE public.vault_documents ADD COLUMN IF NOT EXISTS notes text;
+ALTER TABLE public.vault_documents ADD COLUMN IF NOT EXISTS uploaded_at timestamptz DEFAULT now();
 
 -- bank_accounts (Plaid connected accounts)
 CREATE TABLE IF NOT EXISTS public.bank_accounts (

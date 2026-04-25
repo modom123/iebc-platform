@@ -89,27 +89,39 @@ export default function InfrastructureCheckout() {
             </div>
           </div>
 
-          {/* Portal access CTA */}
-          <div className="rounded-2xl p-5 mb-6 text-left" style={{ background: DARK }}>
-            <p className="font-bold text-sm text-white mb-1">Access Your Portal</p>
+          {/* Free workspace CTA */}
+          <div className="rounded-2xl p-5 mb-5 text-left" style={{ background: DARK }}>
+            <div className="flex items-center gap-2 mb-1">
+              <span className="text-[10px] font-black uppercase tracking-widest px-2 py-0.5 rounded-full" style={{ background: GOLD, color: '#fff' }}>Free</span>
+              <p className="font-bold text-sm text-white">Your Advisor Workspace is ready</p>
+            </div>
             <p className="text-xs mb-4" style={{ color: 'rgba(255,255,255,0.65)' }}>
-              Sign in (or create your free account) to manage your AI Advisor workforce, accounting, and hub — all in one place.
+              Message your advisors, share documents, and track deliverables — all included with every AI Advisor contract.
             </p>
             <div className="flex gap-2">
               <Link
-                href={`/auth/login?email=${encodeURIComponent(form.email)}&next=/hub/workforce`}
+                href={`/auth/login?email=${encodeURIComponent(form.email)}&next=/workspace`}
                 className="flex-1 text-center py-2.5 rounded-xl text-sm font-bold text-white transition"
                 style={{ background: GOLD }}
               >
-                Sign In to Portal →
+                Open My Workspace →
               </Link>
               <Link
-                href={`/auth/signup?email=${encodeURIComponent(form.email)}&next=/hub/workforce`}
+                href={`/auth/signup?email=${encodeURIComponent(form.email)}&next=/workspace`}
                 className="flex-1 text-center py-2.5 rounded-xl text-sm font-bold border-2 border-white text-white hover:bg-white hover:text-[#0B2140] transition"
               >
                 Create Account
               </Link>
             </div>
+          </div>
+
+          {/* Upgrade CTA */}
+          <div className="rounded-2xl p-4 mb-5 text-left border" style={{ background: '#FFFBEB', borderColor: '#FDE68A' }}>
+            <p className="text-xs font-bold mb-1" style={{ color: DARK }}>Want even more?</p>
+            <p className="text-xs text-gray-600 mb-3">Upgrade to the Full Hub — accounting, CRM, invoicing, and automation all connected to your advisor team.</p>
+            <Link href="/checkout/hub" className="inline-block px-4 py-2 rounded-xl text-xs font-bold text-white transition" style={{ background: GOLD }}>
+              Upgrade to Full Hub →
+            </Link>
           </div>
 
           {/* Next steps */}
@@ -132,8 +144,8 @@ export default function InfrastructureCheckout() {
           </div>
 
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
-            <Link href="/hub/workforce" className="px-7 py-3 rounded-xl font-bold text-sm text-white transition-opacity hover:opacity-90 shadow-md" style={{ background: DARK }}>
-              View My Workforce →
+            <Link href="/workspace" className="px-7 py-3 rounded-xl font-bold text-sm text-white transition-opacity hover:opacity-90 shadow-md" style={{ background: DARK }}>
+              Open Workspace →
             </Link>
             <Link href="/infrastructure" className="px-7 py-3 rounded-xl font-bold text-sm border-2 hover:bg-gray-50 transition" style={{ borderColor: DARK, color: DARK }}>
               Add More Advisors

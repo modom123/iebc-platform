@@ -12,7 +12,9 @@ create table if not exists public.profiles (
   created_at timestamptz default now()
 );
 alter table public.profiles enable row level security;
+DROP POLICY IF EXISTS "Users read own profile" ON public.profiles;
 create policy "Users read own profile" on public.profiles for select using (auth.uid() = id);
+DROP POLICY IF EXISTS "Users update own profile" ON public.profiles;
 create policy "Users update own profile" on public.profiles for update using (auth.uid() = id);
 
 -- Auto-create profile on signup
@@ -42,7 +44,9 @@ create table if not exists public.subscriptions (
   created_at timestamptz default now()
 );
 alter table public.subscriptions enable row level security;
+DROP POLICY IF EXISTS "Users read own sub" ON public.subscriptions;
 create policy "Users read own sub" on public.subscriptions for select using (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Service role manages subs" ON public.subscriptions;
 create policy "Service role manages subs" on public.subscriptions for all using (auth.role() = 'service_role');
 
 -- IEBC Platform Fees (0.76% cut on each payment)
@@ -55,9 +59,11 @@ create table if not exists public.iebc_fees (
   created_at timestamptz default now()
 );
 alter table public.iebc_fees enable row level security;
+DROP POLICY IF EXISTS "Admin view fees" ON public.iebc_fees;
 create policy "Admin view fees" on public.iebc_fees for select using (
   exists (select 1 from public.profiles where id = auth.uid() and role = 'admin')
 );
+DROP POLICY IF EXISTS "Service role manages fees" ON public.iebc_fees;
 create policy "Service role manages fees" on public.iebc_fees for all using (auth.role() = 'service_role');
 
 -- Leads & Pipeline
@@ -72,6 +78,7 @@ create table if not exists public.leads (
   created_at timestamptz default now()
 );
 alter table public.leads enable row level security;
+DROP POLICY IF EXISTS "Staff manage leads" ON public.leads;
 create policy "Staff manage leads" on public.leads for all using (
   exists (select 1 from public.profiles where id = auth.uid() and role in ('consultant', 'admin'))
 );
@@ -86,7 +93,9 @@ create table if not exists public.consultant_assignments (
   assigned_at timestamptz default now()
 );
 alter table public.consultant_assignments enable row level security;
+DROP POLICY IF EXISTS "Users read own assignments" ON public.consultant_assignments;
 create policy "Users read own assignments" on public.consultant_assignments for select using (auth.uid() = user_id);
+DROP POLICY IF EXISTS "Admin manage assignments" ON public.consultant_assignments;
 create policy "Admin manage assignments" on public.consultant_assignments for all using (
   exists (select 1 from public.profiles where id = auth.uid() and role = 'admin')
 );
@@ -108,6 +117,7 @@ create table if not exists public.transactions (
   created_at timestamptz default now()
 );
 alter table public.transactions enable row level security;
+DROP POLICY IF EXISTS "Users manage own transactions" ON public.transactions;
 create policy "Users manage own transactions" on public.transactions for all using (auth.uid() = user_id);
 
 -- Invoices
@@ -128,6 +138,7 @@ create table if not exists public.invoices (
   created_at timestamptz default now()
 );
 alter table public.invoices enable row level security;
+DROP POLICY IF EXISTS "Users manage own invoices" ON public.invoices;
 create policy "Users manage own invoices" on public.invoices for all using (auth.uid() = user_id);
 
 -- Tasks
@@ -143,6 +154,7 @@ create table if not exists public.tasks (
   created_at timestamptz default now()
 );
 alter table public.tasks enable row level security;
+DROP POLICY IF EXISTS "Users manage own tasks" ON public.tasks;
 create policy "Users manage own tasks" on public.tasks for all using (auth.uid() = user_id);
 
 -- Team Members
@@ -158,7 +170,9 @@ create table if not exists public.team_members (
   unique(owner_id, invited_email)
 );
 alter table public.team_members enable row level security;
+DROP POLICY IF EXISTS "Owners manage their team" ON public.team_members;
 create policy "Owners manage their team" on public.team_members for all using (auth.uid() = owner_id);
+DROP POLICY IF EXISTS "Members view own membership" ON public.team_members;
 create policy "Members view own membership" on public.team_members for select using (auth.uid() = member_id);
 
 -- Business Formation Checklists
@@ -175,6 +189,7 @@ create table if not exists public.formation_checklists (
   updated_at timestamptz default now()
 );
 alter table public.formation_checklists enable row level security;
+DROP POLICY IF EXISTS "Users manage own formation" ON public.formation_checklists;
 create policy "Users manage own formation" on public.formation_checklists for all using (auth.uid() = user_id);
 -- =============================================
 -- IEBC Platform — Phase 1 Accounting Schema
@@ -194,6 +209,7 @@ create table if not exists public.accounts (
   created_at timestamptz default now()
 );
 alter table public.accounts enable row level security;
+DROP POLICY IF EXISTS "Users manage own accounts" ON public.accounts;
 create policy "Users manage own accounts" on public.accounts for all using (auth.uid() = user_id);
 
 -- Seed default chart of accounts on first use (called from app)
@@ -211,6 +227,7 @@ create table if not exists public.journal_entries (
   created_at timestamptz default now()
 );
 alter table public.journal_entries enable row level security;
+DROP POLICY IF EXISTS "Users manage own journal entries" ON public.journal_entries;
 create policy "Users manage own journal entries" on public.journal_entries for all using (auth.uid() = user_id);
 
 -- Journal Entry Lines (debits + credits must balance)
@@ -223,6 +240,7 @@ create table if not exists public.journal_entry_lines (
   memo text
 );
 alter table public.journal_entry_lines enable row level security;
+DROP POLICY IF EXISTS "Users manage own entry lines" ON public.journal_entry_lines;
 create policy "Users manage own entry lines" on public.journal_entry_lines
   for all using (
     exists (select 1 from public.journal_entries je where je.id = entry_id and je.user_id = auth.uid())
@@ -240,6 +258,7 @@ create table if not exists public.customers (
   created_at timestamptz default now()
 );
 alter table public.customers enable row level security;
+DROP POLICY IF EXISTS "Users manage own customers" ON public.customers;
 create policy "Users manage own customers" on public.customers for all using (auth.uid() = user_id);
 
 -- Invoices
@@ -262,6 +281,7 @@ create table if not exists public.invoices (
   created_at timestamptz default now()
 );
 alter table public.invoices enable row level security;
+DROP POLICY IF EXISTS "Users manage own invoices" ON public.invoices;
 create policy "Users manage own invoices" on public.invoices for all using (auth.uid() = user_id);
 
 -- Invoice Line Items
@@ -274,6 +294,7 @@ create table if not exists public.invoice_line_items (
   amount numeric default 0
 );
 alter table public.invoice_line_items enable row level security;
+DROP POLICY IF EXISTS "Users manage own invoice items" ON public.invoice_line_items;
 create policy "Users manage own invoice items" on public.invoice_line_items
   for all using (
     exists (select 1 from public.invoices i where i.id = invoice_id and i.user_id = auth.uid())
@@ -297,6 +318,7 @@ create table if not exists public.transactions (
   created_at timestamptz default now()
 );
 alter table public.transactions enable row level security;
+DROP POLICY IF EXISTS "Users manage own transactions" ON public.transactions;
 create policy "Users manage own transactions" on public.transactions for all using (auth.uid() = user_id);
 
 -- Plaid bank connections
@@ -310,6 +332,7 @@ create table if not exists public.bank_connections (
   created_at timestamptz default now()
 );
 alter table public.bank_connections enable row level security;
+DROP POLICY IF EXISTS "Users manage own bank connections" ON public.bank_connections;
 create policy "Users manage own bank connections" on public.bank_connections for all using (auth.uid() = user_id);
 
 -- Auto-increment invoice number function
@@ -347,6 +370,7 @@ alter table public.leads add column if not exists user_id uuid references public
 
 -- Update leads RLS: allow users to manage their own leads
 drop policy if exists "Staff manage leads" on public.leads;
+DROP POLICY IF EXISTS "Users manage own leads" ON public.leads;
 create policy "Users manage own leads" on public.leads
   for all using (auth.uid() = user_id);
 
@@ -362,6 +386,7 @@ create table if not exists public.tasks (
   created_at timestamptz default now()
 );
 alter table public.tasks enable row level security;
+DROP POLICY IF EXISTS "Users manage own tasks" ON public.tasks;
 create policy "Users manage own tasks" on public.tasks for all using (auth.uid() = user_id);
 
 -- Index for performance
@@ -386,6 +411,7 @@ create table if not exists public.budgets (
   unique(user_id, category)
 );
 alter table public.budgets enable row level security;
+DROP POLICY IF EXISTS "Users manage own budgets" ON public.budgets;
 create policy "Users manage own budgets" on public.budgets for all using (auth.uid() = user_id);
 
 -- Add phone/address to customers (if not already there)
@@ -433,6 +459,7 @@ create table if not exists public.recurring_transactions (
   created_at timestamptz default now()
 );
 alter table public.recurring_transactions enable row level security;
+DROP POLICY IF EXISTS "Users manage own recurring" ON public.recurring_transactions;
 create policy "Users manage own recurring" on public.recurring_transactions for all using (auth.uid() = user_id);
 create index if not exists recurring_user_id_idx on public.recurring_transactions(user_id);
 
@@ -451,6 +478,7 @@ create table if not exists public.bills (
   created_at timestamptz default now()
 );
 alter table public.bills enable row level security;
+DROP POLICY IF EXISTS "Users manage own bills" ON public.bills;
 create policy "Users manage own bills" on public.bills for all using (auth.uid() = user_id);
 create index if not exists bills_user_id_idx on public.bills(user_id);
 create index if not exists bills_status_idx on public.bills(status);
@@ -468,6 +496,7 @@ create table if not exists public.projects (
   created_at timestamptz default now()
 );
 alter table public.projects enable row level security;
+DROP POLICY IF EXISTS "Users manage own projects" ON public.projects;
 create policy "Users manage own projects" on public.projects for all using (auth.uid() = user_id);
 create index if not exists projects_user_id_idx on public.projects(user_id);
 
@@ -489,6 +518,7 @@ create table if not exists public.transaction_rules (
   created_at timestamptz default now()
 );
 alter table public.transaction_rules enable row level security;
+DROP POLICY IF EXISTS "Users manage own rules" ON public.transaction_rules;
 create policy "Users manage own rules" on public.transaction_rules for all using (auth.uid() = user_id);
 
 -- Tax Obligations
@@ -506,6 +536,7 @@ create table if not exists public.tax_obligations (
   created_at timestamptz default now()
 );
 alter table public.tax_obligations enable row level security;
+DROP POLICY IF EXISTS "Users manage own tax obligations" ON public.tax_obligations;
 create policy "Users manage own tax obligations" on public.tax_obligations for all using (auth.uid() = user_id);
 create index if not exists tax_obligations_user_id_idx on public.tax_obligations(user_id);
 
@@ -539,6 +570,7 @@ create table if not exists public.estimates (
   created_at timestamptz default now()
 );
 alter table public.estimates enable row level security;
+DROP POLICY IF EXISTS "Users manage own estimates" ON public.estimates;
 create policy "Users manage own estimates" on public.estimates for all using (auth.uid() = user_id);
 create index if not exists estimates_user_id_idx on public.estimates(user_id);
 create index if not exists estimates_status_idx on public.estimates(status);
@@ -556,6 +588,7 @@ create table if not exists public.mileage_log (
   created_at timestamptz default now()
 );
 alter table public.mileage_log enable row level security;
+DROP POLICY IF EXISTS "Users manage own mileage" ON public.mileage_log;
 create policy "Users manage own mileage" on public.mileage_log for all using (auth.uid() = user_id);
 create index if not exists mileage_user_id_idx on public.mileage_log(user_id);
 create index if not exists mileage_date_idx on public.mileage_log(user_id, date);
@@ -575,6 +608,7 @@ create table if not exists public.time_entries (
   created_at timestamptz default now()
 );
 alter table public.time_entries enable row level security;
+DROP POLICY IF EXISTS "Users manage own time entries" ON public.time_entries;
 create policy "Users manage own time entries" on public.time_entries for all using (auth.uid() = user_id);
 create index if not exists time_entries_user_id_idx on public.time_entries(user_id);
 create index if not exists time_entries_date_idx on public.time_entries(user_id, date);
@@ -591,7 +625,9 @@ create table if not exists public.team_members (
   unique(owner_id, invited_email)
 );
 alter table public.team_members enable row level security;
+DROP POLICY IF EXISTS "Owners manage their team" ON public.team_members;
 create policy "Owners manage their team" on public.team_members for all using (auth.uid() = owner_id);
+DROP POLICY IF EXISTS "Members view own membership" ON public.team_members;
 create policy "Members view own membership" on public.team_members for select using (auth.uid() = member_id);
 
 -- Business Formation Checklists (per user, one entity at a time)
@@ -607,6 +643,7 @@ create table if not exists public.formation_checklists (
   updated_at timestamptz default now()
 );
 alter table public.formation_checklists enable row level security;
+DROP POLICY IF EXISTS "Users manage own formation" ON public.formation_checklists;
 create policy "Users manage own formation" on public.formation_checklists for all using (auth.uid() = user_id);
 
 -- Auto-update formation updated_at
@@ -639,6 +676,7 @@ create table if not exists public.employees (
   created_at timestamptz default now()
 );
 alter table public.employees enable row level security;
+DROP POLICY IF EXISTS "Users manage own employees" ON public.employees;
 create policy "Users manage own employees" on public.employees for all using (auth.uid() = user_id);
 create index if not exists employees_user_id_idx on public.employees(user_id);
 create index if not exists employees_status_idx on public.employees(user_id, status);
@@ -658,6 +696,7 @@ create table if not exists public.pay_runs (
   created_at timestamptz default now()
 );
 alter table public.pay_runs enable row level security;
+DROP POLICY IF EXISTS "Users manage own pay runs" ON public.pay_runs;
 create policy "Users manage own pay runs" on public.pay_runs for all using (auth.uid() = user_id);
 create index if not exists pay_runs_user_id_idx on public.pay_runs(user_id);
 create index if not exists pay_runs_pay_date_idx on public.pay_runs(user_id, pay_date);
@@ -679,6 +718,7 @@ create table if not exists public.pay_stubs (
   created_at timestamptz default now()
 );
 alter table public.pay_stubs enable row level security;
+DROP POLICY IF EXISTS "Users manage own pay stubs" ON public.pay_stubs;
 create policy "Users manage own pay stubs" on public.pay_stubs for all using (auth.uid() = user_id);
 create index if not exists pay_stubs_run_idx on public.pay_stubs(pay_run_id);
 create index if not exists pay_stubs_employee_idx on public.pay_stubs(employee_id);
@@ -702,6 +742,7 @@ create table if not exists public.vendors (
   created_at timestamptz default now()
 );
 alter table public.vendors enable row level security;
+DROP POLICY IF EXISTS "Users manage own vendors" ON public.vendors;
 create policy "Users manage own vendors" on public.vendors for all using (auth.uid() = user_id);
 create index if not exists vendors_user_id_idx on public.vendors(user_id);
 create index if not exists vendors_1099_idx on public.vendors(user_id, is_1099);
@@ -729,6 +770,7 @@ create table if not exists public.vault_documents (
   created_at timestamptz default now()
 );
 alter table public.vault_documents enable row level security;
+DROP POLICY IF EXISTS "Users manage own documents" ON public.vault_documents;
 create policy "Users manage own documents" on public.vault_documents for all using (auth.uid() = user_id);
 create index if not exists vault_docs_user_id_idx on public.vault_documents(user_id);
 create index if not exists vault_docs_category_idx on public.vault_documents(user_id, category);
@@ -1042,8 +1084,8 @@ CREATE POLICY vault_owner ON public.vault_documents FOR ALL USING (user_id = aut
 -- Run in Supabase dashboard > Storage
 -- ============================================================
 -- INSERT INTO storage.buckets (id, name, public) VALUES ('documents', 'documents', false);
--- DROP POLICY IF EXISTS "Users manage own documents" ON storage.objects;
--- CREATE POLICY "Users manage own documents" ON storage.objects FOR ALL USING (
+-- -- DROP POLICY IF EXISTS "Users manage own documents" ON storage.objects;
+CREATE POLICY "Users manage own documents" ON storage.objects FOR ALL USING (
 --   bucket_id = 'documents' AND auth.uid()::text = (storage.foldername(name))[1]
 -- );
 

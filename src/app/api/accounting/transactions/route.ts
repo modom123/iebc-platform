@@ -15,6 +15,7 @@ export async function GET(req: Request) {
   const category = searchParams.get('category')
   const from = searchParams.get('from')
   const to = searchParams.get('to')
+  const project_id = searchParams.get('project_id')
   const limit = parseInt(searchParams.get('limit') || '50')
 
   let query = supabase
@@ -28,6 +29,7 @@ export async function GET(req: Request) {
   if (category) query = query.eq('category', category)
   if (from) query = query.gte('date', from)
   if (to) query = query.lte('date', to)
+  if (project_id) query = query.eq('project_id', project_id)
 
   const { data, error } = await query
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })

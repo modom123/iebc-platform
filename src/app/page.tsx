@@ -27,9 +27,9 @@ const SERVICES = [
     subtitle: 'Your 24/7 conversion engine.',
     body: 'AI-powered, mobile-first website built for your industry. Online booking, payments, and lead capture — all connected to your hub automatically. Smarter than a static site. It works while you sleep.',
     features: ['Custom pages for your industry', 'Online booking & payment collection', 'Lead capture → flows into hub', 'Domain + hosting included'],
-    detail: '$800 build · then $149/mo hosting & support',
-    cta: 'Book a Strategy Call',
-    href: 'https://calendly.com/new56money/30min',
+    detail: 'from $500 build · then $149/mo hosting',
+    cta: 'View Plans & Buy',
+    href: '/checkout/website',
     accent: '#1D4ED8',
     bg: 'rgba(29,78,216,0.04)',
   },
@@ -68,70 +68,84 @@ const SERVICES = [
     features: ['60 IEBC AI expert consultants', 'Custom API & system integrations', 'Business intelligence & reporting', 'Ongoing infrastructure & support'],
     detail: 'from $499/mo · consultants assembled within 24hrs',
     cta: 'Meet Your Team',
-    href: '/hub/consultants',
+    href: '/infrastructure',
     accent: '#7C3AED',
     bg: 'rgba(124,58,237,0.04)',
+  },
+  {
+    num: '06',
+    icon: '📱',
+    title: 'Social Optimize',
+    subtitle: 'Find, grow, and engage your audience.',
+    body: 'We run your social media across YouTube, Facebook, LinkedIn, TikTok, and Instagram — content creation, posting, engagement, and analytics. Your brand grows while you focus on your business.',
+    features: ['Lead generation across multiple platforms', 'Marketing automation — workflows, drip campaigns & retargeting', 'Automated engagement — comments, DMs & audience interaction', 'Auto posting with AI-optimized scheduling across all platforms', 'Content creation — graphics, captions, short-form video & copy'],
+    detail: 'from $299/mo · up to all 5 platforms',
+    cta: 'Social Optimize',
+    href: '/checkout/social-optimize',
+    accent: '#D946EF',
+    bg: 'rgba(217,70,239,0.04)',
   },
 ]
 
 
 const PLANS = [
   {
-    name: 'Starter',
+    name: 'Starter Bundle',
     setup: '$1,500',
     monthly: '$299/mo',
-    consultants: 8,
-    desc: 'Your business built and automated in 6 weeks.',
+    desc: 'Everything you need to launch — website, hub, accounting & advisors.',
+    badge: '',
     features: [
-      '8 IEBC AI consultants',
-      'Business Formation assistance',
-      'Intelligent Website (5-page)',
-      'Automated Business Hub',
-      'IEBC Automated Workflow setup',
-      'Hosting + domain included',
-      'Delivered in 6 weeks',
+      '🌐 Intelligent Website — 5 custom pages',
+      '⚙️ Automated Business Hub',
+      '📊 Accounting Platform (Silver)',
+      '🏗️ 5 Fractional AI Advisors — 20 hrs/advisor/mo',
+      '🏢 Business Formation assistance',
+      '☁️ Hosting + domain included',
+      '📦 Delivered in 6 weeks',
     ],
     highlight: false,
-    cta: 'Get Started',
-    ctaHref: 'https://calendly.com/new56money/30min',
+    cta: 'Order Now',
+    ctaHref: '/checkout/bundle?plan=starter',
+    callHref: 'https://calendly.com/new56money/30min',
   },
   {
-    name: 'Growth',
+    name: 'Growth Bundle',
     setup: '$3,500',
     monthly: '$499/mo',
-    consultants: 25,
-    desc: 'Full stack for serious, scaling businesses.',
+    desc: 'Full-stack for scaling businesses — every service, fully integrated.',
+    badge: 'Most Popular',
     features: [
-      '25 IEBC AI consultants',
-      '10-page website + booking + payments',
-      'Full Hub — CRM, invoicing, outreach',
-      'Complete IEBC Automated Workflows',
-      'Intelligent Infrastructure layer',
-      '52-week roadmap & strategy sessions',
-      'Priority build & dedicated manager',
+      '🌐 Website — 10 pages + booking + payments',
+      '⚙️ Full Hub — CRM, invoicing, outreach',
+      '📊 Accounting Platform (Gold)',
+      '🏗️ 10 Fractional AI Advisors — 40 hrs/advisor/mo',
+      '🔗 Complete workflow automations',
+      '🎯 Priority build + dedicated manager',
     ],
     highlight: true,
-    cta: 'Schedule a Call',
-    ctaHref: 'https://calendly.com/new56money/30min',
+    cta: 'Order Now',
+    ctaHref: '/checkout/bundle?plan=growth',
+    callHref: 'https://calendly.com/new56money/30min',
   },
   {
-    name: 'Pro',
+    name: 'Pro Bundle',
     setup: '$6,500',
     monthly: '$799/mo',
-    consultants: 60,
-    desc: 'Full enterprise deployment. No limits.',
+    desc: 'Full enterprise deployment across all six services. No limits.',
+    badge: '',
     features: [
-      'All 60 IEBC AI consultants',
-      'Unlimited pages + client login portal',
-      'Every hub module — no limits',
-      'Custom automations + API integrations',
-      'Full Intelligent Infrastructure build',
-      'Quarterly executive review',
-      'SLA guarantee + priority support',
+      '🌐 Unlimited pages + client login portal',
+      '⚙️ Every hub module — zero restrictions',
+      '📊 Accounting Platform (Platinum)',
+      '🏗️ 20 Fractional AI Advisors — 60 hrs/advisor/mo',
+      '🔌 Custom automations + API integrations',
+      '🛡️ SLA guarantee + priority support',
     ],
     highlight: false,
-    cta: 'Book a Call',
-    ctaHref: 'https://calendly.com/new56money/30min',
+    cta: 'Order Now',
+    ctaHref: '/checkout/bundle?plan=pro',
+    callHref: 'https://calendly.com/new56money/30min',
   },
 ]
 
@@ -182,11 +196,11 @@ export default function AgencyHomepage() {
 
           <div className="flex items-center gap-2">
             <Link
-              href="/auth/login"
+              href="/auth/login?next=/accounting"
               className="hidden md:block text-sm font-semibold px-4 py-2 rounded-lg border transition-colors hover:bg-white/10"
               style={{ borderColor: 'rgba(200,144,42,0.5)', color: '#C8902A' }}
             >
-              Client Portal
+              Efficient Login
             </Link>
             <Link
               href="/auth/login?next=/hub/consultants"
@@ -280,17 +294,17 @@ export default function AgencyHomepage() {
               className="text-sm transition-colors hover:text-white/80"
               style={{ color: 'rgba(255,255,255,0.45)' }}
             >
-              Self-service SaaS from{' '}
+              Self-service Financial Infrastructure from{' '}
               <span style={{ color: '#C8902A', textDecoration: 'underline' }}>$9/mo →</span>
             </Link>
             <span style={{ color: 'rgba(255,255,255,0.2)' }}>·</span>
             <Link
-              href="/auth/login"
+              href="/auth/login?next=/accounting"
               className="text-sm transition-colors hover:text-white/80"
               style={{ color: 'rgba(255,255,255,0.45)' }}
             >
-              Already a client?{' '}
-              <span style={{ color: '#C8902A', textDecoration: 'underline' }}>Log into portal →</span>
+              Efficient subscriber?{' '}
+              <span style={{ color: '#C8902A', textDecoration: 'underline' }}>Sign in →</span>
             </Link>
           </div>
         </div>
@@ -328,10 +342,10 @@ export default function AgencyHomepage() {
               className={`${playfair.className} text-2xl sm:text-3xl md:text-4xl font-bold`}
               style={{ color: '#0B2140' }}
             >
-              Five services. One integrated system.
+              Six services. One integrated system.
             </h2>
             <p className="text-gray-500 mt-4 max-w-xl mx-auto">
-              Every engagement includes all five services — custom-built for your business, delivered as
+              Every engagement includes all six services — custom-built for your business, delivered as
               one integrated system.
             </p>
           </div>
@@ -400,7 +414,7 @@ export default function AgencyHomepage() {
               style={{ background: '#0B2140', borderTop: '3px solid #C8902A' }}
             >
               <p className={`${playfair.className} text-xl font-bold text-white mb-3`}>
-                All 5 Services.
+                All 6 Services.
                 <br />
                 One Engagement.
               </p>
@@ -413,7 +427,7 @@ export default function AgencyHomepage() {
                   className="px-6 py-2.5 rounded-lg text-sm font-bold transition-opacity hover:opacity-90 shadow-md text-center"
                   style={{ background: '#C8902A', color: '#fff' }}
                 >
-                  Get Efficient SaaS — from $9/mo
+                  Get Financial Infrastructure — from $9/mo
                 </a>
                 <a
                   href="https://calendly.com/new56money/30min"
@@ -519,11 +533,11 @@ export default function AgencyHomepage() {
             <h2
               className={`${playfair.className} text-2xl sm:text-3xl md:text-4xl font-bold text-white`}
             >
-              Simple, transparent pricing.
+              Bundled services. One price.
             </h2>
             <p className="mt-4 max-w-xl mx-auto" style={{ color: 'rgba(255,255,255,0.6)' }}>
-              One-time setup fee plus a monthly retainer. No surprises, no hidden costs,
-              no long-term contracts.
+              Every bundle includes your Website, Business Hub, Accounting Platform, and AI Advisor Workforce —
+              fully integrated. One-time setup, then a flat monthly retainer.
             </p>
           </div>
 
@@ -531,82 +545,70 @@ export default function AgencyHomepage() {
             {PLANS.map((p, i) => (
               <div
                 key={i}
-                className="rounded-2xl p-7 flex flex-col"
+                className="rounded-2xl p-7 flex flex-col relative"
                 style={{
                   background: p.highlight ? '#fff' : 'rgba(255,255,255,0.05)',
                   border: p.highlight ? '2px solid #C8902A' : '1px solid rgba(255,255,255,0.1)',
                   color: p.highlight ? '#0B2140' : '#fff',
                 }}
               >
-                {p.highlight && (
-                  <div className="text-center mb-4">
-                    <span
-                      className="text-xs font-bold uppercase tracking-widest px-4 py-1 rounded-full"
-                      style={{ background: '#C8902A', color: '#fff' }}
-                    >
-                      Most Popular
+                {p.badge && (
+                  <div className="absolute -top-3.5 left-1/2 -translate-x-1/2">
+                    <span className="text-xs font-bold uppercase tracking-widest px-4 py-1 rounded-full whitespace-nowrap" style={{ background: '#C8902A', color: '#fff' }}>
+                      {p.badge}
                     </span>
                   </div>
                 )}
 
-                <h3 className={`${playfair.className} text-2xl font-bold mb-1`}>{p.name}</h3>
-                <p
-                  className="text-sm mb-4"
-                  style={{ color: p.highlight ? '#666' : 'rgba(255,255,255,0.55)' }}
-                >
+                <h3 className={`${playfair.className} text-xl font-bold mb-1`}>{p.name}</h3>
+                <p className="text-sm mb-4" style={{ color: p.highlight ? '#666' : 'rgba(255,255,255,0.55)' }}>
                   {p.desc}
                 </p>
 
                 <div className="mb-1">
                   <span className={`${playfair.className} text-3xl sm:text-4xl font-black`}>{p.setup}</span>
-                  <span
-                    className="text-sm ml-1.5"
-                    style={{ color: p.highlight ? '#999' : 'rgba(255,255,255,0.4)' }}
-                  >
-                    setup
-                  </span>
+                  <span className="text-sm ml-1.5" style={{ color: p.highlight ? '#999' : 'rgba(255,255,255,0.4)' }}>setup</span>
                 </div>
-                <p className="text-sm font-semibold mb-2" style={{ color: '#C8902A' }}>
+                <p className="text-sm font-semibold mb-5" style={{ color: '#C8902A' }}>
                   {p.monthly} retainer
                 </p>
-                <p
-                  className="text-xs mb-6"
-                  style={{ color: p.highlight ? '#888' : 'rgba(255,255,255,0.45)' }}
-                >
-                  {p.consultants} IEBC AI consultants included
-                </p>
 
-                <ul className="space-y-2.5 flex-1 mb-8">
+                <ul className="space-y-2 flex-1 mb-7">
                   {p.features.map((f, fi) => (
                     <li key={fi} className="flex items-start gap-2 text-sm">
-                      <span className="font-bold shrink-0 mt-0.5" style={{ color: '#C8902A' }}>
-                        ✓
-                      </span>
-                      <span
-                        style={{ color: p.highlight ? '#333' : 'rgba(255,255,255,0.8)' }}
-                      >
-                        {f}
-                      </span>
+                      <span style={{ color: p.highlight ? '#333' : 'rgba(255,255,255,0.85)' }}>{f}</span>
                     </li>
                   ))}
                 </ul>
 
-                <a
-                  href={p.ctaHref}
-                  target={p.ctaHref.startsWith('http') ? '_blank' : undefined}
-                  rel={p.ctaHref.startsWith('http') ? 'noopener noreferrer' : undefined}
-                  className="text-center py-3.5 rounded-xl font-bold text-sm transition-opacity hover:opacity-90 block shadow-md"
-                  style={{ background: '#C8902A', color: '#fff' }}
-                >
-                  {p.cta}
-                </a>
+                <div className="space-y-2">
+                  <Link
+                    href={p.ctaHref}
+                    className="text-center py-3 rounded-xl font-bold text-sm transition-opacity hover:opacity-90 block shadow-md"
+                    style={{ background: '#C8902A', color: '#fff' }}
+                  >
+                    {p.cta} →
+                  </Link>
+                  <a
+                    href={p.callHref}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-center py-2.5 rounded-xl font-semibold text-sm block transition-opacity hover:opacity-80"
+                    style={{
+                      border: `1px solid ${p.highlight ? '#0B2140' : 'rgba(255,255,255,0.25)'}`,
+                      color: p.highlight ? '#0B2140' : 'rgba(255,255,255,0.75)',
+                    }}
+                  >
+                    Book a Call Instead
+                  </a>
+                </div>
               </div>
             ))}
           </div>
 
           <p className="text-center text-sm mt-8" style={{ color: 'rgba(255,255,255,0.35)' }}>
-            Monthly retainers cover ongoing support, updates, hosting, and your AI consultant access.
-            No long-term contracts.
+            Every bundle includes Website · Hub · Accounting · AI Advisor Workforce — fully integrated.
+            Monthly retainer covers hosting, support, and AI consultant access. No long-term contracts.
           </p>
         </div>
       </section>
@@ -645,15 +647,15 @@ export default function AgencyHomepage() {
             Prefer to do it yourself?
           </h3>
           <p className="text-gray-500 mb-6 max-w-lg mx-auto">
-            Our self-service SaaS platform gives you access to Business Infrastructure, Automated Hub,
-            and IEBC Consultants — starting at $9/mo. No setup fee, no contract.
+            Our self-service Financial Infrastructure platform gives you access to Accounting, Automated Hub,
+            and IEBC AI Consultants — starting at $9/mo. No setup fee, no contract.
           </p>
           <Link
             href="/accounting/checkout"
             className="inline-flex items-center gap-2 px-7 py-3 rounded-xl font-bold text-sm border-2 transition-colors hover:bg-[#0B2140] hover:text-white"
             style={{ borderColor: '#0B2140', color: '#0B2140' }}
           >
-            View SaaS Plans &amp; Pricing →
+            View Financial Infrastructure Plans →
           </Link>
         </div>
       </section>
@@ -695,6 +697,7 @@ export default function AgencyHomepage() {
                     ['Automated Business Hubs', '#services'],
                     ['IEBC Automated Workflow', '#services'],
                     ['Intelligent Infrastructure', '#services'],
+                    ['Social Optimize', '/checkout/social-optimize'],
                   ],
                 ],
                 [
@@ -712,8 +715,8 @@ export default function AgencyHomepage() {
                   [
                     ['Book a Call', 'https://calendly.com/new56money/30min'],
                     ['Contact Us', '#contact'],
-                    ['SaaS Platform', '/platform'],
-                    ['Client Portal', '/auth/login'],
+                    ['Financial Infrastructure', '/accounting/checkout'],
+                    ['Efficient Login', '/auth/login?next=/accounting'],
                     ['IEBC Consultants', '/auth/login?next=/hub/consultants'],
                     ['Create Account', '/auth/signup'],
                   ],
@@ -747,15 +750,17 @@ export default function AgencyHomepage() {
           </div>
 
           <div
-            className="border-t pt-6 flex flex-col md:flex-row justify-between items-center gap-2"
+            className="border-t pt-6 flex flex-col md:flex-row justify-between items-center gap-3"
             style={{ borderColor: 'rgba(255,255,255,0.08)' }}
           >
             <p className="text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>
               © {year} Integrated Efficiency Business Consultants (IEBC). All rights reserved.
             </p>
-            <p className="text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>
-              Secured by Supabase · Powered by IEBC Platform
-            </p>
+            <div className="flex items-center gap-4">
+              <a href="/privacy" className="text-xs hover:text-white transition-colors" style={{ color: 'rgba(255,255,255,0.3)' }}>Privacy Policy</a>
+              <a href="/terms" className="text-xs hover:text-white transition-colors" style={{ color: 'rgba(255,255,255,0.3)' }}>Terms of Service</a>
+              <p className="text-xs" style={{ color: 'rgba(255,255,255,0.3)' }}>Secured by Supabase · Powered by IEBC Platform</p>
+            </div>
           </div>
         </div>
       </footer>

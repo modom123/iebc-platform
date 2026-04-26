@@ -1,28 +1,79 @@
+@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,800;0,900;1,700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+:root {
+  --navy:     #0B2140;
+  --navy2:    #102A54;
+  --navy3:    #17377A;
+  --gold:     #C8902A;
+  --gold2:    #E4A830;
+  --gold-lt:  rgba(200,144,42,0.12);
+  --muted:    #5A6A82;
+  --border:   #DDE4EF;
+  --shadow:   0 2px 20px rgba(11,33,64,0.08);
+  --shadow-lg:0 8px 48px rgba(11,33,64,0.14);
+}
+
 body {
-  @apply bg-white text-slate-900;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+  @apply bg-[#F5F7FA] text-slate-900;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  -webkit-font-smoothing: antialiased;
 }
 
 .font-playfair {
   font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
 }
 
+.font-mono-iebc {
+  font-family: 'JetBrains Mono', 'Courier New', monospace;
+}
+
 .btn-primary {
-  @apply bg-[#0F4C81] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#082D4F] transition;
+  @apply bg-[#0B2140] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#17377A] transition shadow-sm;
 }
 
 .btn-secondary {
-  @apply bg-white border-2 border-[#0F4C81] text-[#0F4C81] px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition;
+  @apply bg-white border-2 border-[#0B2140] text-[#0B2140] px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition;
+}
+
+.btn-gold {
+  @apply bg-[#C8902A] text-white px-6 py-3 rounded-lg font-semibold hover:bg-[#b07820] transition shadow-sm;
 }
 
 .input-field {
-  @apply w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F4C81] focus:border-transparent transition;
+  @apply w-full border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-[#0B2140] focus:border-transparent transition;
 }
 
 .label-sm {
   @apply block text-xs font-medium text-gray-500 uppercase tracking-wide mb-1;
+}
+
+.card-iebc {
+  @apply bg-white rounded-xl border border-gray-200 shadow-sm;
+}
+
+/* Briefing gradient background */
+.briefing-bg {
+  background: linear-gradient(135deg, #0B2140 0%, #102A54 50%, #17377A 100%);
+}
+
+/* Pulsing live dot */
+@keyframes iebc-pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50%       { opacity: 0.5; transform: scale(0.85); }
+}
+.live-dot {
+  animation: iebc-pulse 2s infinite;
+}
+
+/* Page fade-in */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.page-enter {
+  animation: fadeUp 0.2s ease;
 }

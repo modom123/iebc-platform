@@ -35,18 +35,22 @@ export async function POST(req: Request) {
     const session = event.data.object as Stripe.Checkout.Session
 
     const email = session.customer_details?.email ?? session.metadata?.customer_email ?? ''
-    const name = session.customer_details?.name ?? session.metadata?.customer_name ?? ''
-    const phone = session.customer_details?.phone ?? session.metadata?.customer_phone ?? ''
+    const name = session.customer_details?.name ?? ''
+    const phone = session.customer_details?.phone ?? ''
+    const businessName = session.metadata?.business_name ?? ''
     // client_reference_id carries the plan when using direct Stripe payment links
     const plan = session.metadata?.plan ?? session.client_reference_id ?? ''
     const stripeCustomerId = typeof session.customer === 'string' ? session.customer : ''
     const stripeSubId = typeof session.subscription === 'string' ? session.subscription : ''
 
+    // Stripe collects billing address on checkout — pull it from customer_details
+    const addr = session.customer_details?.address
     const billingAddress = {
-      street: session.metadata?.billing_street ?? '',
-      city: session.metadata?.billing_city ?? '',
-      state: session.metadata?.billing_state ?? '',
-      zip: session.metadata?.billing_zip ?? '',
+      street: addr?.line1 ?? '',
+      city: addr?.city ?? '',
+      state: addr?.state ?? '',
+      zip: addr?.postal_code ?? '',
+      country: addr?.country ?? '',
     }
 
     if (!email) {
@@ -65,38 +69,36 @@ export async function POST(req: Request) {
 
     if (existingProfile?.id) {
       userId = existingProfile.id
-      // Existing user — update their plan info
       await supabase.from('profiles').update({
         plan,
         stripe_customer_id: stripeCustomerId,
-        phone,
+        full_name: name || undefined,
+        phone: phone || undefined,
+        business_name: businessName || undefined,
         billing_address: JSON.stringify(billingAddress),
       }).eq('id', userId)
     } else {
-      // New user — send invite email so they can set their password
-      const appUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://iebusinessconsultants.com'
-      const { data: invited, error: inviteErr } = await supabase.auth.admin.inviteUserByEmail(email, {
-        data: {
-          full_name: name,
-          plan,
-          stripe_customer_id: stripeCustomerId,
-        },
-        redirectTo: `${appUrl}/auth/callback?next=/accounting`,
+      // New user — create without password; the success-page /complete endpoint
+      // will set the real password using the value from the user's sessionStorage.
+      const { data: created, error: createErr } = await supabase.auth.admin.createUser({
+        email,
+        email_confirm: true,
+        user_metadata: { full_name: name, plan, stripe_customer_id: stripeCustomerId },
       })
 
-      if (inviteErr || !invited?.user) {
-        console.error('Failed to invite user:', inviteErr)
+      if (createErr || !created?.user) {
+        console.error('Failed to create user:', createErr)
         return NextResponse.json({ received: true })
       }
 
-      userId = invited.user.id
+      userId = created.user.id
 
-      // Save profile record
       await supabase.from('profiles').upsert({
         id: userId,
         email,
         full_name: name,
         phone,
+        business_name: businessName,
         plan,
         stripe_customer_id: stripeCustomerId,
         billing_address: JSON.stringify(billingAddress),

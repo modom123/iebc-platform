@@ -12,6 +12,7 @@ const SUBDOMAIN_MAP: Record<string, string> = {
   hub:        '/hub',
   portal:     '/portal',
   platform:   '/platform',
+  workspace:  '/workspace',
 }
 
 function getSubdomain(request: NextRequest): string | null {
@@ -43,7 +44,7 @@ export async function middleware(request: NextRequest) {
   // (e.g. app.iebusinessconsultants.com/auth/login must NOT become /accounting/auth/login)
   const KNOWN_SECTIONS = [
     '/accounting', '/hub', '/portal', '/platform', '/efficient',
-    '/checkout', '/auth', '/settings', '/admin', '/api', '/formation',
+    '/checkout', '/auth', '/settings', '/admin', '/api', '/formation', '/workspace',
   ]
 
   // Track the path that will actually be served (may differ from the request path
@@ -111,7 +112,7 @@ export async function middleware(request: NextRequest) {
       return response
     }
 
-    const protectedPaths = ['/accounting', '/hub', '/settings', '/admin']
+    const protectedPaths = ['/accounting', '/hub', '/settings', '/admin', '/workspace']
     if (protectedPaths.some(p => effectivePathname.startsWith(p)) && !session) {
       // Redirect to login, preserving the effective destination as ?next=
       const loginUrl = new URL('/auth/login', request.url)

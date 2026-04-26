@@ -70,6 +70,12 @@ const PLANS = [
 ]
 
 
+const STRIPE_LINKS: Record<string, string> = {
+  silver:   process.env.NEXT_PUBLIC_STRIPE_LINK_SILVER   || '',
+  gold:     process.env.NEXT_PUBLIC_STRIPE_LINK_GOLD     || '',
+  platinum: process.env.NEXT_PUBLIC_STRIPE_LINK_PLATINUM || '',
+}
+
 function CheckoutContent() {
   const searchParams = useSearchParams()
   const [step, setStep] = useState<1 | 2>(1)
@@ -106,6 +112,18 @@ function CheckoutContent() {
     e.preventDefault()
     if (!selectedPlan) return
 
+    const directLink = STRIPE_LINKS[selectedPlan]
+    if (directLink) {
+      try {
+        const url = new URL(directLink)
+        if (form.email) url.searchParams.set('prefilled_email', form.email)
+        // Pass plan so the webhook can identify which subscription was purchased
+        url.searchParams.set('client_reference_id', selectedPlan)
+        window.location.href = url.toString()
+        return
+      } catch {
+        // Invalid URL — fall through to API checkout
+      }
     if (form.password.length < 8) {
       setError('Password must be at least 8 characters.')
       return
@@ -163,7 +181,6 @@ function CheckoutContent() {
     }
   }
 
-  const isStripeError = error.toLowerCase().includes('not yet configured') || error.toLowerCase().includes('not configured')
 
   return (
     <main className="min-h-screen bg-gray-50">
@@ -342,6 +359,9 @@ function CheckoutContent() {
 
               {/* Error */}
               {error && (
+                <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg">
+                  {error}
+                </div>
                 isStripeError ? (
                   <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-4 space-y-2">
                     <p className="font-semibold text-amber-800 text-sm">Payment setup in progress</p>

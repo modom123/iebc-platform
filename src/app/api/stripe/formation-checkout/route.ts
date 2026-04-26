@@ -3,11 +3,18 @@ import { stripe } from '@/lib/stripe'
 
 interface FormationService {
   id: string
-  name: string
+  label: string
   price: number
 }
 
 export async function POST(req: Request) {
+  if (!process.env.STRIPE_SECRET_KEY) {
+    return NextResponse.json(
+      { error: 'Payment system is not yet configured. Please contact support at info@iebusinessconsultants.com.' },
+      { status: 503 }
+    )
+  }
+
   try {
     const body = await req.json()
     const {
@@ -54,7 +61,7 @@ export async function POST(req: Request) {
       price_data: {
         currency: 'usd',
         product_data: {
-          name: `Business Formation — ${service.name}`,
+          name: `Business Formation — ${service.label}`,
           description: state ? `State: ${state}${company ? ` · Entity: ${company}` : ''}` : undefined,
         },
         unit_amount: service.price * 100, // dollars → cents
@@ -62,7 +69,7 @@ export async function POST(req: Request) {
       quantity: 1,
     }))
 
-    const serviceList = services.map(s => s.name).join(', ')
+    const serviceList = services.map(s => s.label).join(', ')
 
     const checkoutSession = await stripe.checkout.sessions.create({
       mode: 'payment',

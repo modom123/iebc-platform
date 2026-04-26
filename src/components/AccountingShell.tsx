@@ -77,7 +77,7 @@ export default function AccountingShell({ user, children }: { user?: User; child
     <aside className="w-56 flex flex-col bg-white border-r border-gray-200 h-full">
       {/* Logo */}
       <div className="h-14 bg-[#0F4C81] flex items-center px-4 gap-2.5 shrink-0">
-        <div className="w-8 h-8 bg-[#C9A02E] rounded-lg flex items-center justify-center shrink-0">
+        <div className="w-8 h-8 bg-[#C8902A] rounded-lg flex items-center justify-center shrink-0">
           <span className="text-white font-black text-[11px] tracking-tight">IEBC</span>
         </div>
         <div className="leading-tight">
@@ -140,17 +140,25 @@ export default function AccountingShell({ user, children }: { user?: User; child
 
   return (
     <div className="flex h-screen bg-[#F5F7FA] overflow-hidden">
-      {mobileOpen && <div className="fixed inset-0 bg-black/30 z-30 lg:hidden" onClick={() => setMobileOpen(false)} />}
+      {mobileOpen && (
+        <div
+          className="fixed inset-0 bg-black/30 z-30 lg:hidden"
+          onClick={() => setMobileOpen(false)}
+          role="button"
+          aria-label="Close navigation"
+          tabIndex={-1}
+        />
+      )}
 
       <div className="hidden lg:flex shrink-0"><Sidebar /></div>
-      <div className={`fixed inset-y-0 left-0 z-40 lg:hidden flex transition-transform duration-200 ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+      <div className={`fixed inset-y-0 left-0 z-40 lg:hidden flex transition-transform duration-200 will-change-transform ${mobileOpen ? 'translate-x-0' : '-translate-x-full'}`}>
         <Sidebar />
       </div>
 
       <div className="flex flex-col flex-1 min-w-0 overflow-hidden">
         {/* Top bar */}
         <header className="h-14 bg-white border-b border-gray-200 flex items-center px-4 gap-3 shrink-0 shadow-sm">
-          <button onClick={() => setMobileOpen(true)} className="lg:hidden p-2.5 rounded-lg text-gray-500 hover:bg-gray-100 transition min-w-[44px] min-h-[44px] flex items-center justify-center">
+          <button onClick={() => setMobileOpen(true)} aria-label="Open navigation" className="lg:hidden p-2.5 rounded-lg text-gray-500 hover:bg-gray-100 transition min-w-[44px] min-h-[44px] flex items-center justify-center">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h7" />
             </svg>
@@ -164,7 +172,7 @@ export default function AccountingShell({ user, children }: { user?: User; child
           <Link href="/accounting/scanner" className="hidden sm:flex items-center gap-1.5 text-[13px] text-[#0F4C81] hover:bg-blue-50 px-3 py-1.5 rounded-lg font-medium transition border border-blue-100">
             ✦ AI Scanner
           </Link>
-          <Link href="/accounting/checkout" className="text-[11px] sm:text-[13px] bg-[#C9A02E] hover:bg-yellow-600 text-white px-2 sm:px-3 py-1.5 rounded-lg font-semibold transition shadow-sm whitespace-nowrap">
+          <Link href="/accounting/checkout" className="text-[11px] sm:text-[13px] bg-[#C8902A] hover:bg-[#b07820] text-white px-2 sm:px-3 py-1.5 rounded-lg font-semibold transition shadow-sm whitespace-nowrap min-h-[36px] inline-flex items-center">
             ★ Upgrade
           </Link>
         </header>

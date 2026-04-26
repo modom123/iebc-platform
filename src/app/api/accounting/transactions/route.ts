@@ -44,9 +44,11 @@ export async function POST(req: Request) {
   const body = await req.json()
   const { date, description, amount, type, category, vendor, reference, account_id } = body
 
-  if (!description || !amount || !type) {
-    return NextResponse.json({ error: 'description, amount, and type are required' }, { status: 400 })
-  }
+  const VALID_TYPES = ['income', 'expense', 'transfer']
+  if (!description?.trim()) return NextResponse.json({ error: 'description is required' }, { status: 400 })
+  if (!amount || isNaN(parseFloat(amount)) || parseFloat(amount) <= 0) return NextResponse.json({ error: 'amount must be a positive number' }, { status: 400 })
+  if (!type || !VALID_TYPES.includes(type)) return NextResponse.json({ error: `type must be one of: ${VALID_TYPES.join(', ')}` }, { status: 400 })
+  if (date && isNaN(Date.parse(date))) return NextResponse.json({ error: 'Invalid date' }, { status: 400 })
 
   const { data, error } = await supabase
     .from('transactions')
@@ -65,6 +67,14 @@ export async function PATCH(req: Request) {
 
   const body = await req.json()
   const { id, ...updates } = body
+
+  if (!id) return NextResponse.json({ error: 'id is required' }, { status: 400 })
+  if (updates.amount !== undefined && (isNaN(parseFloat(updates.amount)) || parseFloat(updates.amount) <= 0)) {
+    return NextResponse.json({ error: 'amount must be a positive number' }, { status: 400 })
+  }
+  if (updates.type !== undefined && !['income', 'expense', 'transfer'].includes(updates.type)) {
+    return NextResponse.json({ error: 'type must be one of: income, expense, transfer' }, { status: 400 })
+  }
 
   const { data, error } = await supabase
     .from('transactions')

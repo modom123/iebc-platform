@@ -34,6 +34,15 @@ export async function POST(req: Request) {
   const body = await req.json()
   const { customer_id, due_date, tax_rate = 0, notes, line_items = [] } = body
 
+  if (!customer_id) return NextResponse.json({ error: 'customer_id is required' }, { status: 400 })
+  if (!Array.isArray(line_items) || line_items.length === 0) return NextResponse.json({ error: 'At least one line item is required' }, { status: 400 })
+  for (const item of line_items) {
+    if (!item.description?.trim()) return NextResponse.json({ error: 'Each line item must have a description' }, { status: 400 })
+    if (!Number.isFinite(Number(item.quantity)) || Number(item.quantity) <= 0) return NextResponse.json({ error: 'Each line item must have a positive quantity' }, { status: 400 })
+    if (!Number.isFinite(Number(item.unit_price)) || Number(item.unit_price) < 0) return NextResponse.json({ error: 'Each line item must have a valid unit price' }, { status: 400 })
+  }
+  if (due_date && isNaN(Date.parse(due_date))) return NextResponse.json({ error: 'Invalid due_date' }, { status: 400 })
+
   // Calculate totals
   const subtotal = line_items.reduce((sum: number, item: { quantity: number; unit_price: number }) =>
     sum + item.quantity * item.unit_price, 0)
@@ -85,6 +94,8 @@ export async function PATCH(req: Request) {
 
   const body = await req.json()
   const { id, ...updates } = body
+
+  if (!id) return NextResponse.json({ error: 'id is required' }, { status: 400 })
 
   const { data, error } = await supabase
     .from('invoices')

@@ -119,15 +119,18 @@ export default async function Accounting() {
         {/* KPI Cards */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
-            { label: 'Total Revenue', value: fmt(totalIncome), sub: `${fmt(monthIncome)} this month`, color: 'text-green-700' },
-            { label: 'Total Expenses', value: fmt(totalExpenses), sub: `${fmt(monthExpenses)} this month`, color: 'text-red-600' },
-            { label: 'Net Profit', value: fmt(netProfit), sub: netProfit >= 0 ? 'Profitable' : 'Net loss', color: netProfit >= 0 ? 'text-green-700' : 'text-red-600' },
-            { label: 'Outstanding AR', value: fmt(outstanding), sub: overdueCount > 0 ? `${overdueCount} overdue` : 'No overdue', color: outstanding > 0 ? 'text-orange-600' : 'text-gray-700' },
+            { label: 'Total Revenue',   value: fmt(totalIncome),   sub: `${fmt(monthIncome)} this month`,   color: 'text-green-700',  icon: '↑', iconCls: 'text-green-500 bg-green-50' },
+            { label: 'Total Expenses',  value: fmt(totalExpenses), sub: `${fmt(monthExpenses)} this month`, color: 'text-red-600',    icon: '↓', iconCls: 'text-red-500 bg-red-50' },
+            { label: 'Net Profit',      value: fmt(netProfit),     sub: netProfit >= 0 ? 'Profitable' : 'Net loss', color: netProfit >= 0 ? 'text-green-700' : 'text-red-600', icon: netProfit >= 0 ? '=' : '!', iconCls: netProfit >= 0 ? 'text-green-500 bg-green-50' : 'text-red-500 bg-red-50' },
+            { label: 'Outstanding AR',  value: fmt(outstanding),   sub: overdueCount > 0 ? `${overdueCount} overdue` : 'No overdue', color: outstanding > 0 ? 'text-orange-600' : 'text-gray-700', icon: '◷', iconCls: outstanding > 0 ? 'text-orange-500 bg-orange-50' : 'text-gray-400 bg-gray-100' },
           ].map((card, i) => (
             <div key={i} className="bg-white p-3 sm:p-5 rounded-xl border border-gray-200 shadow-sm">
-              <p className="text-[10px] sm:text-xs text-gray-500 font-medium uppercase tracking-wide truncate">{card.label}</p>
-              <p className={`text-lg sm:text-2xl font-bold mt-1 ${card.color}`}>{card.value}</p>
-              <p className="text-[10px] sm:text-xs text-gray-400 mt-1 truncate">{card.sub}</p>
+              <div className="flex items-start justify-between mb-2">
+                <p className="text-[11px] sm:text-xs text-gray-500 font-semibold uppercase tracking-wide">{card.label}</p>
+                <span className={`text-xs font-bold w-6 h-6 rounded-md flex items-center justify-center shrink-0 ${card.iconCls}`} aria-hidden="true">{card.icon}</span>
+              </div>
+              <p className={`text-lg sm:text-2xl font-bold ${card.color}`}>{card.value}</p>
+              <p className="text-[11px] sm:text-xs text-gray-400 mt-1">{card.sub}</p>
             </div>
           ))}
         </div>
@@ -162,7 +165,10 @@ export default async function Accounting() {
                 </div>
               </div>
             ) : (
-              <div className="flex items-center justify-center h-40 text-gray-300 text-sm">No expense data</div>
+              <div className="flex flex-col items-center justify-center h-40 gap-2">
+                <span className="text-3xl" aria-hidden="true">📊</span>
+                <p className="text-sm text-gray-400">No expense data yet</p>
+              </div>
             )}
           </div>
         </div>
@@ -202,10 +208,10 @@ export default async function Accounting() {
               <div className="overflow-x-auto -mx-0">
                 <table className="w-full text-sm">
                   <thead><tr className="bg-gray-50 text-gray-500 text-xs uppercase">
-                    <th className="p-2 sm:p-3 text-left">Date</th>
-                    <th className="p-2 sm:p-3 text-left">Description</th>
-                    <th className="p-2 sm:p-3 text-left hidden sm:table-cell">Category</th>
-                    <th className="p-2 sm:p-3 text-right">Amount</th>
+                    <th scope="col" className="p-2 sm:p-3 text-left font-semibold">Date</th>
+                    <th scope="col" className="p-2 sm:p-3 text-left font-semibold">Description</th>
+                    <th scope="col" className="p-2 sm:p-3 text-left hidden sm:table-cell font-semibold">Category</th>
+                    <th scope="col" className="p-2 sm:p-3 text-right font-semibold">Amount</th>
                   </tr></thead>
                   <tbody className="divide-y divide-gray-50">
                     {recentTx.map(t => (
@@ -222,9 +228,13 @@ export default async function Accounting() {
                 </table>
               </div>
             ) : (
-              <div className="p-8 text-center">
-                <p className="text-gray-400 text-sm mb-3">No transactions yet</p>
-                <Link href="/accounting/transactions" className="btn-primary text-sm">Add First Transaction</Link>
+              <div className="p-10 text-center">
+                <div className="w-14 h-14 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-3" aria-hidden="true">
+                  <span className="text-2xl">💰</span>
+                </div>
+                <p className="font-semibold text-gray-700 mb-1">No transactions yet</p>
+                <p className="text-sm text-gray-400 mb-4">Add your first transaction to see data here.</p>
+                <Link href="/accounting/transactions" className="btn-primary text-sm">Add Transaction</Link>
               </div>
             )}
           </div>

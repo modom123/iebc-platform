@@ -29,10 +29,9 @@ export async function POST(req: Request) {
 
   try {
     const body = await req.json()
-    const { plan, email, password, businessName } = body as {
+    const { plan, email, businessName } = body as {
       plan: string
       email: string
-      password?: string
       businessName?: string
     }
 
@@ -73,7 +72,7 @@ export async function POST(req: Request) {
       payment_method_types: ['card'],
       line_items: lineItems,
       subscription_data: {
-        trial_period_days: 7,
+        trial_period_days: 30,
         metadata: { plan },
       },
       // Stripe collects name, billing address, phone — no duplicate entry
@@ -85,8 +84,6 @@ export async function POST(req: Request) {
         plan,
         customer_email: email,
         business_name: businessName || '',
-        // password in metadata so webhook/success page can create Supabase account
-        account_password: password || '',
       },
       success_url: `${appUrl}/accounting/checkout/success?session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${appUrl}/accounting/checkout?canceled=true`,

@@ -378,10 +378,16 @@ function CheckoutContent() {
           </div>
         )}
 
-        <div className="text-center mt-8">
+        <div className="text-center mt-8 space-y-2">
           <p className="text-xs text-gray-400">
             Already have an account?{' '}
             <Link href="/auth/login" className="text-[#0F4C81] hover:underline font-medium">Sign in here</Link>
+          </p>
+          <p className="text-xs text-gray-300">
+            By subscribing you agree to our{' '}
+            <Link href="/terms" className="text-gray-400 hover:text-gray-600 underline">Terms of Service</Link>
+            {' '}and{' '}
+            <Link href="/privacy" className="text-gray-400 hover:text-gray-600 underline">Privacy Policy</Link>.
           </p>
         </div>
       </div>

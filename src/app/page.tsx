@@ -196,11 +196,11 @@ export default function AgencyHomepage() {
 
           <div className="flex items-center gap-2">
             <Link
-              href="/auth/login"
+              href="/auth/login?next=/accounting"
               className="hidden md:block text-sm font-semibold px-4 py-2 rounded-lg border transition-colors hover:bg-white/10"
               style={{ borderColor: 'rgba(200,144,42,0.5)', color: '#C8902A' }}
             >
-              Client Portal
+              Efficient Login
             </Link>
             <Link
               href="/auth/login?next=/hub/consultants"
@@ -299,12 +299,12 @@ export default function AgencyHomepage() {
             </Link>
             <span style={{ color: 'rgba(255,255,255,0.2)' }}>·</span>
             <Link
-              href="/auth/login"
+              href="/auth/login?next=/accounting"
               className="text-sm transition-colors hover:text-white/80"
               style={{ color: 'rgba(255,255,255,0.45)' }}
             >
-              Already a client?{' '}
-              <span style={{ color: '#C8902A', textDecoration: 'underline' }}>Log into portal →</span>
+              Efficient subscriber?{' '}
+              <span style={{ color: '#C8902A', textDecoration: 'underline' }}>Sign in →</span>
             </Link>
           </div>
         </div>
@@ -716,7 +716,7 @@ export default function AgencyHomepage() {
                     ['Book a Call', 'https://calendly.com/new56money/30min'],
                     ['Contact Us', '#contact'],
                     ['Financial Infrastructure', '/accounting/checkout'],
-                    ['Client Portal', '/auth/login'],
+                    ['Efficient Login', '/auth/login?next=/accounting'],
                     ['IEBC Consultants', '/auth/login?next=/hub/consultants'],
                     ['Create Account', '/auth/signup'],
                   ],

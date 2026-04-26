@@ -76,14 +76,20 @@ function ReportsInner() {
             ))}
           </div>
           <div className="flex gap-2 ml-auto items-center">
-            <input type="date" value={from} onChange={e => setFrom(e.target.value)} className="border border-gray-300 rounded-lg px-3 py-1.5 text-sm" />
-            <span className="text-gray-400 text-sm">to</span>
-            <input type="date" value={to} onChange={e => setTo(e.target.value)} className="border border-gray-300 rounded-lg px-3 py-1.5 text-sm" />
+            <label htmlFor="report-from" className="text-xs font-semibold text-gray-500 uppercase tracking-wide">From</label>
+            <input id="report-from" type="date" value={from} onChange={e => setFrom(e.target.value)}
+              className="border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F4C81] min-h-[36px]" />
+            <label htmlFor="report-to" className="text-xs font-semibold text-gray-500 uppercase tracking-wide">To</label>
+            <input id="report-to" type="date" value={to} onChange={e => setTo(e.target.value)}
+              className="border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F4C81] min-h-[36px]" />
           </div>
         </div>
 
         {loading ? (
-          <div className="bg-white rounded-xl border border-gray-200 p-12 text-center text-gray-400">Generating report...</div>
+          <div className="bg-white rounded-xl border border-gray-200 p-12 flex flex-col items-center gap-3" aria-label="Generating report" aria-busy="true">
+            <div className="w-8 h-8 border-2 border-[#0F4C81] border-t-transparent rounded-full animate-spin" aria-hidden="true" />
+            <span className="text-sm text-gray-500 font-medium">Generating report…</span>
+          </div>
         ) : data && (
 
           <div className="space-y-6">
@@ -143,11 +149,11 @@ function ReportsInner() {
                     </div>
                     <table className="w-full text-sm">
                       <thead><tr className="bg-gray-50 text-gray-500 text-xs uppercase">
-                        <th className="p-3 text-left">Month</th>
-                        <th className="p-3 text-right">Revenue</th>
-                        <th className="p-3 text-right">Expenses</th>
-                        <th className="p-3 text-right">Net Profit</th>
-                        <th className="p-3 text-right">Margin</th>
+                        <th scope="col" className="p-3 text-left font-semibold">Month</th>
+                        <th scope="col" className="p-3 text-right font-semibold">Revenue</th>
+                        <th scope="col" className="p-3 text-right font-semibold">Expenses</th>
+                        <th scope="col" className="p-3 text-right font-semibold">Net Profit</th>
+                        <th scope="col" className="p-3 text-right font-semibold">Margin</th>
                       </tr></thead>
                       <tbody className="divide-y divide-gray-50">
                         {data.monthly.map(row => {
@@ -204,10 +210,10 @@ function ReportsInner() {
                     <div className="p-4 border-b border-gray-100"><h3 className="font-bold">Monthly Breakdown</h3></div>
                     <table className="w-full text-sm">
                       <thead><tr className="bg-gray-50 text-gray-500 text-xs uppercase">
-                        <th className="p-3 text-left">Month</th>
-                        <th className="p-3 text-right">Cash In</th>
-                        <th className="p-3 text-right">Cash Out</th>
-                        <th className="p-3 text-right">Net</th>
+                        <th scope="col" className="p-3 text-left font-semibold">Month</th>
+                        <th scope="col" className="p-3 text-right font-semibold">Cash In</th>
+                        <th scope="col" className="p-3 text-right font-semibold">Cash Out</th>
+                        <th scope="col" className="p-3 text-right font-semibold">Net</th>
                       </tr></thead>
                       <tbody className="divide-y divide-gray-50">
                         {data.monthly.map(row => (
@@ -310,11 +316,11 @@ function ReportsInner() {
                   ) : (
                     <table className="w-full text-sm">
                       <thead><tr className="bg-gray-50 text-gray-500 text-xs uppercase border-b border-gray-100">
-                        <th className="p-3 text-left">Code</th>
-                        <th className="p-3 text-left">Account</th>
-                        <th className="p-3 text-left">Type</th>
-                        <th className="p-3 text-right">Debit</th>
-                        <th className="p-3 text-right">Credit</th>
+                        <th scope="col" className="p-3 text-left font-semibold">Code</th>
+                        <th scope="col" className="p-3 text-left font-semibold">Account</th>
+                        <th scope="col" className="p-3 text-left font-semibold">Type</th>
+                        <th scope="col" className="p-3 text-right font-semibold">Debit</th>
+                        <th scope="col" className="p-3 text-right font-semibold">Credit</th>
                       </tr></thead>
                       <tbody className="divide-y divide-gray-50">
                         {(data.rows || []).map((row, i) => (

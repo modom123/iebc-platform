@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import Link from 'next/link'
 
 type Invoice = {
@@ -35,7 +35,8 @@ export default function InvoicesPage() {
   const [loading, setLoading] = useState(true)
   const [filterStatus, setFilterStatus] = useState('')
   const [shareModal, setShareModal] = useState<ShareModal | null>(null)
-  const [copied, setCopied] = useState(false)
+  const [copied, setCopied]         = useState(false)
+  const closeRef                    = useRef<HTMLButtonElement>(null)
 
   const load = async () => {
     setLoading(true)
@@ -89,11 +90,23 @@ export default function InvoicesPage() {
 
       {/* Share Invoice Modal */}
       {shareModal && (
-        <div className="fixed inset-0 bg-black/30 flex items-center justify-center z-50">
+        <div
+          className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4"
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="share-modal-title"
+          onKeyDown={e => { if (e.key === 'Escape') setShareModal(null) }}
+        >
           <div className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-md space-y-4">
             <div className="flex justify-between items-center">
-              <h3 className="font-bold text-gray-800">Share Invoice {shareModal.invoiceNumber}</h3>
-              <button onClick={() => setShareModal(null)} className="text-gray-400 hover:text-gray-600 text-xl">×</button>
+              <h3 id="share-modal-title" className="font-bold text-gray-800">Share Invoice {shareModal.invoiceNumber}</h3>
+              <button
+                ref={closeRef}
+                onClick={() => setShareModal(null)}
+                aria-label="Close modal"
+                className="w-8 h-8 flex items-center justify-center rounded-lg text-gray-400 hover:text-gray-600 hover:bg-gray-100 transition text-lg">
+                ×
+              </button>
             </div>
             <p className="text-sm text-gray-500">
               Generate a secure payment link to send to your client. The link expires in 30 days and lets them view the invoice and pay online.
@@ -170,22 +183,39 @@ export default function InvoicesPage() {
         {/* Table */}
         <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
           {loading ? (
-            <div className="p-8 text-center text-gray-400">Loading...</div>
+            <div className="p-6 space-y-3" aria-label="Loading invoices" aria-busy="true">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <div key={i} className="flex gap-4 animate-pulse">
+                  <div className="h-4 bg-gray-200 rounded w-20 shrink-0" />
+                  <div className="h-4 bg-gray-200 rounded flex-1" />
+                  <div className="h-4 bg-gray-200 rounded w-16 shrink-0" />
+                  <div className="h-4 bg-gray-200 rounded w-20 shrink-0" />
+                </div>
+              ))}
+            </div>
           ) : invoices.length === 0 ? (
-            <div className="p-8 text-center">
-              <p className="text-gray-400 mb-3">No invoices yet</p>
-              <Link href="/accounting/invoices/new" className="btn-primary text-sm">Create First Invoice</Link>
+            <div className="p-12 text-center">
+              <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4" aria-hidden="true">
+                <span className="text-3xl">▤</span>
+              </div>
+              <p className="font-semibold text-gray-700 mb-1">
+                {filterStatus ? `No ${filterStatus} invoices` : 'No invoices yet'}
+              </p>
+              <p className="text-sm text-gray-400 mb-5">
+                {filterStatus ? 'Try a different filter or create a new invoice.' : 'Create your first invoice to start collecting payments.'}
+              </p>
+              <Link href="/accounting/invoices/new" className="btn-primary text-sm">Create Invoice</Link>
             </div>
           ) : (
             <table className="w-full text-sm">
               <thead><tr className="bg-gray-50 text-gray-500 text-xs uppercase border-b border-gray-100">
-                <th className="p-3 text-left">Invoice #</th>
-                <th className="p-3 text-left">Customer</th>
-                <th className="p-3 text-left">Issued</th>
-                <th className="p-3 text-left">Due</th>
-                <th className="p-3 text-left">Status</th>
-                <th className="p-3 text-right">Total</th>
-                <th className="p-3 text-center">Actions</th>
+                <th scope="col" className="p-3 text-left font-semibold">Invoice #</th>
+                <th scope="col" className="p-3 text-left font-semibold">Customer</th>
+                <th scope="col" className="p-3 text-left font-semibold">Issued</th>
+                <th scope="col" className="p-3 text-left font-semibold">Due</th>
+                <th scope="col" className="p-3 text-left font-semibold">Status</th>
+                <th scope="col" className="p-3 text-right font-semibold">Total</th>
+                <th scope="col" className="p-3 text-center font-semibold">Actions</th>
               </tr></thead>
               <tbody className="divide-y divide-gray-50">
                 {invoices.map(inv => (
@@ -203,12 +233,22 @@ export default function InvoicesPage() {
                     <td className="p-3 text-right font-semibold">{fmt(inv.total)}</td>
                     <td className="p-3 text-center">
                       <div className="flex gap-1 justify-center flex-wrap">
-                        {inv.status === 'draft' && <button onClick={() => markAs(inv.id, 'sent')} className="text-xs text-blue-600 hover:underline">Mark Sent</button>}
-                        {inv.status === 'sent' && <button onClick={() => markAs(inv.id, 'paid')} className="text-xs text-green-600 hover:underline">Mark Paid</button>}
-                        {inv.status !== 'void' && inv.status !== 'paid' && (
-                          <button onClick={() => openShare(inv)} className="text-xs text-[#C9A02E] hover:underline font-medium">Share</button>
+                        {inv.status === 'draft' && (
+                          <button onClick={() => markAs(inv.id, 'sent')} aria-label={`Mark invoice ${inv.invoice_number} as sent`}
+                            className="btn-action text-blue-600 bg-blue-50 hover:bg-blue-100">Sent</button>
                         )}
-                        {inv.status !== 'void' && inv.status !== 'paid' && <button onClick={() => markAs(inv.id, 'void')} className="text-xs text-gray-400 hover:underline ml-1">Void</button>}
+                        {inv.status === 'sent' && (
+                          <button onClick={() => markAs(inv.id, 'paid')} aria-label={`Mark invoice ${inv.invoice_number} as paid`}
+                            className="btn-action text-green-600 bg-green-50 hover:bg-green-100">Paid</button>
+                        )}
+                        {inv.status !== 'void' && inv.status !== 'paid' && (
+                          <button onClick={() => openShare(inv)} aria-label={`Share invoice ${inv.invoice_number}`}
+                            className="btn-action text-[#C8902A] bg-amber-50 hover:bg-amber-100">Share</button>
+                        )}
+                        {inv.status !== 'void' && inv.status !== 'paid' && (
+                          <button onClick={() => markAs(inv.id, 'void')} aria-label={`Void invoice ${inv.invoice_number}`}
+                            className="btn-action text-gray-500 bg-gray-100 hover:bg-gray-200">Void</button>
+                        )}
                       </div>
                     </td>
                   </tr>

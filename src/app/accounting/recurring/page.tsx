@@ -1,7 +1,7 @@
-'use client'
-import { useEffect, useState } from 'react'
-import Link from 'next/link'
+import ComingSoon from '@/components/ComingSoon'
 
+export default function Page() {
+  return <ComingSoon title="Recurring Transactions" backHref="/accounting" backLabel="← Dashboard" />
 type Recurring = {
   id: string
   description: string
@@ -76,6 +76,38 @@ export default function RecurringPage() {
   const del = async (id: string) => {
     if (!confirm('Delete this recurring entry?')) return
     await fetch(`/api/accounting/recurring?id=${id}`, { method: 'DELETE' })
+    load()
+  }
+
+  const postNow = async (item: Recurring) => {
+    // Post a transaction for today using this recurring entry's data
+    const txRes = await fetch('/api/accounting/transactions', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        description: item.description,
+        amount: item.amount,
+        type: item.type,
+        category: item.category,
+        vendor: item.vendor,
+        date: new Date().toISOString().split('T')[0],
+      }),
+    })
+    if (!txRes.ok) { alert('Failed to post transaction'); return }
+
+    // Advance next_date by frequency
+    const d = new Date(item.next_date)
+    if (item.frequency === 'daily') d.setDate(d.getDate() + 1)
+    else if (item.frequency === 'weekly') d.setDate(d.getDate() + 7)
+    else if (item.frequency === 'monthly') d.setMonth(d.getMonth() + 1)
+    else if (item.frequency === 'yearly') d.setFullYear(d.getFullYear() + 1)
+    const next = d.toISOString().split('T')[0]
+
+    await fetch('/api/accounting/recurring', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: item.id, next_date: next }),
+    })
     load()
   }
 
@@ -227,7 +259,15 @@ export default function RecurringPage() {
                       </button>
                     </td>
                     <td className="p-3 text-center">
-                      <button onClick={() => del(item.id)} className="text-xs text-red-400 hover:text-red-600">Delete</button>
+                      <div className="flex items-center justify-center gap-3">
+                        {item.is_active && (
+                          <button onClick={() => postNow(item)}
+                            className="text-xs font-semibold text-[#0F4C81] hover:text-[#0a3a63] bg-blue-50 hover:bg-blue-100 px-2 py-1 rounded transition">
+                            Post Now
+                          </button>
+                        )}
+                        <button onClick={() => del(item.id)} className="text-xs text-red-400 hover:text-red-600">Delete</button>
+                      </div>
                     </td>
                   </tr>
                 ))}

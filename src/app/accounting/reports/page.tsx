@@ -1,8 +1,4 @@
-'use client'
-import { useEffect, useState, useCallback } from 'react'
-import Link from 'next/link'
-import { useSearchParams } from 'next/navigation'
-import { Suspense } from 'react'
+import ComingSoon from '@/components/ComingSoon'
 
 type TrialBalanceRow = { code: string; name: string; type: string; debit: number; credit: number }
 
@@ -356,4 +352,6 @@ function ReportsInner() {
 
 export default function ReportsPage() {
   return <Suspense><ReportsInner /></Suspense>
+export default function Page() {
+  return <ComingSoon title="Reports" backHref="/accounting" backLabel="← Dashboard" />
 }

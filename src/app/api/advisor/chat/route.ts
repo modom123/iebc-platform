@@ -1,13 +1,17 @@
 import { NextResponse } from 'next/server'
 import Anthropic from '@anthropic-ai/sdk'
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
-
 export async function POST(req: Request) {
+  if (!process.env.ANTHROPIC_API_KEY) {
+    return NextResponse.json({ error: 'Advisor unavailable' }, { status: 503 })
+  }
+
   try {
     const { advisorName, advisorTitle, advisorDept, message, history = [] } = await req.json()
 
     if (!message) return NextResponse.json({ error: 'message required' }, { status: 400 })
+
+    const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY })
 
     const systemPrompt = `You are ${advisorName}, a ${advisorTitle} at IEBC (Integrated Efficiency Business Consultants). You work in the ${advisorDept} department.
 

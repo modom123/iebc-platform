@@ -104,13 +104,13 @@ export default function AppShell({ user, children }: { user?: User; children: Re
   const Sidebar = () => (
     <aside className="w-56 flex flex-col bg-white border-r border-gray-200 h-full">
       {/* Brand */}
-      <div className="h-14 bg-[#0B2140] flex items-center px-4 gap-2.5 shrink-0">
-        <div className="w-8 h-8 bg-[#C8902A] rounded-lg flex items-center justify-center shrink-0">
-          <span className="text-white font-black text-[11px] tracking-tight">IEBC</span>
+      <div className="h-14 bg-white border-b border-gray-100 flex items-center px-4 gap-2.5 shrink-0">
+        <div className="w-8 h-8 bg-[#0B2140] rounded-lg flex items-center justify-center shrink-0">
+          <span className="text-[#C8902A] font-black text-[10px] tracking-tight">PHM</span>
         </div>
         <div className="leading-tight">
-          <p className="text-white font-bold text-sm">Master Hub</p>
-          <p className="text-blue-300 text-[9px] font-mono tracking-[0.18em] uppercase">Operations · Growth</p>
+          <p className="text-[#0B2140] font-bold text-sm tracking-wide">PHANTOM</p>
+          <p className="text-gray-400 text-[9px] font-mono tracking-[0.15em] uppercase">Command · Intelligence</p>
         </div>
       </div>
 
@@ -146,9 +146,15 @@ export default function AppShell({ user, children }: { user?: User; children: Re
           </div>
         ))}
 
-        {/* Hire Advisors quick link */}
+        {/* Quick links */}
         <div>
           <p className="px-2 mb-1 text-[9px] font-bold text-gray-400 uppercase tracking-[0.15em]">Quick Links</p>
+          <Link href="/consultant"
+            className="flex items-center gap-2.5 px-2.5 py-[7px] rounded-lg text-[12.5px] text-gray-600 hover:bg-gray-50 border-l-[3px] border-transparent transition-all">
+            <span className="text-[14px] opacity-60 w-4 text-center">💼</span>
+            <span className="truncate">New Money Hub</span>
+            <span className="ml-auto text-[9px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded font-bold">NM</span>
+          </Link>
           <Link href="/infrastructure"
             className="flex items-center gap-2.5 px-2.5 py-[7px] rounded-lg text-[12.5px] text-gray-600 hover:bg-gray-50 border-l-[3px] border-transparent transition-all">
             <span className="text-[14px] opacity-60 w-4 text-center">🏗️</span>
@@ -170,7 +176,7 @@ export default function AppShell({ user, children }: { user?: User; children: Re
           <span>Settings</span>
         </Link>
         <div className="flex items-center gap-2.5 px-2.5 py-2">
-          <div className="w-7 h-7 rounded-full bg-[#0B2140] flex items-center justify-center text-white text-[11px] font-bold shrink-0">
+          <div className="w-7 h-7 rounded-full bg-amber-100 border border-amber-300 flex items-center justify-center text-[#0B2140] text-[11px] font-bold shrink-0">
             {initials}
           </div>
           <div className="flex-1 min-w-0">

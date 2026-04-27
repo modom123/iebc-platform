@@ -120,6 +120,25 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(loginUrl)
     }
 
+    // ── Subscription gate for /accounting ────────────────────────────
+    // Require an active/trialing/past_due subscription for all accounting
+    // pages. Checkout itself is already exempted above via publicWithinProtected.
+    if (effectivePathname.startsWith('/accounting') && session) {
+      try {
+        const { data: sub } = await supabase
+          .from('subscriptions')
+          .select('status')
+          .eq('user_id', session.user.id)
+          .single()
+        const ACTIVE_STATUSES = ['active', 'trialing', 'past_due']
+        if (!sub || !ACTIVE_STATUSES.includes(sub.status)) {
+          return NextResponse.redirect(new URL('/accounting/checkout?required=1', request.url))
+        }
+      } catch {
+        // Subscription check failed — fail open so a DB hiccup doesn't lock users out
+      }
+    }
+
     // Admin-only guard
     if (effectivePathname.startsWith('/admin') && session) {
       try {

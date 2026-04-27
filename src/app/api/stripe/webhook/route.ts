@@ -126,7 +126,77 @@ export async function POST(req: Request) {
         gross_amount_cents: session.amount_total,
         iebc_fee_cents: feeCents,
         status: 'succeeded',
-      }).select().maybeSingle() // ignore if iebc_fees doesn't exist yet
+      }).select().maybeSingle()
+    }
+
+    // Notify admin hub of new subscriber (fails silently if table doesn't exist yet)
+    await supabase.from('hub_notifications').insert({
+      type: 'new_subscriber',
+      title: `New subscriber: ${name || email}`,
+      body: `${email} signed up for the ${plan ? plan.charAt(0).toUpperCase() + plan.slice(1) : 'Efficient'} plan`,
+      metadata: { user_id: userId, plan, email, name },
+      read_at: null,
+    }).select().maybeSingle()
+
+    // Welcome email via Resend (no-op if RESEND_API_KEY is not set)
+    if (process.env.RESEND_API_KEY && email) {
+      const planLabel = plan ? plan.charAt(0).toUpperCase() + plan.slice(1) : 'Efficient'
+      const planPrice: Record<string, string> = { silver: '$9/mo', gold: '$22/mo', platinum: '$42/mo' }
+      try {
+        await fetch('https://api.resend.com/emails', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${process.env.RESEND_API_KEY}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            from: 'Efficient by IEBC <noreply@iebusinessconsultants.com>',
+            to: email,
+            subject: `Welcome to Efficient, ${name?.split(' ')[0] || 'there'}!`,
+            html: `
+<!DOCTYPE html>
+<html>
+<body style="margin:0;padding:0;background:#f5f7fa;font-family:'Inter',Arial,sans-serif;">
+  <div style="max-width:560px;margin:40px auto;background:#fff;border-radius:16px;overflow:hidden;border:1px solid #e2e8f0;">
+    <div style="background:#0B2140;padding:32px 40px;text-align:center;">
+      <div style="display:inline-flex;align-items:center;gap:10px;margin-bottom:8px;">
+        <div style="width:36px;height:36px;background:#C8902A;border-radius:8px;display:inline-flex;align-items:center;justify-content:center;">
+          <span style="color:#fff;font-weight:900;font-size:10px;letter-spacing:-0.5px;">EFF</span>
+        </div>
+        <span style="color:#fff;font-weight:800;font-size:20px;">Efficient</span>
+      </div>
+      <p style="color:rgba(255,255,255,0.6);margin:0;font-size:13px;">by IEBC · Financial Infrastructure</p>
+    </div>
+    <div style="padding:40px;">
+      <h1 style="color:#0B2140;font-size:24px;font-weight:800;margin:0 0 8px;">Welcome, ${name?.split(' ')[0] || 'there'}!</h1>
+      <p style="color:#64748b;font-size:15px;line-height:1.6;margin:0 0 24px;">
+        Your <strong style="color:#0B2140;">${planLabel}</strong> plan is now active${planPrice[plan] ? ` at <strong>${planPrice[plan]}</strong>` : ''}. You have full access to the Efficient accounting suite.
+      </p>
+      <a href="${process.env.NEXT_PUBLIC_APP_URL || 'https://iebusinessconsultants.com'}/accounting"
+         style="display:inline-block;background:linear-gradient(135deg,#0B2140,#17377A);color:#fff;padding:14px 28px;border-radius:10px;text-decoration:none;font-weight:700;font-size:14px;">
+        Go to Your Dashboard →
+      </a>
+      <div style="margin-top:32px;padding-top:24px;border-top:1px solid #f1f5f9;">
+        <p style="color:#94a3b8;font-size:13px;margin:0 0 12px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">What you can do now</p>
+        <ul style="color:#64748b;font-size:14px;line-height:2;padding-left:20px;margin:0;">
+          <li>Connect your bank account for automatic transaction import</li>
+          <li>Create and send invoices to your clients</li>
+          <li>Scan receipts with AI — snap a photo, we handle the rest</li>
+          <li>Run payroll, track mileage, and manage your team</li>
+        </ul>
+      </div>
+      <p style="color:#94a3b8;font-size:12px;margin-top:32px;">
+        Questions? Reply to this email or visit <a href="https://iebusinessconsultants.com" style="color:#0B2140;">iebusinessconsultants.com</a>
+      </p>
+    </div>
+  </div>
+</body>
+</html>`,
+          }),
+        })
+      } catch {
+        // Email failure should never break the webhook response
+      }
     }
   }
 
@@ -158,6 +228,16 @@ export async function POST(req: Request) {
         updated_at: new Date().toISOString(),
       })
       .eq('stripe_subscription_id', subscription.id)
+
+    // Notify admin hub of cancellation
+    const cancelledEmail = subscription.metadata?.email || ''
+    await supabase.from('hub_notifications').insert({
+      type: 'subscription_cancelled',
+      title: 'Subscription cancelled',
+      body: `${cancelledEmail || 'A subscriber'} cancelled their ${subscription.metadata?.plan || ''} plan`,
+      metadata: { stripe_subscription_id: subscription.id, plan: subscription.metadata?.plan },
+      read_at: null,
+    }).select().maybeSingle()
   }
 
   // ── 4. Payment failed → mark past_due ──
@@ -171,6 +251,16 @@ export async function POST(req: Request) {
           updated_at: new Date().toISOString(),
         })
         .eq('stripe_subscription_id', invoice.subscription)
+
+      // Notify admin hub
+      const failedEmail = invoice.customer_email || ''
+      await supabase.from('hub_notifications').insert({
+        type: 'payment_failed',
+        title: 'Payment failed',
+        body: `${failedEmail || 'A subscriber'} — $${((invoice.amount_due ?? 0) / 100).toFixed(2)} could not be charged`,
+        metadata: { stripe_subscription_id: invoice.subscription, amount: invoice.amount_due, email: failedEmail },
+        read_at: null,
+      }).select().maybeSingle()
     }
   }
 

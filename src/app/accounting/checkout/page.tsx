@@ -82,7 +82,9 @@ function CheckoutContent() {
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [isStripeError, setIsStripeError] = useState(false)
   const [canceled, setCanceled] = useState(false)
+  const [required, setRequired] = useState(false)
 
   const [form, setForm] = useState({
     email: '',
@@ -99,6 +101,9 @@ function CheckoutContent() {
     }
     if (searchParams.get('canceled') === 'true') {
       setCanceled(true)
+    }
+    if (searchParams.get('required') === '1') {
+      setRequired(true)
     }
   }, [searchParams])
 
@@ -124,6 +129,7 @@ function CheckoutContent() {
       } catch {
         // Invalid URL — fall through to API checkout
       }
+    }
     if (form.password.length < 8) {
       setError('Password must be at least 8 characters.')
       return
@@ -176,6 +182,7 @@ function CheckoutContent() {
           return
         } catch { /* fall through */ }
       }
+      setIsStripeError(true)
       setError(err instanceof Error ? err.message : 'Something went wrong. Please try again.')
       setLoading(false)
     }
@@ -205,6 +212,16 @@ function CheckoutContent() {
       </div>
 
       <div className="max-w-5xl mx-auto px-4 py-10">
+        {required && (
+          <div className="mb-6 bg-[#0B2140] text-white text-sm px-5 py-4 rounded-xl flex items-start gap-3 shadow-md">
+            <span className="text-xl shrink-0 mt-0.5">🔒</span>
+            <div>
+              <p className="font-bold mb-0.5">A subscription is required to access Efficient</p>
+              <p className="text-white/70 text-xs">Choose a plan below to get started — all plans include a 7-day free trial with no charge until day 8.</p>
+            </div>
+          </div>
+        )}
+
         {canceled && (
           <div className="mb-6 bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg flex items-center gap-2">
             <span>⚠</span> Payment was canceled. Your info is saved — just select a plan to try again.
@@ -359,9 +376,6 @@ function CheckoutContent() {
 
               {/* Error */}
               {error && (
-                <div className="bg-red-50 border border-red-200 text-red-700 text-sm px-4 py-3 rounded-lg">
-                  {error}
-                </div>
                 isStripeError ? (
                   <div className="bg-amber-50 border border-amber-200 rounded-xl px-4 py-4 space-y-2">
                     <p className="font-semibold text-amber-800 text-sm">Payment setup in progress</p>

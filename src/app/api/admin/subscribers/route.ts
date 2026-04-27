@@ -48,7 +48,7 @@ export async function GET(req: Request) {
   if (!subs || subs.length === 0) return NextResponse.json({ subscribers: [], totals: { count: 0, mrr: 0, arr: 0 } })
 
   // Bulk-fetch matching profiles
-  const userIds = [...new Set(subs.map(s => s.user_id).filter(Boolean))]
+  const userIds = Array.from(new Set(subs.map(s => s.user_id).filter(Boolean)))
   const { data: profiles } = await admin
     .from('profiles')
     .select('id, full_name, email, phone, business_name, created_at')

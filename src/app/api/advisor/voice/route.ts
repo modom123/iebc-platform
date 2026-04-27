@@ -5,7 +5,7 @@ const MALE_VOICES  = ['pNInz6obpgDQGcFmaJgB', 'TxGEqnHWrfWFTfGW9XjX', 'ErXwobaYi
 const FEMALE_VOICES = ['21m00Tcm4TlvDq8ikWAM', 'EXAVITQu4vr4xnSDxMaL', 'MF3mGyEYCl7XYWbV9V6O']
 const FEMALE_FIRST_NAMES = new Set(['Sofia','Priya','Rachel','Lisa','Amara','Nina','Sandra','Jennifer','Michelle','Yuki','Christine','Emma','Maya','Natasha','Alicia','Dana','Sarah','Maria','Allison','Beth'])
 
-export function getVoiceId(advisorName: string, seed = 0): string {
+function getVoiceId(advisorName: string, seed = 0): string {
   const first = advisorName.split(' ')[0].replace('Dr.', '').trim()
   const voices = FEMALE_FIRST_NAMES.has(first) ? FEMALE_VOICES : MALE_VOICES
   return voices[seed % voices.length]

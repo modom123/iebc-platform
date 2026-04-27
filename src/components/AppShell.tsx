@@ -5,8 +5,9 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 
 type User = { name?: string | null; email?: string | null; role?: string | null }
+type NavItem = { href: string; icon: string; label: string; exact?: boolean }
 
-const NAV_SECTIONS = [
+const NAV_SECTIONS: { title: string; items: NavItem[] }[] = [
   {
     title: 'Overview',
     items: [

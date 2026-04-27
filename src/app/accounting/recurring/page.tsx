@@ -1,7 +1,7 @@
-import ComingSoon from '@/components/ComingSoon'
+'use client'
+import { useEffect, useState } from 'react'
+import Link from 'next/link'
 
-export default function Page() {
-  return <ComingSoon title="Recurring Transactions" backHref="/accounting" backLabel="← Dashboard" />
 type Recurring = {
   id: string
   description: string

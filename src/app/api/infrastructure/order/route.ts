@@ -145,11 +145,10 @@ export async function POST(req: Request) {
     const clientId = body.clientId || generateClientId()
     const order = {
       id: `infra_${Date.now()}`,
-      clientId,
       createdAt: new Date().toISOString(),
       status: 'pending',
       ...body,
-      clientId, // ensure clientId is not overwritten by body spread
+      clientId,
     }
     orders.push(order)
 

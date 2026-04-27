@@ -88,7 +88,7 @@ export default function AdminLeadsPage() {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        lead_ids:    [...selected],
+        lead_ids:    Array.from(selected),
         assigned_to: assignTarget === '__unassign__' ? null : assignTarget,
       }),
     })

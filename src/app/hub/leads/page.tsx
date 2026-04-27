@@ -552,12 +552,12 @@ export default function LeadsPage() {
                         <span className="text-xs text-gray-400">{new Date(a.created_at).toLocaleString()}</span>
                       </div>
                       <p className="text-sm font-medium text-gray-700">{a.subject}</p>
-                      {a.metadata?.sent === false && (
+                      {(a.metadata?.sent as boolean) === false && (
                         <p className="text-xs text-yellow-600 mt-1">⚠ Email not delivered (Resend not configured)</p>
                       )}
-                      {a.type === 'converted' && a.metadata?.checkout_url && (
+                      {a.type === 'converted' && !!a.metadata?.checkout_url && (
                         <p className="text-xs text-gray-400 mt-1 truncate">
-                          Link: {String(a.metadata.checkout_url)}
+                          Link: {String(a.metadata.checkout_url as string)}
                         </p>
                       )}
                     </div>

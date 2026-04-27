@@ -42,7 +42,7 @@ export default async function InvoiceDetailPage({ params }: { params: { id: stri
       .select(`*, customers(*), invoice_line_items(*)`)
       .eq('id', params.id)
       .eq('user_id', session.user.id)
-      .single() as Promise<{ data: Invoice | null }>,
+      .single() as unknown as Promise<{ data: Invoice | null }>,
     supabase
       .from('profiles')
       .select('full_name, email')

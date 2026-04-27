@@ -154,12 +154,6 @@ export default function TransactionsPage() {
   const [showForm, setShowForm]         = useState(false)
   const [filterType, setFilterType]     = useState('')
   const [filterProject, setFilterProject] = useState('')
-  const [form, setForm] = useState({
-    date: new Date().toISOString().split('T')[0],
-    description: '', amount: '', type: 'income', category: '', vendor: '', project_id: '',
-  })
-  const [saving, setSaving]   = useState(false)
-  const [error, setError]     = useState('')
   const [form, setForm] = useState({ ...EMPTY_FORM, date: new Date().toISOString().split('T')[0] })
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
@@ -297,8 +291,8 @@ export default function TransactionsPage() {
     setForm(p => ({ ...p, type: f.type, description: f.description, vendor: f.vendor, category: f.category, amount: String(f.amount) }))
   }
 
-  const descSuggestions   = [...new Set(transactions.map(t => t.description).filter(Boolean))].sort()
-  const vendorSuggestions = [...new Set(transactions.map(t => t.vendor).filter(Boolean))].sort()
+  const descSuggestions   = Array.from(new Set(transactions.map(t => t.description).filter(Boolean))).sort()
+  const vendorSuggestions = Array.from(new Set(transactions.map(t => t.vendor).filter(Boolean))).sort()
   const frequent          = getFrequent(transactions)
 
   const totalIncome   = transactions.filter(t => t.type === 'income').reduce((s, t) => s + Number(t.amount), 0)
@@ -506,53 +500,6 @@ export default function TransactionsPage() {
           ) : (
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
-                <thead>
-                  <tr className="bg-gray-50 text-gray-500 text-xs uppercase border-b border-gray-100">
-                    <th scope="col" className="p-3 text-left font-semibold">Date</th>
-                    <th scope="col" className="p-3 text-left font-semibold">Description</th>
-                    <th scope="col" className="p-3 text-left font-semibold">Vendor</th>
-                    <th scope="col" className="p-3 text-left font-semibold">Category</th>
-                    <th scope="col" className="p-3 text-left font-semibold">Project</th>
-                    <th scope="col" className="p-3 text-right font-semibold">Amount</th>
-                    <th scope="col" className="p-3 text-center font-semibold">Actions</th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-gray-100">
-                  {transactions.map(t => {
-                    const proj = projects.find(p => p.id === t.project_id)
-                    return (
-                      <tr key={t.id} className="hover:bg-gray-50 transition-colors">
-                        <td className="p-3 text-gray-500 whitespace-nowrap tabular-nums">{t.date}</td>
-                        <td className="p-3 font-medium text-gray-800 max-w-[200px] truncate" title={t.description}>{t.description}</td>
-                        <td className="p-3 text-gray-500 max-w-[120px] truncate" title={t.vendor || ''}>{t.vendor || '—'}</td>
-                        <td className="p-3">
-                          <span className="px-2 py-1 bg-gray-100 rounded-md text-xs font-medium text-gray-600">{t.category || 'Uncategorized'}</span>
-                        </td>
-                        <td className="p-3">
-                          {proj
-                            ? <Link href="/accounting/projects" className="text-xs text-[#0F4C81] hover:underline">{proj.name}</Link>
-                            : <span className="text-gray-300 text-xs">—</span>}
-                        </td>
-                        <td className={`p-3 text-right font-mono font-semibold whitespace-nowrap ${t.type === 'income' ? 'text-green-600' : 'text-red-600'}`}>
-                          <span className="sr-only">{t.type === 'income' ? 'Income' : 'Expense'}:</span>
-                          {t.reconciled && <span className="text-green-400 mr-1 text-xs" aria-label="Reconciled">✓</span>}
-                          {t.type === 'income' ? '+' : '-'}{fmt(t.amount)}
-                        </td>
-                        <td className="p-3 text-center">
-                          <button
-                            onClick={() => handleDelete(t.id)}
-                            aria-label={`Delete transaction: ${t.description}`}
-                            className="text-xs text-red-500 hover:text-red-700 hover:bg-red-50 px-3 py-1.5 rounded-md transition min-h-[32px] font-medium">
-                            Delete
-                          </button>
-                        </td>
-                      </tr>
-                    )
-                  })}
-                </tbody>
-              </table>
-            </div>
-            <table className="w-full text-sm">
               <thead><tr className="bg-gray-50 text-gray-500 text-xs uppercase border-b border-gray-100">
                 <th className="p-3 text-left">Date</th>
                 <th className="p-3 text-left">Description</th>
@@ -646,6 +593,7 @@ export default function TransactionsPage() {
                 })}
               </tbody>
             </table>
+            </div>
           )}
         </div>
       </div>

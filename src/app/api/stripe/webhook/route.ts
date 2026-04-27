@@ -30,6 +30,17 @@ export async function POST(req: Request) {
 
   const supabase = getAdminClient()
 
+  // Idempotency guard: skip if this event was already processed
+  const { data: existing } = await supabase
+    .from('stripe_events')
+    .select('id')
+    .eq('event_id', event.id)
+    .maybeSingle()
+  if (existing) {
+    return NextResponse.json({ received: true })
+  }
+  await supabase.from('stripe_events').insert({ event_id: event.id, type: event.type })
+
   // ── 1. Checkout completed → create Supabase account + save profile ──
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object as Stripe.Checkout.Session

@@ -26,6 +26,7 @@ type FormData = {
 
 export default function Signup() {
   const [step, setStep] = useState<1 | 2>(1)
+  const [verified, setVerified] = useState(false)
   const [form, setForm] = useState<FormData>({
     name: '', email: '', password: '', confirm: '',
     phone: '', business_name: '',
@@ -87,23 +88,31 @@ export default function Signup() {
       const data = await res.json()
       if (!res.ok) throw new Error(data.error || 'Registration failed.')
 
-      // 2. Sign in client-side (sets auth cookie) so they're logged in when they return from Stripe
-      const { error: signInErr } = await supabase.auth.signInWithPassword({
-        email: form.email,
-        password: form.password,
-      })
-      if (signInErr) throw new Error('Account created but sign-in failed. Please log in manually.')
-
-      // 3. Redirect to Stripe to save card on file (no charge — for future upsells)
-      if (data.setupUrl) {
-        window.location.href = data.setupUrl
-      } else {
-        window.location.href = '/accounting?welcome=1'
-      }
+      // Account created — user must verify email before signing in
+      setVerified(true)
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : 'Something went wrong.')
       setLoading(false)
     }
+  }
+
+  if (verified) {
+    return (
+      <main className="min-h-screen bg-gray-50 flex items-center justify-center p-6">
+        <div className="bg-white rounded-2xl border border-gray-200 w-full max-w-md shadow-sm p-10 text-center">
+          <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+            <svg className="w-8 h-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" /></svg>
+          </div>
+          <h2 className="text-xl font-bold text-gray-900 mb-2">Check your email</h2>
+          <p className="text-sm text-gray-500 mb-1">We sent a confirmation link to</p>
+          <p className="text-sm font-semibold text-gray-800 mb-6">{form.email}</p>
+          <p className="text-xs text-gray-400 mb-6">Click the link in the email to activate your account, then sign in to access your dashboard.</p>
+          <Link href="/auth/login" className="inline-block px-6 py-2.5 rounded-xl font-bold text-sm text-white bg-[#0B2140] hover:opacity-90 transition">
+            Go to Sign In
+          </Link>
+        </div>
+      </main>
+    )
   }
 
   return (

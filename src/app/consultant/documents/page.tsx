@@ -1,1 +1,5 @@
-export { default } from '@/app/hub/documents/page'
+import ComingSoon from '@/components/ComingSoon'
+
+export default function Page() {
+  return <ComingSoon title="Documents" backHref="/consultant" backLabel="← Consultant Hub" />
+}

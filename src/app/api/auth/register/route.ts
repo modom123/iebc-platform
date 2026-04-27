@@ -35,11 +35,11 @@ export async function POST(req: Request) {
 
     const supabase = getAdminClient()
 
-    // 1. Create Supabase user (email already confirmed — no verification email needed)
+    // 1. Create Supabase user — email_confirm: false sends a verification email
     const { data: created, error: createErr } = await supabase.auth.admin.createUser({
       email,
       password,
-      email_confirm: true,
+      email_confirm: false,
       user_metadata: { full_name: name },
     })
 
@@ -101,7 +101,7 @@ export async function POST(req: Request) {
       cancel_url:  `${appUrl}/accounting?welcome=1&card_skipped=1`,
     })
 
-    return NextResponse.json({ setupUrl: setupSession.url })
+    return NextResponse.json({ setupUrl: setupSession.url, emailVerificationRequired: true })
   } catch (err) {
     console.error('Register error:', err)
     return NextResponse.json({ error: 'Something went wrong. Please try again.' }, { status: 500 })

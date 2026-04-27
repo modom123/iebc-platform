@@ -63,6 +63,7 @@ create policy "Service role manages fees" on public.iebc_fees for all using (aut
 -- Leads & Pipeline
 create table if not exists public.leads (
   id uuid default gen_random_uuid() primary key,
+  assigned_to uuid references public.profiles(id) on delete set null,
   business_name text not null,
   contact_email text,
   industry text,
@@ -72,8 +73,10 @@ create table if not exists public.leads (
   created_at timestamptz default now()
 );
 alter table public.leads enable row level security;
-create policy "Staff manage leads" on public.leads for all using (
-  exists (select 1 from public.profiles where id = auth.uid() and role in ('consultant', 'admin'))
+-- Consultants can only manage leads assigned to them; admins manage all leads
+create policy "Consultants manage own leads" on public.leads for all using (
+  auth.uid() = assigned_to
+  or exists (select 1 from public.profiles where id = auth.uid() and role = 'admin')
 );
 
 -- Consultant Assignments
@@ -176,3 +179,14 @@ create table if not exists public.formation_checklists (
 );
 alter table public.formation_checklists enable row level security;
 create policy "Users manage own formation" on public.formation_checklists for all using (auth.uid() = user_id);
+
+-- Stripe webhook event deduplication
+-- Prevents the same event from being processed twice on Stripe retries
+create table if not exists public.stripe_events (
+  id uuid default gen_random_uuid() primary key,
+  event_id text unique not null,
+  type text not null,
+  processed_at timestamptz default now()
+);
+alter table public.stripe_events enable row level security;
+create policy "Service role manages stripe events" on public.stripe_events for all using (auth.role() = 'service_role');

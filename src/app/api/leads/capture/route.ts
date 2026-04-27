@@ -9,6 +9,10 @@ export async function POST(req: Request) {
     if (!email) {
       return NextResponse.json({ error: 'email is required' }, { status: 400 })
     }
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      return NextResponse.json({ error: 'Invalid email address' }, { status: 400 })
+    }
 
     const supabase = createClient(
       process.env.NEXT_PUBLIC_SUPABASE_URL!,

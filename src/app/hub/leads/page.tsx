@@ -10,6 +10,8 @@ type Lead = {
   heat: 'hot' | 'warm' | 'cold'
   est_value: number
   status: 'new' | 'contacted' | 'qualified' | 'closed_won' | 'closed_lost'
+  assigned_to: string | null
+  assigned_to_name?: string | null
   created_at: string
 }
 
@@ -65,6 +67,7 @@ export default function LeadsPage() {
   const [loading, setLoading]         = useState(true)
   const [filterStatus, setFilterStatus] = useState('')
   const [filterHeat, setFilterHeat]   = useState('')
+  const [filterMine, setFilterMine]   = useState(false)
   const [showForm, setShowForm]       = useState(false)
   const [saving, setSaving]           = useState(false)
   const [formError, setFormError]     = useState('')
@@ -94,11 +97,12 @@ export default function LeadsPage() {
     const params = new URLSearchParams()
     if (filterStatus) params.set('status', filterStatus)
     if (filterHeat)   params.set('heat', filterHeat)
+    if (filterMine)   params.set('assigned_to', 'me')
     const res = await fetch(`/api/leads?${params}`)
     const data = await res.json()
     setLeads(Array.isArray(data) ? data : [])
     setLoading(false)
-  }, [filterStatus, filterHeat])
+  }, [filterStatus, filterHeat, filterMine])
 
   useEffect(() => { load() }, [load])
 
@@ -238,7 +242,10 @@ export default function LeadsPage() {
           <span className="text-gray-300">|</span>
           <h1 className="font-bold text-gray-800">Lead Pipeline</h1>
         </div>
-        <button onClick={() => setShowForm(true)} className="btn-primary text-sm">+ Add Lead</button>
+        <div className="flex items-center gap-2">
+          <Link href="/admin/leads" className="text-xs text-gray-400 hover:text-[#0F4C81] hover:underline">Assign Leads →</Link>
+          <button onClick={() => setShowForm(true)} className="btn-primary text-sm">+ Add Lead</button>
+        </div>
       </div>
 
       <div className="max-w-6xl mx-auto p-6 space-y-4">
@@ -259,6 +266,11 @@ export default function LeadsPage() {
 
         {/* Filters */}
         <div className="flex gap-2 flex-wrap items-center">
+          <button onClick={() => setFilterMine(!filterMine)}
+            className={`px-3 py-1 rounded-full text-xs font-bold transition border ${filterMine ? 'bg-[#0B2140] text-white border-[#0B2140]' : 'bg-white border-gray-300 text-gray-600 hover:border-[#0B2140]'}`}>
+            {filterMine ? '★ My Leads' : '☆ My Leads'}
+          </button>
+          <div className="w-px h-5 bg-gray-200" />
           <div className="flex gap-1 flex-wrap">
             {['', 'new', 'contacted', 'qualified', 'closed_won', 'closed_lost'].map(s => (
               <button key={s} onClick={() => setFilterStatus(s)}
@@ -337,9 +349,10 @@ export default function LeadsPage() {
               <thead>
                 <tr className="bg-gray-50 text-gray-500 text-xs uppercase border-b border-gray-100">
                   <th className="p-3 text-left">Business</th>
-                  <th className="p-3 text-left">Industry</th>
+                  <th className="p-3 text-left hidden md:table-cell">Industry</th>
                   <th className="p-3 text-left">Heat</th>
                   <th className="p-3 text-left">Status</th>
+                  <th className="p-3 text-left hidden lg:table-cell">Assigned</th>
                   <th className="p-3 text-right">Est. Value</th>
                   <th className="p-3 text-center">Actions</th>
                 </tr>
@@ -351,7 +364,7 @@ export default function LeadsPage() {
                       <p className="font-medium">{lead.business_name}</p>
                       {lead.contact_email && <p className="text-xs text-gray-400">{lead.contact_email}</p>}
                     </td>
-                    <td className="p-3 text-gray-500">{lead.industry || '—'}</td>
+                    <td className="p-3 text-gray-500 hidden md:table-cell">{lead.industry || '—'}</td>
                     <td className="p-3">
                       <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${HEAT_STYLES[lead.heat]}`}>{lead.heat}</span>
                     </td>
@@ -362,6 +375,15 @@ export default function LeadsPage() {
                           <option key={s} value={s}>{s.replace('_', ' ')}</option>
                         ))}
                       </select>
+                    </td>
+                    <td className="p-3 hidden lg:table-cell">
+                      {lead.assigned_to ? (
+                        <span className="text-xs text-green-700 font-medium bg-green-50 px-2 py-0.5 rounded-full">
+                          {lead.assigned_to_name || 'Assigned'}
+                        </span>
+                      ) : (
+                        <span className="text-xs text-orange-500 font-medium">Unassigned</span>
+                      )}
                     </td>
                     <td className="p-3 text-right font-mono font-semibold">{fmt(lead.est_value)}</td>
                     <td className="p-3">

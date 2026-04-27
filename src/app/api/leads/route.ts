@@ -22,12 +22,23 @@ export async function GET(req: Request) {
   const status = searchParams.get('status')
   const heat = searchParams.get('heat')
 
+  const assignedFilter = searchParams.get('assigned_to') // 'me' | uuid | 'unassigned' | ''
+
   let query = supabase.from('leads').select('*').order('created_at', { ascending: false })
 
-  // Admins and IEBC staff see ALL leads; clients see only their own
-  if (!isAdmin) query = query.eq('user_id', session.user.id)
+  if (isAdmin) {
+    // Admins/iebc_staff see everything unless they ask for a specific assignment
+    if (assignedFilter === 'me')           query = query.eq('assigned_to', session.user.id)
+    else if (assignedFilter === 'unassigned') query = query.is('assigned_to', null)
+    else if (assignedFilter)               query = query.eq('assigned_to', assignedFilter)
+  } else {
+    // Regular workers see leads they own OR leads assigned to them
+    query = query.or(`user_id.eq.${session.user.id},assigned_to.eq.${session.user.id}`)
+    if (assignedFilter === 'me')           query = query.eq('assigned_to', session.user.id)
+  }
+
   if (status) query = query.eq('status', status)
-  if (heat) query = query.eq('heat', heat)
+  if (heat)   query = query.eq('heat', heat)
 
   const { data, error } = await query
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
@@ -70,9 +81,12 @@ export async function PATCH(req: Request) {
   const body = await req.json()
   const { id, ...updates } = body
 
-  let query = supabase.from('leads').update(updates).eq('id', id).select().single()
-  // Non-admins can only update their own leads
-  if (!isAdmin) query = supabase.from('leads').update(updates).eq('id', id).eq('user_id', session.user.id).select().single()
+  // Admins can update anything; workers can update leads they own or are assigned to
+  let query = isAdmin
+    ? supabase.from('leads').update(updates).eq('id', id).select().single()
+    : supabase.from('leads').update(updates).eq('id', id)
+        .or(`user_id.eq.${session.user.id},assigned_to.eq.${session.user.id}`)
+        .select().single()
 
   const { data, error } = await query
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })

@@ -1,14 +1,17 @@
 'use client'
 import { useEffect, useState } from 'react'
+import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 
 type MileageEntry = { id: string; date: string; purpose: string; from_location: string; to_location: string; miles: number; deduction_amount: number; created_at: string }
 type TimeEntry = { id: string; date: string; client: string; project: string; description: string; hours: number; rate: number; billable: boolean; created_at: string }
+type Customer = { id: string; name: string; email: string }
 
 const fmt = (n: number) => '$' + Number(n).toLocaleString('en-US', { minimumFractionDigits: 2 })
 const IRS_RATE = 0.67
 
 export default function TrackerPage() {
+  const router = useRouter()
   const [tab, setTab] = useState<'mileage' | 'time'>('mileage')
   const [mileage, setMileage] = useState<MileageEntry[]>([])
   const [timeEntries, setTimeEntries] = useState<TimeEntry[]>([])
@@ -16,6 +19,16 @@ export default function TrackerPage() {
   const [showForm, setShowForm] = useState(false)
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+
+  // Invoice conversion state
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set())
+  const [showInvoiceModal, setShowInvoiceModal] = useState(false)
+  const [customers, setCustomers] = useState<Customer[]>([])
+  const [invoiceCustomerId, setInvoiceCustomerId] = useState('')
+  const [invoiceDueDate, setInvoiceDueDate] = useState('')
+  const [invoiceNotes, setInvoiceNotes] = useState('')
+  const [creatingInvoice, setCreatingInvoice] = useState(false)
+  const [invoiceError, setInvoiceError] = useState('')
 
   const [mileForm, setMileForm] = useState({ date: new Date().toISOString().split('T')[0], purpose: '', from_location: '', to_location: '', miles: '' })
   const [timeForm, setTimeForm] = useState({ date: new Date().toISOString().split('T')[0], client: '', project: '', description: '', hours: '', rate: '', billable: true })
@@ -78,6 +91,56 @@ export default function TrackerPage() {
     if (!confirm('Delete this entry?')) return
     await fetch(`/api/accounting/tracker?id=${id}&table=${table}`, { method: 'DELETE' })
     load()
+  }
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev)
+      next.has(id) ? next.delete(id) : next.add(id)
+      return next
+    })
+  }
+
+  const openInvoiceModal = async () => {
+    setInvoiceError('')
+    const res = await fetch('/api/accounting/customers')
+    const data = await res.json()
+    setCustomers(Array.isArray(data) ? data : [])
+    setInvoiceCustomerId('')
+    setInvoiceDueDate('')
+    setInvoiceNotes('')
+    setShowInvoiceModal(true)
+  }
+
+  const createInvoice = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setCreatingInvoice(true)
+    setInvoiceError('')
+    const selected = timeEntries.filter(t => selectedIds.has(t.id))
+    const line_items = selected.map(t => ({
+      description: [t.client, t.project, t.description].filter(Boolean).join(' — '),
+      quantity: Number(t.hours),
+      unit_price: Number(t.rate),
+    }))
+    const res = await fetch('/api/accounting/invoices', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        customer_id: invoiceCustomerId || null,
+        due_date: invoiceDueDate || null,
+        notes: invoiceNotes || null,
+        line_items,
+      }),
+    })
+    const data = await res.json()
+    if (res.ok) {
+      setShowInvoiceModal(false)
+      setSelectedIds(new Set())
+      router.push(`/accounting/invoices/${data.id}`)
+    } else {
+      setInvoiceError(data.error || 'Failed to create invoice')
+    }
+    setCreatingInvoice(false)
   }
 
   const totalMiles = mileage.reduce((s, m) => s + Number(m.miles), 0)
@@ -282,55 +345,135 @@ export default function TrackerPage() {
         )}
 
         {tab === 'time' && (
-          <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
-            {loading ? <div className="p-8 text-center text-gray-400">Loading...</div>
-            : timeEntries.length === 0 ? (
-              <div className="p-12 text-center">
-                <p className="text-4xl mb-3">⏱️</p>
-                <p className="font-medium text-gray-600 mb-1">No time entries yet</p>
-                <p className="text-sm text-gray-400 mb-4">Track billable hours by client and project.</p>
-                <button onClick={() => setShowForm(true)} className="btn-primary text-sm">Log First Entry</button>
+          <>
+            {selectedIds.size > 0 && (
+              <div className="flex items-center justify-between bg-[#0F4C81] text-white rounded-xl px-5 py-3">
+                <span className="text-sm font-medium">{selectedIds.size} entr{selectedIds.size === 1 ? 'y' : 'ies'} selected
+                  {' '}· {fmt(timeEntries.filter(t => selectedIds.has(t.id)).reduce((s, t) => s + Number(t.hours) * Number(t.rate), 0))} billable
+                </span>
+                <div className="flex gap-2">
+                  <button onClick={openInvoiceModal}
+                    className="bg-white text-[#0F4C81] font-bold text-sm px-4 py-1.5 rounded-lg hover:bg-blue-50 transition">
+                    Create Invoice
+                  </button>
+                  <button onClick={() => setSelectedIds(new Set())}
+                    className="text-blue-200 hover:text-white text-sm px-3 py-1.5">
+                    Clear
+                  </button>
+                </div>
               </div>
-            ) : (
-              <table className="w-full text-sm">
-                <thead><tr className="bg-gray-50 text-gray-500 text-xs uppercase border-b">
-                  <th className="p-3 text-left">Date</th>
-                  <th className="p-3 text-left">Client / Project</th>
-                  <th className="p-3 text-left">Description</th>
-                  <th className="p-3 text-right">Hours</th>
-                  <th className="p-3 text-right">Value</th>
-                  <th className="p-3 text-center">Del</th>
-                </tr></thead>
-                <tbody className="divide-y divide-gray-50">
-                  {timeEntries.map(t => (
-                    <tr key={t.id} className="hover:bg-gray-50">
-                      <td className="p-3 text-gray-500">{t.date}</td>
-                      <td className="p-3">
-                        <p className="font-medium">{t.client || '—'}</p>
-                        {t.project && <p className="text-xs text-gray-400">{t.project}</p>}
-                      </td>
-                      <td className="p-3 text-gray-600">{t.description}</td>
-                      <td className="p-3 text-right font-mono font-semibold">{Number(t.hours).toFixed(2)}</td>
-                      <td className="p-3 text-right">
-                        {t.billable && t.rate > 0
-                          ? <span className="font-semibold text-green-600">{fmt(t.hours * t.rate)}</span>
-                          : <span className="text-gray-400 text-xs">non-billable</span>
-                        }
-                      </td>
-                      <td className="p-3 text-center"><button onClick={() => deleteEntry(t.id, 'time')} className="text-xs text-red-400 hover:text-red-600">✕</button></td>
-                    </tr>
-                  ))}
-                </tbody>
-                <tfoot className="bg-gray-50 border-t border-gray-200">
-                  <tr>
-                    <td colSpan={3} className="p-3 text-xs font-bold text-gray-600 text-right">TOTAL</td>
-                    <td className="p-3 text-right font-bold font-mono">{totalHours.toFixed(2)}</td>
-                    <td className="p-3 text-right font-bold text-green-600">{fmt(billableValue)}</td>
-                    <td />
-                  </tr>
-                </tfoot>
-              </table>
             )}
+            <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+              {loading ? <div className="p-8 text-center text-gray-400">Loading...</div>
+              : timeEntries.length === 0 ? (
+                <div className="p-12 text-center">
+                  <p className="text-4xl mb-3">⏱️</p>
+                  <p className="font-medium text-gray-600 mb-1">No time entries yet</p>
+                  <p className="text-sm text-gray-400 mb-4">Track billable hours by client and project.</p>
+                  <button onClick={() => setShowForm(true)} className="btn-primary text-sm">Log First Entry</button>
+                </div>
+              ) : (
+                <table className="w-full text-sm">
+                  <thead><tr className="bg-gray-50 text-gray-500 text-xs uppercase border-b">
+                    <th className="p-3 w-8"></th>
+                    <th className="p-3 text-left">Date</th>
+                    <th className="p-3 text-left">Client / Project</th>
+                    <th className="p-3 text-left">Description</th>
+                    <th className="p-3 text-right">Hours</th>
+                    <th className="p-3 text-right">Value</th>
+                    <th className="p-3 text-center">Del</th>
+                  </tr></thead>
+                  <tbody className="divide-y divide-gray-50">
+                    {timeEntries.map(t => (
+                      <tr key={t.id} className={`hover:bg-gray-50 cursor-pointer ${selectedIds.has(t.id) ? 'bg-blue-50' : ''}`}
+                        onClick={() => t.billable && t.rate > 0 && toggleSelect(t.id)}>
+                        <td className="p-3">
+                          {t.billable && t.rate > 0 && (
+                            <input type="checkbox" checked={selectedIds.has(t.id)}
+                              onChange={() => toggleSelect(t.id)}
+                              onClick={e => e.stopPropagation()}
+                              className="h-4 w-4 rounded border-gray-300 text-[#0F4C81]" />
+                          )}
+                        </td>
+                        <td className="p-3 text-gray-500">{t.date}</td>
+                        <td className="p-3">
+                          <p className="font-medium">{t.client || '—'}</p>
+                          {t.project && <p className="text-xs text-gray-400">{t.project}</p>}
+                        </td>
+                        <td className="p-3 text-gray-600">{t.description}</td>
+                        <td className="p-3 text-right font-mono font-semibold">{Number(t.hours).toFixed(2)}</td>
+                        <td className="p-3 text-right">
+                          {t.billable && t.rate > 0
+                            ? <span className="font-semibold text-green-600">{fmt(t.hours * t.rate)}</span>
+                            : <span className="text-gray-400 text-xs">non-billable</span>
+                          }
+                        </td>
+                        <td className="p-3 text-center">
+                          <button onClick={e => { e.stopPropagation(); deleteEntry(t.id, 'time') }}
+                            className="text-xs text-red-400 hover:text-red-600">✕</button>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                  <tfoot className="bg-gray-50 border-t border-gray-200">
+                    <tr>
+                      <td colSpan={4} className="p-3 text-xs font-bold text-gray-600 text-right">TOTAL</td>
+                      <td className="p-3 text-right font-bold font-mono">{totalHours.toFixed(2)}</td>
+                      <td className="p-3 text-right font-bold text-green-600">{fmt(billableValue)}</td>
+                      <td />
+                    </tr>
+                  </tfoot>
+                </table>
+              )}
+            </div>
+          </>
+        )}
+
+        {/* Create Invoice Modal */}
+        {showInvoiceModal && (
+          <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4"
+            onClick={e => { if (e.target === e.currentTarget) setShowInvoiceModal(false) }}>
+            <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md">
+              <div className="p-6 border-b border-gray-100 flex justify-between items-start">
+                <div>
+                  <h3 className="font-bold text-gray-800 text-lg">Create Invoice from Time</h3>
+                  <p className="text-xs text-gray-500 mt-0.5">{selectedIds.size} entries · {fmt(timeEntries.filter(t => selectedIds.has(t.id)).reduce((s, t) => s + Number(t.hours) * Number(t.rate), 0))}</p>
+                </div>
+                <button onClick={() => setShowInvoiceModal(false)} className="text-gray-400 hover:text-gray-600 text-2xl leading-none">×</button>
+              </div>
+              <form onSubmit={createInvoice} className="p-6 space-y-4">
+                <div>
+                  <label className="text-xs font-semibold text-gray-600 block mb-1.5">Customer</label>
+                  <select value={invoiceCustomerId} onChange={e => setInvoiceCustomerId(e.target.value)}
+                    className="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F4C81]">
+                    <option value="">No customer (add later)</option>
+                    {customers.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                  </select>
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-gray-600 block mb-1.5">Due Date</label>
+                  <input type="date" value={invoiceDueDate} onChange={e => setInvoiceDueDate(e.target.value)}
+                    className="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F4C81]" />
+                </div>
+                <div>
+                  <label className="text-xs font-semibold text-gray-600 block mb-1.5">Notes</label>
+                  <textarea value={invoiceNotes} onChange={e => setInvoiceNotes(e.target.value)} rows={2}
+                    placeholder="Optional invoice notes..."
+                    className="w-full border border-gray-300 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F4C81] resize-none" />
+                </div>
+                {invoiceError && <p className="text-red-600 text-sm bg-red-50 rounded-lg px-3 py-2">{invoiceError}</p>}
+                <div className="flex gap-3 pt-1">
+                  <button type="submit" disabled={creatingInvoice}
+                    className="flex-1 bg-[#0F4C81] hover:bg-[#0a3a63] disabled:opacity-60 text-white py-3 rounded-xl font-bold text-sm transition">
+                    {creatingInvoice ? 'Creating...' : 'Create Draft Invoice'}
+                  </button>
+                  <button type="button" onClick={() => setShowInvoiceModal(false)}
+                    className="px-5 py-3 border border-gray-200 rounded-xl text-sm text-gray-600 hover:bg-gray-50 transition">
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </div>
           </div>
         )}
       </div>

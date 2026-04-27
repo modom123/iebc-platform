@@ -2,8 +2,10 @@ import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import PrintButton from './PrintButton'
+import InvoiceActions from './InvoiceActions'
 
 type LineItem = { id: string; description: string; quantity: number; unit_price: number; amount: number }
+type Payment = { id: string; amount: number; method: string; paid_at: string }
 type Invoice = {
   id: string; invoice_number: string; status: string; issue_date: string; due_date: string
   subtotal: number; tax_rate: number; tax_amount: number; total: number; amount_paid: number; notes: string
@@ -34,34 +36,53 @@ export default async function InvoiceDetailPage({ params }: { params: { id: stri
   const { data: { session } } = await supabase.auth.getSession()
   if (!session) redirect('/auth/login')
 
-  const { data: invoice } = await supabase
-    .from('invoices')
-    .select(`*, customers(*), invoice_line_items(*)`)
-    .eq('id', params.id)
-    .eq('user_id', session.user.id)
-    .single() as { data: Invoice | null }
+  const [{ data: invoice }, { data: profile }, { data: paymentsRaw }] = await Promise.all([
+    supabase
+      .from('invoices')
+      .select(`*, customers(*), invoice_line_items(*)`)
+      .eq('id', params.id)
+      .eq('user_id', session.user.id)
+      .single() as Promise<{ data: Invoice | null }>,
+    supabase
+      .from('profiles')
+      .select('full_name, email')
+      .eq('id', session.user.id)
+      .single(),
+    supabase
+      .from('invoice_payments')
+      .select('*')
+      .eq('invoice_id', params.id)
+      .eq('user_id', session.user.id)
+      .order('paid_at', { ascending: false }),
+  ])
 
   if (!invoice) notFound()
 
-  const { data: profile } = await supabase
-    .from('profiles')
-    .select('full_name, email')
-    .eq('id', session.user.id)
-    .single()
-
+  const payments: Payment[] = (paymentsRaw || []) as Payment[]
   const balance = Number(invoice.total) - Number(invoice.amount_paid)
 
   return (
     <main className="min-h-screen bg-gray-50">
-      {/* Toolbar — hidden on print */}
-      <div className="print:hidden bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center">
+      {/* Toolbar */}
+      <div className="print:hidden bg-white border-b border-gray-200 px-6 py-4 flex justify-between items-center flex-wrap gap-3">
         <div className="flex items-center gap-3">
           <Link href="/accounting/invoices" className="text-gray-400 hover:text-gray-600 text-sm">← Invoices</Link>
           <span className="text-gray-300">|</span>
           <h1 className="font-bold text-gray-800">{invoice.invoice_number}</h1>
-          <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[invoice.status] || ''}`}>{invoice.status}</span>
+          <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${STATUS_COLORS[invoice.status] || ''}`}>
+            {invoice.status}
+          </span>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 items-center flex-wrap">
+          <InvoiceActions
+            invoiceId={invoice.id}
+            invoiceNumber={invoice.invoice_number}
+            status={invoice.status}
+            total={Number(invoice.total)}
+            amountPaid={Number(invoice.amount_paid)}
+            customerEmail={invoice.customers?.email}
+            payments={payments}
+          />
           <PrintButton />
         </div>
       </div>
@@ -142,7 +163,7 @@ export default async function InvoiceDetailPage({ params }: { params: { id: stri
             </table>
           </div>
 
-          {/* Totals */}
+          {/* Totals + Payment History */}
           <div className="p-10">
             <div className="max-w-xs ml-auto space-y-2 text-sm">
               <div className="flex justify-between">
@@ -173,6 +194,20 @@ export default async function InvoiceDetailPage({ params }: { params: { id: stri
               )}
             </div>
 
+            {/* Payment history rendered client-side so it updates after recording */}
+            <div className="print:hidden">
+              <InvoiceActions
+                invoiceId={invoice.id}
+                invoiceNumber={invoice.invoice_number}
+                status={invoice.status}
+                total={Number(invoice.total)}
+                amountPaid={Number(invoice.amount_paid)}
+                customerEmail={invoice.customers?.email}
+                payments={payments}
+                historyOnly
+              />
+            </div>
+
             {invoice.notes && (
               <div className="mt-8 pt-8 border-t border-gray-100">
                 <p className="text-xs font-bold text-gray-400 uppercase tracking-widest mb-2">Notes</p>
@@ -181,7 +216,7 @@ export default async function InvoiceDetailPage({ params }: { params: { id: stri
             )}
 
             <div className="mt-10 pt-6 border-t border-gray-100 text-center">
-              <p className="text-xs text-gray-300">Thank you for your business · IEBC Platform · iebc-platform.vercel.app</p>
+              <p className="text-xs text-gray-300">Thank you for your business · IEBC Platform</p>
             </div>
           </div>
         </div>

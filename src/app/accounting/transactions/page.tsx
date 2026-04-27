@@ -22,6 +22,7 @@ const CATEGORIES = {
   transfer: ['Transfer'],
 }
 
+const EMPTY_FORM = { date: '', description: '', amount: '', type: 'income', category: '', vendor: '', project_id: '' }
 const fmt = (n: number) => '$' + Number(n).toLocaleString('en-US', { minimumFractionDigits: 2 })
 
 export default function TransactionsPage() {
@@ -31,9 +32,15 @@ export default function TransactionsPage() {
   const [showForm, setShowForm] = useState(false)
   const [filterType, setFilterType] = useState('')
   const [filterProject, setFilterProject] = useState('')
-  const [form, setForm] = useState({ date: new Date().toISOString().split('T')[0], description: '', amount: '', type: 'income', category: '', vendor: '', project_id: '' })
+  const [form, setForm] = useState({ ...EMPTY_FORM, date: new Date().toISOString().split('T')[0] })
   const [saving, setSaving] = useState(false)
   const [error, setError] = useState('')
+
+  // Edit state
+  const [editingId, setEditingId] = useState<string | null>(null)
+  const [editForm, setEditForm] = useState<typeof EMPTY_FORM & { date: string }>({ ...EMPTY_FORM, date: '' })
+  const [editSaving, setEditSaving] = useState(false)
+  const [editError, setEditError] = useState('')
 
   const load = async () => {
     setLoading(true)
@@ -57,26 +64,105 @@ export default function TransactionsPage() {
     e.preventDefault()
     setSaving(true)
     setError('')
+
+    // Optimistically add
+    const tempId = 'temp-' + Date.now()
+    const optimistic: Transaction = {
+      id: tempId,
+      date: form.date,
+      description: form.description,
+      amount: parseFloat(form.amount),
+      type: form.type as Transaction['type'],
+      category: form.category,
+      vendor: form.vendor,
+      project_id: form.project_id || undefined,
+      reconciled: false,
+    }
+    setTransactions(prev => [optimistic, ...prev])
+    setShowForm(false)
+    setForm({ ...EMPTY_FORM, date: new Date().toISOString().split('T')[0] })
+
     const res = await fetch('/api/accounting/transactions', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(form),
     })
+
     if (res.ok) {
-      setShowForm(false)
-      setForm({ date: new Date().toISOString().split('T')[0], description: '', amount: '', type: 'income', category: '', vendor: '', project_id: '' })
-      load()
+      const saved = await res.json()
+      setTransactions(prev => prev.map(t => t.id === tempId ? saved : t))
     } else {
       const d = await res.json()
+      setTransactions(prev => prev.filter(t => t.id !== tempId))
+      setShowForm(true)
       setError(d.error || 'Failed to save')
     }
     setSaving(false)
   }
 
+  const startEdit = (t: Transaction) => {
+    setEditingId(t.id)
+    setEditForm({
+      date: t.date,
+      description: t.description,
+      amount: String(t.amount),
+      type: t.type,
+      category: t.category || '',
+      vendor: t.vendor || '',
+      project_id: t.project_id || '',
+    })
+    setEditError('')
+  }
+
+  const cancelEdit = () => {
+    setEditingId(null)
+    setEditError('')
+  }
+
+  const handleEditSave = async (id: string) => {
+    setEditSaving(true)
+    setEditError('')
+
+    const updated: Transaction = {
+      id,
+      date: editForm.date,
+      description: editForm.description,
+      amount: parseFloat(editForm.amount),
+      type: editForm.type as Transaction['type'],
+      category: editForm.category,
+      vendor: editForm.vendor,
+      project_id: editForm.project_id || undefined,
+    }
+
+    // Optimistically update
+    const prev = transactions
+    setTransactions(txns => txns.map(t => t.id === id ? { ...t, ...updated } : t))
+    setEditingId(null)
+
+    const res = await fetch('/api/accounting/transactions', {
+      method: 'PATCH',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, ...editForm, amount: parseFloat(editForm.amount) }),
+    })
+
+    if (!res.ok) {
+      const d = await res.json()
+      setTransactions(prev)
+      setEditingId(id)
+      setEditError(d.error || 'Failed to update')
+    }
+    setEditSaving(false)
+  }
+
   const handleDelete = async (id: string) => {
     if (!confirm('Delete this transaction?')) return
-    await fetch(`/api/accounting/transactions?id=${id}`, { method: 'DELETE' })
-    load()
+
+    // Optimistically remove
+    const prev = transactions
+    setTransactions(txns => txns.filter(t => t.id !== id))
+
+    const res = await fetch(`/api/accounting/transactions?id=${id}`, { method: 'DELETE' })
+    if (!res.ok) setTransactions(prev)
   }
 
   const totalIncome = transactions.filter(t => t.type === 'income').reduce((s, t) => s + Number(t.amount), 0)
@@ -207,8 +293,59 @@ export default function TransactionsPage() {
               <tbody className="divide-y divide-gray-50">
                 {transactions.map(t => {
                   const proj = projects.find(p => p.id === t.project_id)
+                  const isTemp = t.id.startsWith('temp-')
+
+                  if (editingId === t.id) {
+                    return (
+                      <tr key={t.id} className="bg-blue-50">
+                        <td className="p-2">
+                          <input type="date" value={editForm.date} onChange={e => setEditForm({...editForm, date: e.target.value})} className="w-full border border-gray-300 rounded px-2 py-1 text-xs" />
+                        </td>
+                        <td className="p-2">
+                          <input type="text" required value={editForm.description} onChange={e => setEditForm({...editForm, description: e.target.value})} className="w-full border border-gray-300 rounded px-2 py-1 text-xs" />
+                        </td>
+                        <td className="p-2">
+                          <input type="text" value={editForm.vendor} onChange={e => setEditForm({...editForm, vendor: e.target.value})} className="w-full border border-gray-300 rounded px-2 py-1 text-xs" placeholder="Vendor" />
+                        </td>
+                        <td className="p-2">
+                          <select value={editForm.category} onChange={e => setEditForm({...editForm, category: e.target.value})} className="w-full border border-gray-300 rounded px-2 py-1 text-xs">
+                            <option value="">Uncategorized</option>
+                            {(CATEGORIES[editForm.type as keyof typeof CATEGORIES] || []).map(c => <option key={c} value={c}>{c}</option>)}
+                          </select>
+                        </td>
+                        <td className="p-2">
+                          {projects.length > 0 ? (
+                            <select value={editForm.project_id} onChange={e => setEditForm({...editForm, project_id: e.target.value})} className="w-full border border-gray-300 rounded px-2 py-1 text-xs">
+                              <option value="">No project</option>
+                              {projects.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
+                            </select>
+                          ) : <span className="text-gray-300 text-xs">—</span>}
+                        </td>
+                        <td className="p-2">
+                          <div className="flex flex-col gap-1 items-end">
+                            <select value={editForm.type} onChange={e => setEditForm({...editForm, type: e.target.value, category: ''})} className="border border-gray-300 rounded px-2 py-1 text-xs w-24">
+                              <option value="income">Income</option>
+                              <option value="expense">Expense</option>
+                              <option value="transfer">Transfer</option>
+                            </select>
+                            <input type="number" step="0.01" min="0" required value={editForm.amount} onChange={e => setEditForm({...editForm, amount: e.target.value})} className="border border-gray-300 rounded px-2 py-1 text-xs w-24 text-right" />
+                          </div>
+                        </td>
+                        <td className="p-2 text-center">
+                          {editError && <p className="text-red-500 text-xs mb-1">{editError}</p>}
+                          <div className="flex gap-1 justify-center">
+                            <button onClick={() => handleEditSave(t.id)} disabled={editSaving} className="px-2 py-1 bg-[#0F4C81] text-white rounded text-xs hover:bg-[#0a3a66] disabled:opacity-50">
+                              {editSaving ? '...' : 'Save'}
+                            </button>
+                            <button onClick={cancelEdit} className="px-2 py-1 bg-gray-100 text-gray-600 rounded text-xs hover:bg-gray-200">Cancel</button>
+                          </div>
+                        </td>
+                      </tr>
+                    )
+                  }
+
                   return (
-                    <tr key={t.id} className="hover:bg-gray-50">
+                    <tr key={t.id} className={`hover:bg-gray-50 transition-opacity ${isTemp ? 'opacity-60' : ''}`}>
                       <td className="p-3 text-gray-500 whitespace-nowrap">{t.date}</td>
                       <td className="p-3 font-medium">{t.description}</td>
                       <td className="p-3 text-gray-500">{t.vendor || '—'}</td>
@@ -221,7 +358,16 @@ export default function TransactionsPage() {
                         {t.type === 'income' ? '+' : '-'}{fmt(t.amount)}
                       </td>
                       <td className="p-3 text-center">
-                        <button onClick={() => handleDelete(t.id)} className="text-red-400 hover:text-red-600 text-xs">Delete</button>
+                        <div className="flex gap-2 justify-center">
+                          <button
+                            onClick={() => startEdit(t)}
+                            disabled={isTemp}
+                            className="text-[#0F4C81] hover:text-[#0a3a66] text-xs disabled:opacity-40"
+                          >
+                            Edit
+                          </button>
+                          <button onClick={() => handleDelete(t.id)} disabled={isTemp} className="text-red-400 hover:text-red-600 text-xs disabled:opacity-40">Delete</button>
+                        </div>
                       </td>
                     </tr>
                   )

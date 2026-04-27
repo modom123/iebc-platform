@@ -1,3 +1,7 @@
+import ComingSoon from '@/components/ComingSoon'
+
+export default function Page() {
+  return <ComingSoon title="Revenue" backHref="/hub" backLabel="← Hub" />
 import { createServerSupabaseClient } from '@/lib/supabase/server'
 import { createClient } from '@supabase/supabase-js'
 import { redirect } from 'next/navigation'

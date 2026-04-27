@@ -112,7 +112,7 @@ export async function middleware(request: NextRequest) {
       return response
     }
 
-    const protectedPaths = ['/accounting', '/hub', '/settings', '/admin', '/workspace']
+    const protectedPaths = ['/accounting', '/hub', '/settings', '/admin', '/workspace', '/consultant']
     if (protectedPaths.some(p => effectivePathname.startsWith(p)) && !session) {
       // Redirect to login, preserving the effective destination as ?next=
       const loginUrl = new URL('/auth/login', request.url)

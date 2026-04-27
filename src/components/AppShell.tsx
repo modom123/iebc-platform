@@ -106,11 +106,11 @@ export default function AppShell({ user, children }: { user?: User; children: Re
       {/* Brand */}
       <div className="h-14 bg-[#0B2140] flex items-center px-4 gap-2.5 shrink-0">
         <div className="w-8 h-8 bg-[#C8902A] rounded-lg flex items-center justify-center shrink-0">
-          <span className="text-white font-black text-[11px] tracking-tight">IEBC</span>
+          <span className="text-white font-black text-[10px] tracking-tight">PHM</span>
         </div>
         <div className="leading-tight">
-          <p className="text-white font-bold text-sm">Master Hub</p>
-          <p className="text-blue-300 text-[9px] font-mono tracking-[0.18em] uppercase">Operations · Growth</p>
+          <p className="text-white font-bold text-sm tracking-wide">PHANTOM</p>
+          <p className="text-blue-300 text-[9px] font-mono tracking-[0.18em] uppercase">Command · Intelligence</p>
         </div>
       </div>
 
@@ -146,9 +146,15 @@ export default function AppShell({ user, children }: { user?: User; children: Re
           </div>
         ))}
 
-        {/* Hire Advisors quick link */}
+        {/* Quick links */}
         <div>
           <p className="px-2 mb-1 text-[9px] font-bold text-gray-400 uppercase tracking-[0.15em]">Quick Links</p>
+          <Link href="/consultant"
+            className="flex items-center gap-2.5 px-2.5 py-[7px] rounded-lg text-[12.5px] text-gray-600 hover:bg-gray-50 border-l-[3px] border-transparent transition-all">
+            <span className="text-[14px] opacity-60 w-4 text-center">💼</span>
+            <span className="truncate">New Money Hub</span>
+            <span className="ml-auto text-[9px] bg-green-100 text-green-700 px-1.5 py-0.5 rounded font-bold">NM</span>
+          </Link>
           <Link href="/infrastructure"
             className="flex items-center gap-2.5 px-2.5 py-[7px] rounded-lg text-[12.5px] text-gray-600 hover:bg-gray-50 border-l-[3px] border-transparent transition-all">
             <span className="text-[14px] opacity-60 w-4 text-center">🏗️</span>

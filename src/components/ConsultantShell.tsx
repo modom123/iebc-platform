@@ -53,13 +53,13 @@ export default function ConsultantShell({ user, children }: { user?: User; child
   const Sidebar = () => (
     <aside className="w-56 flex flex-col bg-white border-r border-gray-200 h-full">
       {/* Logo */}
-      <div className="h-14 bg-[#1a3a5c] flex items-center px-4 gap-2.5 shrink-0">
+      <div className="h-14 bg-[#0d1f0f] flex items-center px-4 gap-2.5 shrink-0">
         <div className="w-8 h-8 bg-[#C9A02E] rounded-lg flex items-center justify-center shrink-0">
-          <span className="text-white font-black text-[11px] tracking-tight">IEBC</span>
+          <span className="text-white font-black text-[10px] tracking-tight">NM</span>
         </div>
         <div className="leading-tight">
-          <p className="text-white font-bold text-sm">Consultant Hub</p>
-          <p className="text-blue-300 text-[10px]">Sales · Outreach · CRM</p>
+          <p className="text-white font-bold text-sm tracking-wide">New Money</p>
+          <p className="text-green-400 text-[9px] font-mono tracking-[0.18em] uppercase">Close · Convert · Collect</p>
         </div>
       </div>
 
@@ -75,10 +75,10 @@ export default function ConsultantShell({ user, children }: { user?: User; child
                   <Link key={label} href={href} onClick={() => setMobileOpen(false)}
                     className={`flex items-center gap-2.5 px-2.5 py-[7px] rounded-lg text-[13px] transition-all duration-100 ${
                       isActive
-                        ? 'bg-blue-50 text-[#1a3a5c] font-semibold border-l-[3px] border-[#1a3a5c]'
+                        ? 'bg-green-50 text-[#0d4a1a] font-semibold border-l-[3px] border-[#C9A02E]'
                         : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900 border-l-[3px] border-transparent'
                     }`}>
-                    <span className={`text-[15px] leading-none w-4 text-center shrink-0 ${isActive ? 'text-[#1a3a5c]' : 'text-gray-400'}`}>{icon}</span>
+                    <span className={`text-[15px] leading-none w-4 text-center shrink-0 ${isActive ? 'text-[#0d4a1a]' : 'text-gray-400'}`}>{icon}</span>
                     <span className="truncate">{label}</span>
                   </Link>
                 )
@@ -90,20 +90,28 @@ export default function ConsultantShell({ user, children }: { user?: User; child
 
       {/* Footer */}
       <div className="shrink-0 border-t border-gray-100 p-2 space-y-1">
+        {user?.role === 'admin' && (
+          <Link href="/hub" onClick={() => setMobileOpen(false)}
+            className="flex items-center gap-2.5 px-2.5 py-[7px] rounded-lg text-[12px] text-gray-500 hover:bg-gray-50 border-l-[3px] border-transparent transition-all">
+            <span className="text-[13px] opacity-60 w-4 text-center">⚡</span>
+            <span className="truncate">Switch to PHANTOM</span>
+            <span className="ml-auto text-[9px] bg-amber-100 text-amber-700 px-1.5 py-0.5 rounded font-bold">PH</span>
+          </Link>
+        )}
         <Link href="/settings" onClick={() => setMobileOpen(false)}
           className={`flex items-center gap-2.5 px-2.5 py-[7px] rounded-lg text-[13px] transition-all ${
             pathname.startsWith('/settings')
-              ? 'bg-blue-50 text-[#1a3a5c] font-semibold border-l-[3px] border-[#1a3a5c]'
+              ? 'bg-green-50 text-[#0d4a1a] font-semibold border-l-[3px] border-[#C9A02E]'
               : 'text-gray-600 hover:bg-gray-50 border-l-[3px] border-transparent'
           }`}>
           <span className="text-[15px] text-gray-400 w-4 text-center">⚙</span>
           <span>Settings</span>
         </Link>
         <div className="flex items-center gap-2.5 px-2.5 py-2">
-          <div className="w-7 h-7 rounded-full bg-[#1a3a5c] flex items-center justify-center text-white text-[11px] font-bold shrink-0">{initials}</div>
+          <div className="w-7 h-7 rounded-full bg-[#0d1f0f] flex items-center justify-center text-white text-[11px] font-bold shrink-0">{initials}</div>
           <div className="flex-1 min-w-0">
             <p className="text-[12px] font-semibold text-gray-800 truncate">{user?.name ?? 'My Account'}</p>
-            <p className="text-[10px] text-gray-400 truncate">IEBC Consultant</p>
+            <p className="text-[10px] text-gray-400 truncate">New Money · IEBC</p>
           </div>
           <span className="w-2 h-2 bg-green-400 rounded-full shrink-0 border-2 border-white" />
         </div>
@@ -133,7 +141,7 @@ export default function ConsultantShell({ user, children }: { user?: User; child
             {activeItem && <span className="font-semibold text-gray-600">{activeItem.label}</span>}
           </div>
           <div className="flex-1" />
-          <Link href="/consultant/leads" className="hidden sm:flex items-center gap-1.5 text-[13px] text-[#1a3a5c] hover:bg-blue-50 px-3 py-1.5 rounded-lg font-medium transition border border-blue-100">
+          <Link href="/consultant/leads" className="hidden sm:flex items-center gap-1.5 text-[13px] text-[#0d4a1a] hover:bg-green-50 px-3 py-1.5 rounded-lg font-medium transition border border-green-200">
             ◆ Add Lead
           </Link>
           <Link href="/consultant/outreach" className="text-[11px] sm:text-[13px] bg-[#C9A02E] hover:bg-yellow-600 text-white px-2 sm:px-3 py-1.5 rounded-lg font-semibold transition shadow-sm whitespace-nowrap">

@@ -31,6 +31,7 @@ const STATUS_STYLES: Record<string, string> = {
 const fmt = (n: number) => '$' + Number(n).toLocaleString('en-US', { minimumFractionDigits: 2 })
 
 export default function InvoicesPage() {
+  const [tab, setTab] = useState<'invoices' | 'estimates'>('invoices')
   const [invoices, setInvoices] = useState<Invoice[]>([])
   const [loading, setLoading] = useState(true)
   const [filterStatus, setFilterStatus] = useState('')
@@ -147,15 +148,52 @@ export default function InvoicesPage() {
         <div className="flex items-center gap-3">
           <Link href="/accounting" className="text-gray-400 hover:text-gray-600 text-sm">← Dashboard</Link>
           <span className="text-gray-300">|</span>
-          <h1 className="font-bold text-gray-800">Invoices</h1>
+          <h1 className="font-bold text-gray-800">Invoices & Estimates</h1>
         </div>
         <div className="flex gap-2">
-          <a href="/api/export?type=invoices" className="btn-secondary text-sm py-2">Export CSV</a>
-          <Link href="/accounting/invoices/new" className="btn-primary text-sm">+ New Invoice</Link>
+          {tab === 'invoices' && (
+            <>
+              <a href="/api/export?type=invoices" className="btn-secondary text-sm py-2">Export CSV</a>
+              <Link href="/accounting/invoices/new" className="btn-primary text-sm">+ New Invoice</Link>
+            </>
+          )}
+        </div>
+      </div>
+
+      {/* Tab toggle */}
+      <div className="bg-white border-b border-gray-100 px-6">
+        <div className="flex gap-1">
+          {([['invoices', '▤ Invoices'], ['estimates', '◻ Estimates']] as const).map(([t, label]) => (
+            <button key={t} onClick={() => setTab(t)}
+              className={`px-4 py-3 text-sm font-medium border-b-2 transition-colors ${tab === t ? 'border-[#0F4C81] text-[#0F4C81]' : 'border-transparent text-gray-500 hover:text-gray-700'}`}>
+              {label}
+            </button>
+          ))}
         </div>
       </div>
 
       <div className="max-w-6xl mx-auto p-6 space-y-4">
+
+        {/* ── ESTIMATES TAB ── */}
+        {tab === 'estimates' && (
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-12 text-center">
+            <div className="w-16 h-16 bg-blue-50 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <span className="text-3xl">◻</span>
+            </div>
+            <h3 className="font-bold text-gray-800 mb-2">Estimates & Quotes</h3>
+            <p className="text-sm text-gray-500 mb-1 max-w-sm mx-auto">
+              Create professional estimates and quotes to send to clients before work begins.
+            </p>
+            <p className="text-xs text-gray-400 mb-6">Once approved, convert an estimate directly into an invoice with one click.</p>
+            <div className="flex gap-3 justify-center">
+              <button className="btn-primary text-sm opacity-50 cursor-not-allowed" disabled>+ New Estimate</button>
+              <span className="text-xs text-amber-600 bg-amber-50 border border-amber-200 px-3 py-2 rounded-lg font-medium">Coming soon</span>
+            </div>
+          </div>
+        )}
+
+        {/* ── INVOICES TAB ── */}
+        {tab === 'invoices' && (<>
         {/* Summary */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           {[
@@ -257,6 +295,7 @@ export default function InvoicesPage() {
             </table>
           )}
         </div>
+        </>)}
       </div>
     </main>
   )

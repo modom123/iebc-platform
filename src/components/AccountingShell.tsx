@@ -12,10 +12,9 @@ const NAV = [
     items: [
       { href: '/accounting',              icon: '◈', label: 'Overview',          exact: true },
       { href: '/accounting/transactions', icon: '⇄', label: 'Transactions' },
-      { href: '/accounting/invoices',     icon: '▤', label: 'Invoices' },
-      { href: '/accounting/estimates',    icon: '◻', label: 'Estimates' },
+      { href: '/accounting/invoices',     icon: '▤', label: 'Invoices & Estimates' },
       { href: '/accounting/bills',        icon: '▥', label: 'Bills & Payables' },
-      { href: '/accounting/customers',    icon: '◯', label: 'Customers' },
+      { href: '/accounting/customers',    icon: '◯', label: 'Customers & Portals' },
       { href: '/accounting/vendors',      icon: '⬡', label: 'Vendors & 1099' },
       { href: '/accounting/payroll',      icon: '◫', label: 'Payroll' },
     ],
@@ -23,16 +22,13 @@ const NAV = [
   {
     title: 'Finance',
     items: [
-      { href: '/accounting/coa',              icon: '≡', label: 'Chart of Accounts' },
-      { href: '/accounting/journal',          icon: '⊟', label: 'Journal Entries' },
-      { href: '/accounting/reconcile',        icon: '⇌', label: 'Reconciliation' },
-      { href: '/accounting/reports',          icon: '▦', label: 'Reports' },
-      { href: '/accounting/tax',              icon: '◈', label: 'Tax Center' },
-      { href: '/accounting/budgets',          icon: '◎', label: 'Budgets' },
-      { href: '/accounting/aged-receivables', icon: '⏱', label: 'Aged Receivables' },
-      { href: '/accounting/forecast',         icon: '▲', label: 'Cash Forecast' },
-      { href: '/accounting/rules',            icon: '⚡', label: 'Auto Rules' },
-      { href: '/accounting/scanner',          icon: '✦', label: 'AI Receipt Scanner' },
+      { href: '/accounting/coa',      icon: '≡', label: 'Chart of Accounts' },
+      { href: '/accounting/journal',  icon: '⊟', label: 'Journal Entries' },
+      { href: '/accounting/reconcile',icon: '⇌', label: 'Reconciliation' },
+      { href: '/accounting/reports',  icon: '▦', label: 'Reports' },
+      { href: '/accounting/tax',      icon: '◈', label: 'Tax Center' },
+      { href: '/accounting/budgets',  icon: '◎', label: 'Budgets' },
+      { href: '/accounting/scanner',  icon: '✦', label: 'AI Receipt Scanner' },
     ],
   },
   {
@@ -49,8 +45,6 @@ const NAV = [
     title: 'Connect',
     items: [
       { href: '/accounting/connect', icon: '⬡', label: 'Bank Connect' },
-      { href: '/accounting/clients', icon: '◈', label: 'Client Portals' },
-      { href: '/accounting/audit',   icon: '◉', label: 'Audit Trail' },
     ],
   },
 ]

@@ -163,6 +163,7 @@ export default function TransactionsPage() {
   const [editForm, setEditForm] = useState<typeof EMPTY_FORM & { date: string }>({ ...EMPTY_FORM, date: '' })
   const [editSaving, setEditSaving] = useState(false)
   const [editError, setEditError] = useState('')
+  const [showRules, setShowRules] = useState(false)
 
   const load = async () => {
     setLoading(true)
@@ -307,12 +308,42 @@ export default function TransactionsPage() {
           <h1 className="font-bold text-gray-800">Transactions</h1>
         </div>
         <div className="flex gap-2">
+          <button onClick={() => setShowRules(r => !r)}
+            className={`text-sm px-3 py-2 rounded-lg border font-medium transition ${showRules ? 'bg-amber-50 border-amber-300 text-amber-700' : 'border-gray-200 text-gray-600 hover:border-gray-400'}`}>
+            ⚡ Rules
+          </button>
           <a href="/api/export?type=transactions" className="btn-secondary text-sm py-2">Export CSV</a>
           <button onClick={() => setShowForm(true)} className="btn-primary text-sm">+ Add Transaction</button>
         </div>
       </div>
 
       <div className="max-w-6xl mx-auto p-6 space-y-4">
+
+        {/* Auto Rules Panel */}
+        {showRules && (
+          <div className="bg-amber-50 border border-amber-200 rounded-xl p-5 space-y-3">
+            <div className="flex justify-between items-start">
+              <div>
+                <h3 className="font-bold text-amber-900">⚡ Auto Rules</h3>
+                <p className="text-xs text-amber-700 mt-0.5">Automatically categorize transactions based on description or vendor keywords.</p>
+              </div>
+              <button onClick={() => setShowRules(false)} className="text-amber-400 hover:text-amber-700 text-lg leading-none">×</button>
+            </div>
+            <div className="bg-white rounded-lg border border-amber-100 p-4 text-center">
+              <p className="text-sm text-gray-600 mb-1">No rules configured yet.</p>
+              <p className="text-xs text-gray-400 mb-3">Rules run automatically when transactions are imported or created.</p>
+              <button className="text-sm px-4 py-2 bg-amber-600 text-white rounded-lg hover:bg-amber-700 transition opacity-50 cursor-not-allowed" disabled>
+                + Create Rule
+              </button>
+              <span className="ml-2 text-xs text-amber-600 bg-amber-50 border border-amber-200 px-2 py-1 rounded font-medium">Coming soon</span>
+            </div>
+            <div className="text-xs text-amber-700 space-y-1">
+              <p className="font-semibold">Example rules you&apos;ll be able to create:</p>
+              <p>• If description contains <span className="font-mono bg-amber-100 px-1 rounded">AWS</span> → set category to <span className="font-mono bg-amber-100 px-1 rounded">Software & Subscriptions</span></p>
+              <p>• If vendor is <span className="font-mono bg-amber-100 px-1 rounded">Stripe</span> → set type to <span className="font-mono bg-amber-100 px-1 rounded">Income</span></p>
+            </div>
+          </div>
+        )}
 
         {/* KPI Summary */}
         <div className="grid grid-cols-3 gap-4" role="region" aria-label="Financial summary">

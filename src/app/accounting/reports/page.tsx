@@ -20,6 +20,10 @@ type ReportData = {
   balanced?: boolean
 }
 
+type ARInvoice = { id: string; invoice_number: string; customer: string; due_date: string; balance: number; days: number }
+type ARBucket = { label: string; invoices: ARInvoice[]; total: number }
+type ForecastRow = { month: string; income: number; expense: number; net: number; running: number }
+
 const fmt = (n: number | string) => '$' + Number(n).toLocaleString('en-US', { minimumFractionDigits: 2 })
 
 function ReportsInner() {
@@ -28,13 +32,53 @@ function ReportsInner() {
   const [from, setFrom] = useState(new Date(new Date().getFullYear(), 0, 1).toISOString().split('T')[0])
   const [to, setTo] = useState(new Date().toISOString().split('T')[0])
   const [data, setData] = useState<ReportData | null>(null)
+  const [arBuckets, setArBuckets] = useState<ARBucket[] | null>(null)
+  const [forecastRows, setForecastRows] = useState<ForecastRow[] | null>(null)
   const [loading, setLoading] = useState(false)
 
   const load = useCallback(async () => {
     setLoading(true)
-    const res = await fetch(`/api/accounting/reports?type=${reportType}&from=${from}&to=${to}`)
-    const d = await res.json()
-    setData(d)
+    setData(null); setArBuckets(null); setForecastRows(null)
+
+    if (reportType === 'aged_receivables') {
+      const res = await fetch('/api/accounting/invoices')
+      const invs: { id: string; invoice_number: string; status: string; due_date: string; total: number; amount_paid: number; customers: { name: string } | null }[] = await res.json()
+      const today = new Date()
+      const buckets: Record<string, ARBucket> = {
+        '0–30 days':  { label: '0–30 days',  invoices: [], total: 0 },
+        '31–60 days': { label: '31–60 days', invoices: [], total: 0 },
+        '61–90 days': { label: '61–90 days', invoices: [], total: 0 },
+        '90+ days':   { label: '90+ days',   invoices: [], total: 0 },
+      }
+      for (const inv of (Array.isArray(invs) ? invs : [])) {
+        if (['paid', 'void', 'draft'].includes(inv.status)) continue
+        const balance = Number(inv.total) - Number(inv.amount_paid)
+        if (balance <= 0) continue
+        const due = new Date(inv.due_date || today)
+        const days = Math.max(0, Math.floor((today.getTime() - due.getTime()) / 86400000))
+        const key = days <= 30 ? '0–30 days' : days <= 60 ? '31–60 days' : days <= 90 ? '61–90 days' : '90+ days'
+        buckets[key].invoices.push({ id: inv.id, invoice_number: inv.invoice_number, customer: inv.customers?.name || '—', due_date: inv.due_date, balance, days })
+        buckets[key].total += balance
+      }
+      setArBuckets(Object.values(buckets))
+    } else if (reportType === 'forecast') {
+      const res = await fetch('/api/accounting/recurring')
+      const items: { type: string; amount: number; is_active: boolean }[] = await res.json()
+      const active = Array.isArray(items) ? items.filter(i => i.is_active) : []
+      const monthlyIn  = active.filter(i => i.type === 'income').reduce((s, i) => s + Number(i.amount), 0)
+      const monthlyOut = active.filter(i => i.type === 'expense').reduce((s, i) => s + Number(i.amount), 0)
+      let running = 0
+      const rows: ForecastRow[] = Array.from({ length: 12 }, (_, idx) => {
+        const d = new Date(); d.setMonth(d.getMonth() + idx)
+        const label = d.toLocaleString('en-US', { month: 'short', year: '2-digit' })
+        running += monthlyIn - monthlyOut
+        return { month: label, income: monthlyIn, expense: monthlyOut, net: monthlyIn - monthlyOut, running }
+      })
+      setForecastRows(rows)
+    } else {
+      const res = await fetch(`/api/accounting/reports?type=${reportType}&from=${from}&to=${to}`)
+      setData(await res.json())
+    }
     setLoading(false)
   }, [reportType, from, to])
 
@@ -45,7 +89,12 @@ function ReportsInner() {
     ['cashflow', 'Cash Flow'],
     ['balance_sheet', 'Balance Sheet'],
     ['trial_balance', 'Trial Balance'],
+    ['aged_receivables', 'Aged Receivables'],
+    ['forecast', 'Cash Forecast'],
+    ['audit', 'Audit Log'],
   ]
+
+  const showDateRange = !['aged_receivables', 'forecast', 'audit'].includes(reportType)
 
   return (
     <main className="min-h-screen bg-gray-50">
@@ -74,20 +123,120 @@ function ReportsInner() {
               </button>
             ))}
           </div>
-          <div className="flex gap-2 ml-auto items-center">
-            <label htmlFor="report-from" className="text-xs font-semibold text-gray-500 uppercase tracking-wide">From</label>
-            <input id="report-from" type="date" value={from} onChange={e => setFrom(e.target.value)}
-              className="border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F4C81] min-h-[36px]" />
-            <label htmlFor="report-to" className="text-xs font-semibold text-gray-500 uppercase tracking-wide">To</label>
-            <input id="report-to" type="date" value={to} onChange={e => setTo(e.target.value)}
-              className="border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F4C81] min-h-[36px]" />
-          </div>
+          {showDateRange && (
+            <div className="flex gap-2 ml-auto items-center">
+              <label htmlFor="report-from" className="text-xs font-semibold text-gray-500 uppercase tracking-wide">From</label>
+              <input id="report-from" type="date" value={from} onChange={e => setFrom(e.target.value)}
+                className="border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F4C81] min-h-[36px]" />
+              <label htmlFor="report-to" className="text-xs font-semibold text-gray-500 uppercase tracking-wide">To</label>
+              <input id="report-to" type="date" value={to} onChange={e => setTo(e.target.value)}
+                className="border border-gray-300 rounded-lg px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-[#0F4C81] min-h-[36px]" />
+            </div>
+          )}
         </div>
 
         {loading ? (
           <div className="bg-white rounded-xl border border-gray-200 p-12 flex flex-col items-center gap-3" aria-label="Generating report" aria-busy="true">
             <div className="w-8 h-8 border-2 border-[#0F4C81] border-t-transparent rounded-full animate-spin" aria-hidden="true" />
             <span className="text-sm text-gray-500 font-medium">Generating report…</span>
+          </div>
+        ) : reportType === 'aged_receivables' && arBuckets ? (
+          <div className="space-y-4">
+            <div className="grid grid-cols-4 gap-4">
+              {arBuckets.map(b => (
+                <div key={b.label} className={`bg-white p-4 rounded-xl border text-center ${b.total > 0 ? 'border-red-200' : 'border-gray-200'}`}>
+                  <p className="text-xs text-gray-500 uppercase font-semibold">{b.label}</p>
+                  <p className={`text-xl font-bold mt-1 ${b.total > 0 ? 'text-red-600' : 'text-gray-400'}`}>{fmt(b.total)}</p>
+                  <p className="text-xs text-gray-400">{b.invoices.length} invoice{b.invoices.length !== 1 ? 's' : ''}</p>
+                </div>
+              ))}
+            </div>
+            {arBuckets.filter(b => b.invoices.length > 0).map(b => (
+              <div key={b.label} className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+                <div className="px-4 py-3 border-b border-gray-100 flex justify-between">
+                  <h3 className="font-bold text-gray-800">{b.label}</h3>
+                  <span className="font-bold text-red-600">{fmt(b.total)}</span>
+                </div>
+                <table className="w-full text-sm">
+                  <thead><tr className="bg-gray-50 text-gray-500 text-xs uppercase">
+                    <th className="p-3 text-left">Invoice</th>
+                    <th className="p-3 text-left">Customer</th>
+                    <th className="p-3 text-left">Due Date</th>
+                    <th className="p-3 text-right">Days Overdue</th>
+                    <th className="p-3 text-right">Balance</th>
+                  </tr></thead>
+                  <tbody className="divide-y divide-gray-50">
+                    {b.invoices.map(inv => (
+                      <tr key={inv.id} className="hover:bg-gray-50">
+                        <td className="p-3 font-mono text-[#0F4C81]">
+                          <Link href={`/accounting/invoices/${inv.id}`} className="hover:underline">{inv.invoice_number}</Link>
+                        </td>
+                        <td className="p-3 font-medium">{inv.customer}</td>
+                        <td className="p-3 text-gray-500">{inv.due_date || '—'}</td>
+                        <td className="p-3 text-right"><span className="px-2 py-0.5 bg-red-100 text-red-700 rounded-full text-xs font-medium">{inv.days}d</span></td>
+                        <td className="p-3 text-right font-semibold text-red-600">{fmt(inv.balance)}</td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+            ))}
+            {arBuckets.every(b => b.invoices.length === 0) && (
+              <div className="bg-white rounded-xl border border-gray-200 p-10 text-center">
+                <p className="text-green-600 font-semibold">✓ No outstanding receivables</p>
+                <p className="text-sm text-gray-400 mt-1">All invoices are paid or current.</p>
+              </div>
+            )}
+          </div>
+        ) : reportType === 'forecast' && forecastRows ? (
+          <div className="space-y-4">
+            <div className="grid grid-cols-3 gap-4">
+              <div className="bg-white p-5 rounded-xl border border-gray-200 text-center">
+                <p className="text-xs text-gray-500 uppercase">Monthly Income (recurring)</p>
+                <p className="text-2xl font-bold text-green-600 mt-1">{fmt(forecastRows[0]?.income || 0)}</p>
+              </div>
+              <div className="bg-white p-5 rounded-xl border border-gray-200 text-center">
+                <p className="text-xs text-gray-500 uppercase">Monthly Expenses (recurring)</p>
+                <p className="text-2xl font-bold text-red-600 mt-1">{fmt(forecastRows[0]?.expense || 0)}</p>
+              </div>
+              <div className="bg-white p-5 rounded-xl border border-gray-200 text-center">
+                <p className="text-xs text-gray-500 uppercase">12-Month Projected Net</p>
+                <p className={`text-2xl font-bold mt-1 ${(forecastRows[11]?.running || 0) >= 0 ? 'text-green-600' : 'text-red-600'}`}>{fmt(forecastRows[11]?.running || 0)}</p>
+              </div>
+            </div>
+            <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+              <div className="px-4 py-3 border-b border-gray-100"><h3 className="font-bold text-gray-800">12-Month Forecast (based on recurring transactions)</h3></div>
+              <table className="w-full text-sm">
+                <thead><tr className="bg-gray-50 text-gray-500 text-xs uppercase">
+                  <th className="p-3 text-left">Month</th>
+                  <th className="p-3 text-right">Projected In</th>
+                  <th className="p-3 text-right">Projected Out</th>
+                  <th className="p-3 text-right">Net</th>
+                  <th className="p-3 text-right">Running Total</th>
+                </tr></thead>
+                <tbody className="divide-y divide-gray-50">
+                  {forecastRows.map(row => (
+                    <tr key={row.month} className="hover:bg-gray-50">
+                      <td className="p-3 font-medium">{row.month}</td>
+                      <td className="p-3 text-right text-green-600 font-mono">{fmt(row.income)}</td>
+                      <td className="p-3 text-right text-red-600 font-mono">{fmt(row.expense)}</td>
+                      <td className={`p-3 text-right font-semibold font-mono ${row.net >= 0 ? 'text-green-600' : 'text-red-600'}`}>{fmt(row.net)}</td>
+                      <td className={`p-3 text-right font-bold font-mono ${row.running >= 0 ? 'text-gray-800' : 'text-red-600'}`}>{fmt(row.running)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+            <p className="text-xs text-gray-400 text-center">Forecast based on active recurring transactions only. Does not include variable income or expenses.</p>
+          </div>
+        ) : reportType === 'audit' ? (
+          <div className="bg-white rounded-xl border border-gray-200 p-12 text-center">
+            <div className="w-16 h-16 bg-gray-100 rounded-2xl flex items-center justify-center mx-auto mb-4">
+              <span className="text-3xl">◉</span>
+            </div>
+            <h3 className="font-bold text-gray-800 mb-2">Audit Log</h3>
+            <p className="text-sm text-gray-500 mb-1 max-w-sm mx-auto">Track all changes made to transactions, invoices, and financial records.</p>
+            <span className="text-xs text-amber-600 bg-amber-50 border border-amber-200 px-3 py-2 rounded-lg font-medium inline-block mt-3">Coming soon</span>
           </div>
         ) : data && (
 

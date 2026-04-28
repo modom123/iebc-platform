@@ -43,7 +43,7 @@ const NAV: { title: string; items: NavItem[] }[] = [
       { href: '/accounting/reconcile',    icon: '⇌', label: 'Reconciliation',                    minPlan: 'gold' },
       { href: '/accounting/reports',      icon: '▦', label: 'Reports',                           minPlan: 'gold' },
       { href: '/accounting/forecast',     icon: '🔮', label: 'Cash Flow Forecast',               minPlan: 'gold' },
-      { href: '/accounting/scanner',      icon: '✦', label: 'AI Receipt Scanner',                minPlan: 'gold' },
+      { href: '/accounting/scanner',      icon: '✦', label: 'Document Scanner',                  minPlan: 'gold' },
       { href: '/accounting/tracker',      icon: '▷', label: 'Mileage & Time',                   minPlan: 'gold' },
       { href: '/accounting/coa',          icon: '≡', label: 'Chart of Accounts',                 minPlan: 'platinum' },
       { href: '/accounting/journal',      icon: '⊟', label: 'Journal Entries',                   minPlan: 'platinum' },
@@ -135,42 +135,19 @@ export default function AccountingShell({
       {/* Nav */}
       <nav className="flex-1 overflow-y-auto py-3 space-y-3 px-2">
         {NAV.map(({ title, items }) => {
-          const visibleItems = items.filter(item => {
-            // Always show items the user can access; also show locked items so they know what exists
-            return true
-          })
+          // Only render items the current plan can access
+          const accessible = items.filter(({ href }) => hasAccess(plan, href))
+          // Skip the entire section if nothing in it is accessible
+          if (accessible.length === 0) return null
           return (
             <div key={title}>
               <p className="px-2 mb-1 text-[10px] font-bold text-gray-400 uppercase tracking-[0.12em]">{title}</p>
               <div className="space-y-px">
-                {visibleItems.map(({ href, icon, label, exact, minPlan }) => {
+                {accessible.map(({ href, icon, label, exact }) => {
                   const isActive = active(href, exact)
-                  const canAccess = hasAccess(plan, href)
-
-                  if (!canAccess) {
-                    const needed = PLAN_LABELS[minPlan]
-                    const neededPrice = PLAN_PRICES[minPlan]
-                    return (
-                      <Link
-                        key={label}
-                        href={`/accounting/checkout?plan=${minPlan}&upgrade=1`}
-                        className="flex items-center gap-2.5 px-2.5 py-[7px] rounded-lg text-[13px] text-gray-300 hover:bg-gray-50 hover:text-gray-400 border-l-[3px] border-transparent transition-all group"
-                        title={`Requires ${needed} plan — ${neededPrice}/mo`}
-                      >
-                        <span className="text-[15px] leading-none w-4 text-center shrink-0 opacity-30">{icon}</span>
-                        <span className="truncate flex-1 line-through">{label}</span>
-                        <span className={`text-[9px] font-bold px-1.5 py-0.5 rounded uppercase tracking-wide shrink-0 ${
-                          minPlan === 'gold' ? 'bg-amber-100 text-amber-600' : 'bg-blue-100 text-blue-600'
-                        }`}>
-                          {needed}
-                        </span>
-                      </Link>
-                    )
-                  }
-
                   return (
                     <Link
-                      key={label}
+                      key={href}
                       href={href}
                       onClick={() => setMobileOpen(false)}
                       className={`flex items-center gap-2.5 px-2.5 py-[7px] rounded-lg text-[13px] transition-all duration-100 ${

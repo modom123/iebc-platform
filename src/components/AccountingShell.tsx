@@ -241,14 +241,6 @@ export default function AccountingShell({
             {activeItem && <span className="font-semibold text-gray-600">{activeItem.label}</span>}
           </div>
           <div className="flex-1" />
-          {plan !== 'platinum' && (
-            <Link
-              href={`/accounting/checkout?plan=${upgradeTo}&upgrade=1`}
-              className="text-[11px] sm:text-[13px] bg-[#C8902A] hover:bg-[#b07820] text-white px-2 sm:px-3 py-1.5 rounded-lg font-semibold transition shadow-sm whitespace-nowrap min-h-[36px] inline-flex items-center"
-            >
-              ★ Upgrade to {PLAN_LABELS[upgradeTo]}
-            </Link>
-          )}
         </header>
 
         <div className="flex-1 overflow-y-auto">{children}</div>

@@ -1,6 +1,7 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextResponse } from 'next/server'
 import type { NextRequest } from 'next/server'
+import { hasAccess, requiredPlanFor, type Plan } from '@/lib/plan-features'
 
 // Subdomain → path prefix mapping
 // e.g. app.iebusinessconsultants.com  → rewrite to /accounting
@@ -120,19 +121,27 @@ export async function middleware(request: NextRequest) {
       return NextResponse.redirect(loginUrl)
     }
 
-    // ── Subscription gate for /accounting ────────────────────────────
+    // ── Subscription + plan gate for /accounting ─────────────────────
     // Require an active/trialing/past_due subscription for all accounting
     // pages. Checkout itself is already exempted above via publicWithinProtected.
     if (effectivePathname.startsWith('/accounting') && session) {
       try {
         const { data: sub } = await supabase
           .from('subscriptions')
-          .select('status')
+          .select('status, plan')
           .eq('user_id', session.user.id)
           .single()
         const ACTIVE_STATUSES = ['active', 'trialing', 'past_due']
         if (!sub || !ACTIVE_STATUSES.includes(sub.status)) {
           return NextResponse.redirect(new URL('/accounting/checkout?required=1', request.url))
+        }
+        // Plan-level route gating
+        const plan = (sub.plan ?? 'silver') as Plan
+        if (!hasAccess(plan, effectivePathname)) {
+          const needed = requiredPlanFor(effectivePathname)
+          return NextResponse.redirect(
+            new URL(`/accounting/checkout?plan=${needed}&upgrade=1`, request.url)
+          )
         }
       } catch {
         // Subscription check failed — fail open so a DB hiccup doesn't lock users out
